@@ -213,7 +213,7 @@ function FAQAccordion() {
     },
     {
       q: "Is the Smallcase platform SEBI registered?",
-      a: "Yes. Smallcase Technologies is a SEBI-registered Investment Adviser. The model portfolios themselves are curated and advised by Raghuvir Consultants, a SEBI-registered Research Analyst (Reg No. INH-0000365254)."
+      a: "Yes. Smallcase Technologies is a SEBI-registered Investment Adviser. The model portfolios themselves are curated and advised by Raghuvir Consultants, a SEBI-registered Research Analyst (Reg No. INH-XXXXXXXXXX)."
     },
     {
       q: "Who executes the trades and acts as my broker?",

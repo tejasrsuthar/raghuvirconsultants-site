@@ -119,7 +119,7 @@ export default function Footer() {
 
           {/* Bottom regulatory bar */}
           <div className="pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-[10px] text-gray-400 uppercase tracking-widest">© 2026 RAGHUVIR CONSULTANTS · SEBI RA REG. NO. INH-0000365254 · ALL RIGHTS RESERVED.</p>
+            <p className="text-[10px] text-gray-400 uppercase tracking-widest">© 2026 RAGHUVIR CONSULTANTS · SEBI RA REG. NO. INH-XXXXXXXXXX · ALL RIGHTS RESERVED.</p>
             <p className="text-[10px] text-gray-400 uppercase tracking-widest">INVESTMENT IS SUBJECT TO MARKET RISKS. READ ALL DOCUMENTS CAREFULLY.</p>
           </div>
         </div>

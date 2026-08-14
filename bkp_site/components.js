@@ -129,7 +129,7 @@ function renderFooter() {
 
             <!-- Bottom bar -->
             <div class="pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4">
-                <p class="text-[10px] text-gray-400 uppercase tracking-widest">© 2026 Raghuvir Consultants · SEBI RA Reg. No. INH-0000365254 · All Rights Reserved.</p>
+                <p class="text-[10px] text-gray-400 uppercase tracking-widest">© 2026 Raghuvir Consultants · SEBI RA Reg. No. INH-XXXXXXXXXX · All Rights Reserved.</p>
                 <p class="text-[10px] text-gray-400 uppercase tracking-widest">Investment is subject to market risks. Read all documents carefully.</p>
             </div>
         </div>

@@ -15,7 +15,7 @@ export default function Terms() {
         <div className="max-w-3xl mx-auto text-textmuted leading-relaxed space-y-6">
           <h2 className="text-2xl font-bold text-forest">SEBI Disclosure</h2>
           <p>
-            Raghuvir Consultants is a SEBI Registered Research Analyst (Reg No. INH-0000365254). Any information provided on this platform is solely for informational purposes and does not constitute explicit trade execution advice.
+            Raghuvir Consultants is a SEBI Registered Research Analyst (Reg No. INH-XXXXXXXXXX). Any information provided on this platform is solely for informational purposes and does not constitute explicit trade execution advice.
           </p>
           <h2 className="text-2xl font-bold text-forest">Market Risk</h2>
           <p>

@@ -14,7 +14,7 @@ export default function About() {
             </span>
           </h1>
           <p className="text-xl text-textmuted max-w-2xl mx-auto leading-relaxed font-medium">
-            SEBI Registered Research Analyst (Reg. No. INH-0000365254) dedicated to publishing independent, data-driven research for investors who demand more than opinion.
+            SEBI Registered Research Analyst (Reg. No. INH-XXXXXXXXXX) dedicated to publishing independent, data-driven research for investors who demand more than opinion.
           </p>
         </div>
       </header>

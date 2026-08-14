@@ -9,7 +9,7 @@ export default function Home() {
         <div className="max-w-4xl mx-auto text-center relative z-10">
           <div className="inline-flex items-center gap-2 bg-[#FAF9F6] border border-bordercolor rounded-full px-4 py-2 mb-8 shadow-sm">
             <span className="w-2 h-2 rounded-full bg-forest animate-pulse"></span>
-            <span className="text-xs font-bold uppercase tracking-[0.2em] text-forest/70">SEBI Registered Research Analyst · INH-0000365254</span>
+            <span className="text-xs font-bold uppercase tracking-[0.2em] text-forest/70">SEBI Registered Research Analyst · INH-XXXXXXXXXX</span>
           </div>
 
           <h1 className="mb-6 text-center">

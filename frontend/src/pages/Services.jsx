@@ -18,7 +18,7 @@ export default function Services() {
       {/* Hero */}
       <header className="pt-40 pb-20 px-6 border-b border-bordercolor grid-overlay">
         <div className="max-w-4xl mx-auto text-center">
-          <span className="text-xs font-bold uppercase tracking-[0.3em] text-textmuted mb-6 block">SEBI Registered Research Analyst · INH-0000365254</span>
+          <span className="text-xs font-bold uppercase tracking-[0.3em] text-textmuted mb-6 block">SEBI Registered Research Analyst · INH-XXXXXXXXXX</span>
           <h1 className="mb-10 text-center">
             <span className="block text-3xl md:text-4xl text-textmuted mb-3 font-semibold">Our Research</span>
             <span className="text-6xl md:text-[90px] block text-forest leading-none font-extrabold tracking-tight my-2">
