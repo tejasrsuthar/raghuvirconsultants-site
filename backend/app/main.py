@@ -10,7 +10,7 @@ from app.core.security import get_password_hash
 import os
 
 # ── Allowed origins (tightened from "*" for production) ───────────────────────
-ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "http://localhost,http://localhost:5173,http://localhost:5174").split(",")
+ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "http://localhost,http://localhost:5173,http://localhost:5174,http://stock-analytics.local,https://stock-analytics.raghuvirconsultants.in,http://raghuvircons.local").split(",")
 
 # ── Security headers middleware ────────────────────────────────────────────────
 class SecurityHeadersMiddleware(BaseHTTPMiddleware):
@@ -32,7 +32,7 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
 app = FastAPI(
     title="Raghuvir Consultants API",
     description="Enterprise Advisory System Backend",
-    version="2.9.0"
+    version="2.9.1"
 )
 
 # ── Middleware stack (order matters — outermost first) ─────────────────────────
@@ -41,11 +41,15 @@ app = FastAPI(
 app.add_middleware(
     TrustedHostMiddleware,
     allowed_hosts=[
+        "stock-analytics.raghuvirconsultants.in",
+        "stock-analytics.local",
         "api.raghuvirconsultants.in",
+        "raghuvircons.local",
         "localhost",
         "127.0.0.1",
         "0.0.0.0",
-        "*",  # Loosen during local dev; restrict to api.raghuvirconsultants.in in prod
+        "backend",
+        "*",  # Loosen during local dev
     ]
 )
 
@@ -102,11 +106,11 @@ def seed_admin():
 
 @app.get("/")
 def read_root():
-    return {"message": "Raghuvir Consultants API is running", "version": "2.9.0"}
+    return {"message": "Raghuvir Consultants API is running", "version": "2.9.1"}
 
 @app.get("/health")
 @app.get("/api/health")
 @app.get("/api/system/health")
 def health_check():
-    return {"status": "ok", "version": "2.9.0"}
+    return {"status": "ok", "version": "2.9.1"}
 

@@ -8,6 +8,12 @@ export default defineConfig({
     host: true,
     port: 5174,
     strictPort: true,
-    allowedHosts: ['app.raghuvircons.local', 'app.raghuvirconsultants.in', 'localhost', '127.0.0.1']
+    allowedHosts: ['stock-analytics.local', 'app.raghuvircons.local', 'app.raghuvirconsultants.in', 'localhost', '127.0.0.1'],
+    proxy: {
+      '/api': {
+        target: 'http://localhost:8000',
+        changeOrigin: true,
+      }
+    }
   }
 })

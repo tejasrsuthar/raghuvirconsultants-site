@@ -1,0 +1,11 @@
+# Local Caddy Reverse Proxy Configuration
+# Serves http://stock-analytics.local with relative /api/ path proxying to FastAPI backend
+
+stock-analytics.local:80 {
+    handle /api/* {
+        reverse_proxy localhost:8000
+    }
+    handle {
+        reverse_proxy localhost:5173
+    }
+}
