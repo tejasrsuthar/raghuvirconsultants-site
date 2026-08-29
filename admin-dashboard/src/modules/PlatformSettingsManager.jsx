@@ -65,65 +65,86 @@ export default function PlatformSettingsManager() {
   };
 
   return (
-    <div className="bg-white border border-gray-200 rounded-3xl p-6 shadow-2xs w-full max-w-4xl mx-auto">
-      <div className="flex justify-between items-center mb-6 border-b border-gray-100 pb-4">
-        <div className="p-3 bg-gray-100 rounded-2xl text-gray-800">
-          <Settings className="w-6 h-6" />
-        </div>
-        <div>
-          <h2 className="text-xl font-bold text-gray-900">Platform-Wide Global Settings</h2>
-          <p className="text-xs text-gray-500 mt-0.5">Configure system defaults, pagination parameters, and security policies</p>
+    <div className="space-y-6 w-full font-sans">
+      {/* Top Banner Card */}
+      <div className="bg-white border border-gray-200 rounded-3xl p-6 sm:p-8 shadow-2xs w-full flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex items-center gap-4">
+          <div className="p-3.5 bg-gray-100 rounded-2xl text-gray-800 shrink-0">
+            <Settings className="w-6 h-6 text-gray-700" />
+          </div>
+          <div>
+            <h2 className="text-xl sm:text-2xl font-extrabold text-gray-900 tracking-tight">Platform-Wide Global Settings</h2>
+            <p className="text-xs text-gray-500 mt-1">Configure system defaults, pagination parameters, and security policies</p>
+          </div>
         </div>
       </div>
 
       {saved && (
-        <div className="p-4 mb-6 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-2xl text-xs font-bold flex items-center gap-2">
-          <CheckCircle className="w-4 h-4" /> System settings updated successfully!
+        <div className="p-4 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-2xl text-xs font-bold flex items-center gap-2 shadow-2xs">
+          <CheckCircle2 className="w-4 h-4 text-emerald-600" /> System settings updated and persisted successfully!
         </div>
       )}
 
-      {error && <div className="p-4 mb-6 bg-red-50 text-red-600 border border-red-200 rounded-2xl text-xs font-bold">{error}</div>}
+      {error && <div className="p-4 bg-red-50 text-red-600 border border-red-200 rounded-2xl text-xs font-bold">{error}</div>}
 
       {loading ? (
-        <div className="text-center py-8 text-xs text-gray-500">Loading settings...</div>
+        <div className="text-center py-12 text-xs text-gray-500 bg-white border border-gray-200 rounded-3xl">Loading platform settings...</div>
       ) : (
         <form onSubmit={handleSave} className="space-y-6">
-          <div>
-            <label className="block text-xs font-bold text-gray-700 uppercase mb-1">
-              Default Pagination Page Size (50,000+ Scaled Records)
-            </label>
-            <input
-              type="number"
-              min="5"
-              max="100"
-              required
-              value={settings.default_page_size}
-              onChange={(e) => setSettings({ ...settings, default_page_size: e.target.value })}
-              className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs font-semibold"
-            />
-            <p className="text-[10px] text-gray-400 mt-1">Default number of rows returned per page across all CRUD modules</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Pagination Configuration Card */}
+            <div className="bg-white border border-gray-200 rounded-3xl p-6 sm:p-8 shadow-2xs space-y-4">
+              <div className="border-b border-gray-100 pb-3">
+                <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider">Database & Pagination Tuning</h3>
+                <p className="text-xs text-gray-500 mt-0.5">Control row limits for ultra-fast response times across 50k+ records</p>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-gray-700 uppercase mb-1.5">
+                  Default Pagination Page Size
+                </label>
+                <input
+                  type="number"
+                  min="5"
+                  max="100"
+                  required
+                  value={settings.default_page_size}
+                  onChange={(e) => setSettings({ ...settings, default_page_size: e.target.value })}
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-gray-400"
+                />
+                <p className="text-[11px] text-gray-400 mt-1.5">Default number of rows returned per page across all CRUD modules</p>
+              </div>
+            </div>
+
+            {/* Password Security Policy Card */}
+            <div className="bg-white border border-gray-200 rounded-3xl p-6 sm:p-8 shadow-2xs space-y-4">
+              <div className="border-b border-gray-100 pb-3">
+                <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider">Authentication Security Policy</h3>
+                <p className="text-xs text-gray-500 mt-0.5">Define password complexity standards for public and administrative accounts</p>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-gray-700 uppercase mb-1.5">
+                  Minimum Password Length Policy
+                </label>
+                <input
+                  type="number"
+                  min="7"
+                  max="32"
+                  required
+                  value={settings.min_password_length}
+                  onChange={(e) => setSettings({ ...settings, min_password_length: e.target.value })}
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-gray-400"
+                />
+                <p className="text-[11px] text-gray-400 mt-1.5">Minimum character length required (enforces special character from !@#$%)</p>
+              </div>
+            </div>
           </div>
 
-          <div>
-            <label className="block text-xs font-bold text-gray-700 uppercase mb-1">
-              Minimum Password Length Policy
-            </label>
-            <input
-              type="number"
-              min="7"
-              max="32"
-              required
-              value={settings.min_password_length}
-              onChange={(e) => setSettings({ ...settings, min_password_length: e.target.value })}
-              className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs font-semibold"
-            />
-            <p className="text-[10px] text-gray-400 mt-1">Minimum character length required (must include special character from !@#$%)</p>
-          </div>
-
-          <div className="pt-4">
+          <div className="bg-white border border-gray-200 rounded-3xl p-6 shadow-2xs flex items-center justify-end">
             <button
               type="submit"
-              className="bg-gray-900 hover:bg-black text-white px-6 py-3 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 shadow-sm"
+              className="bg-gray-900 hover:bg-black text-white px-8 py-3.5 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 shadow-sm transition-transform active:scale-95 cursor-pointer"
             >
               <Save className="w-4 h-4" /> Save System Settings
             </button>
