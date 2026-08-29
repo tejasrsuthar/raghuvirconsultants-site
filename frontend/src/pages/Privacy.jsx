@@ -1,14 +1,18 @@
 import React from 'react';
+import Breadcrumb from '../components/Breadcrumb';
 
 export default function Privacy() {
   return (
     <div className="pt-20">
-      <header className="pt-40 pb-20 px-6 border-b border-bordercolor grid-overlay">
-        <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-5xl font-extrabold text-forest tracking-tight leading-none mb-6">Privacy Policy</h1>
-          <p className="text-xl text-textmuted max-w-2xl mx-auto leading-relaxed">
-            Your privacy matters to us. Learn how we handle information.
-          </p>
+      <header className="pt-32 pb-20 px-6 border-b border-bordercolor grid-overlay">
+        <div className="max-w-4xl mx-auto">
+          <Breadcrumb items={[{ label: 'Privacy Policy' }]} />
+          <div className="text-center">
+            <h1 className="text-5xl font-extrabold text-forest tracking-tight leading-none mb-6">Privacy Policy</h1>
+            <p className="text-xl text-textmuted max-w-2xl mx-auto leading-relaxed">
+              Your privacy matters to us. Learn how we handle information.
+            </p>
+          </div>
         </div>
       </header>
       <section className="py-20 px-6 bg-sand">

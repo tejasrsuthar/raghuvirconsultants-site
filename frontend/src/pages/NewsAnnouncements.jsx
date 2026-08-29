@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Newspaper, ExternalLink, Calendar, RefreshCw, ChevronRight } from 'lucide-react';
+import { Newspaper, ExternalLink, Calendar, RefreshCw } from 'lucide-react';
+import Breadcrumb from '../components/Breadcrumb';
 import { API_BASE_URL } from '../config/apiConfig';
 
 export default function NewsAnnouncements() {
@@ -38,13 +38,12 @@ export default function NewsAnnouncements() {
   return (
     <div className="pt-32 pb-24 px-6 max-w-5xl mx-auto min-h-[90vh]">
       {/* Breadcrumb Navigation */}
-      <div className="flex items-center gap-2 text-xs font-semibold text-textmuted mb-4">
-        <Link to="/investor" className="hover:text-forest transition-colors">
-          Investor Dashboard
-        </Link>
-        <ChevronRight className="w-3.5 h-3.5 text-textmuted/60" />
-        <span className="text-forest font-bold">News & Announcements</span>
-      </div>
+      <Breadcrumb
+        items={[
+          { label: 'Investor Dashboard', to: '/investor' },
+          { label: 'News & Announcements' }
+        ]}
+      />
 
       <div className="flex justify-between items-center mb-8 border-b border-bordercolor pb-6">
         <div>

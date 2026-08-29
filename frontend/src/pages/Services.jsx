@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import Breadcrumb from '../components/Breadcrumb';
 
 export default function Services() {
   const navigate = useNavigate();
@@ -16,18 +17,21 @@ export default function Services() {
   return (
     <div className="pt-20">
       {/* Hero */}
-      <header className="pt-40 pb-20 px-6 border-b border-bordercolor grid-overlay">
-        <div className="max-w-4xl mx-auto text-center">
-          <span className="text-xs font-bold uppercase tracking-[0.3em] text-textmuted mb-6 block">SEBI Registered Research Analyst · INH-XXXXXXXXXX</span>
-          <h1 className="mb-10 text-center">
-            <span className="block text-3xl md:text-4xl text-textmuted mb-3 font-semibold">Our Research</span>
-            <span className="text-6xl md:text-[90px] block text-forest leading-none font-extrabold tracking-tight my-2">
-              <span className="text-underline-highlight">SERVICES</span>
-            </span>
-          </h1>
-          <p className="text-xl text-textmuted max-w-2xl mx-auto leading-relaxed font-medium">
-            As a SEBI-registered Research Analyst, we publish independent, structured research reports across equities, quantitative strategies, and macro themes — free from commissions or distribution conflicts.
-          </p>
+      <header className="pt-32 pb-20 px-6 border-b border-bordercolor grid-overlay">
+        <div className="max-w-4xl mx-auto">
+          <Breadcrumb items={[{ label: 'Services' }]} />
+          <div className="text-center">
+            <span className="text-xs font-bold uppercase tracking-[0.3em] text-textmuted mb-6 block">SEBI Registered Research Analyst · INH-XXXXXXXXXX</span>
+            <h1 className="mb-10 text-center">
+              <span className="block text-3xl md:text-4xl text-textmuted mb-3 font-semibold">Our Research</span>
+              <span className="text-6xl md:text-[90px] block text-forest leading-none font-extrabold tracking-tight my-2">
+                <span className="text-underline-highlight">SERVICES</span>
+              </span>
+            </h1>
+            <p className="text-xl text-textmuted max-w-2xl mx-auto leading-relaxed font-medium">
+              As a SEBI-registered Research Analyst, we publish independent, structured research reports across equities, quantitative strategies, and macro themes — free from commissions or distribution conflicts.
+            </p>
+          </div>
         </div>
       </header>
 

@@ -1,22 +1,26 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import Breadcrumb from '../components/Breadcrumb';
 
 export default function Smallcase() {
   return (
     <div className="pt-20">
       {/* Hero */}
-      <header className="pt-40 pb-20 px-6 border-b border-bordercolor grid-overlay">
-        <div className="max-w-4xl mx-auto text-center">
-          <span className="text-xs font-bold uppercase tracking-[0.3em] text-textmuted mb-6 block">Research-Backed Strategies</span>
-          <h1 className="mb-10 text-center">
-            <span className="block text-3xl md:text-4xl text-textmuted mb-3 font-semibold">Explore Our</span>
-            <span className="text-6xl md:text-[90px] block text-forest leading-none font-extrabold tracking-tight my-2">
-              <span className="text-underline-highlight">SMALLCASES</span>
-            </span>
-          </h1>
-          <p className="text-xl text-textmuted max-w-2xl mx-auto leading-relaxed font-medium">
-            Our quantitative research, translated into directly investable strategies — available through Smallcase with a single click from your own brokerage account while maintaining full control of your assets.
-          </p>
+      <header className="pt-32 pb-20 px-6 border-b border-bordercolor grid-overlay">
+        <div className="max-w-4xl mx-auto">
+          <Breadcrumb items={[{ label: 'Smallcase Strategies' }]} />
+          <div className="text-center">
+            <span className="text-xs font-bold uppercase tracking-[0.3em] text-textmuted mb-6 block">Research-Backed Strategies</span>
+            <h1 className="mb-10 text-center">
+              <span className="block text-3xl md:text-4xl text-textmuted mb-3 font-semibold">Explore Our</span>
+              <span className="text-6xl md:text-[90px] block text-forest leading-none font-extrabold tracking-tight my-2">
+                <span className="text-underline-highlight">SMALLCASES</span>
+              </span>
+            </h1>
+            <p className="text-xl text-textmuted max-w-2xl mx-auto leading-relaxed font-medium">
+              Our quantitative research, translated into directly investable strategies — available through Smallcase with a single click from your own brokerage account while maintaining full control of your assets.
+            </p>
+          </div>
         </div>
       </header>
 

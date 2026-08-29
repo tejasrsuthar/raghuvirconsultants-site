@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Settings, Sliders, Shield, ArrowLeft, ChevronRight } from 'lucide-react';
+import { Settings, Sliders, Shield, ArrowLeft } from 'lucide-react';
 import { z } from 'zod';
+import Breadcrumb from '../components/Breadcrumb';
 import { API_BASE_URL } from '../config/apiConfig';
 
 const profileSchema = z.object({
@@ -91,13 +92,12 @@ export default function InvestorSettings() {
   return (
     <div className="pt-32 pb-24 px-6 max-w-6xl mx-auto min-h-[90vh]">
       {/* Breadcrumb Navigation */}
-      <div className="flex items-center gap-2 text-xs font-semibold text-textmuted mb-4">
-        <Link to="/investor" className="hover:text-forest transition-colors">
-          Investor Dashboard
-        </Link>
-        <ChevronRight className="w-3.5 h-3.5 text-textmuted/60" />
-        <span className="text-forest font-bold">Account Settings</span>
-      </div>
+      <Breadcrumb
+        items={[
+          { label: 'Investor Dashboard', to: '/investor' },
+          { label: 'Account Settings' }
+        ]}
+      />
 
       {/* Header */}
       <div className="flex justify-between items-center border-b border-bordercolor pb-6 mb-8">

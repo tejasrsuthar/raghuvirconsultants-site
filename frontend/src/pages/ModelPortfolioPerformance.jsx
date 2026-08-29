@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { TrendingUp, ShieldCheck, Award, Info, ChevronRight } from 'lucide-react';
+import { TrendingUp, ShieldCheck, Award, Info } from 'lucide-react';
+import Breadcrumb from '../components/Breadcrumb';
 
 export default function ModelPortfolioPerformance() {
   const [timeframe, setTimeframe] = useState('1Y');
@@ -17,13 +18,12 @@ export default function ModelPortfolioPerformance() {
   return (
     <div className="pt-32 pb-24 px-6 max-w-6xl mx-auto min-h-[90vh]">
       {/* Breadcrumb Navigation */}
-      <div className="flex items-center gap-2 text-xs font-semibold text-textmuted mb-4">
-        <Link to="/investor" className="hover:text-forest transition-colors">
-          Investor Dashboard
-        </Link>
-        <ChevronRight className="w-3.5 h-3.5 text-textmuted/60" />
-        <span className="text-forest font-bold">Model Portfolio Performance</span>
-      </div>
+      <Breadcrumb
+        items={[
+          { label: 'Investor Dashboard', to: '/investor' },
+          { label: 'Model Portfolio Performance' }
+        ]}
+      />
 
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 border-b border-bordercolor pb-6 gap-4">

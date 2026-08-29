@@ -7,6 +7,7 @@ import {
   MapPin, ChevronDown, ChevronUp, ShieldCheck, Sparkles, CheckCircle2 
 } from 'lucide-react';
 import { API_BASE_URL } from '../config/apiConfig';
+import Breadcrumb from '../components/Breadcrumb';
 
 const signupSchema = z.object({
   username: z.string().min(3, { message: "Username must be at least 3 characters long." }),
@@ -228,7 +229,10 @@ export default function Signup() {
   };
 
   return (
-    <div className="pt-28 pb-24 px-4 flex justify-center items-center min-h-[90vh]">
+    <div className="pt-28 pb-24 px-4 flex flex-col justify-center items-center min-h-[90vh]">
+      <div className="w-full max-w-xl mb-4">
+        <Breadcrumb items={[{ label: 'Investor Registration' }]} />
+      </div>
       <div className="bg-white border border-bordercolor p-8 sm:p-10 rounded-3xl w-full max-w-xl shadow-sm">
         <div className="text-center mb-6">
           <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-800 border border-emerald-200/80 rounded-full text-xs font-bold uppercase tracking-wider mb-2.5">

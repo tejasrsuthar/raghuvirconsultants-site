@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Breadcrumb from '../components/Breadcrumb';
 
 export default function Contact() {
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
@@ -13,18 +14,21 @@ export default function Contact() {
 
   return (
     <div className="pt-20">
-      <header className="pt-40 pb-20 px-6 border-b border-bordercolor grid-overlay">
-        <div className="max-w-4xl mx-auto text-center">
-          <span className="text-xs font-bold uppercase tracking-[0.3em] text-textmuted mb-6 block">Research Enquiries</span>
-          <h1 className="mb-10 text-center">
-            <span className="block text-3xl md:text-4xl text-textmuted mb-3 font-semibold">Get in</span>
-            <span className="text-6xl md:text-[90px] block text-forest leading-none font-extrabold tracking-tight my-2">
-              <span className="text-underline-highlight">TOUCH</span>
-            </span>
-          </h1>
-          <p className="text-xl text-textmuted max-w-2xl mx-auto leading-relaxed font-medium">
-            Interested in our research? Reach out to subscribe or learn more about our coverage.
-          </p>
+      <header className="pt-32 pb-20 px-6 border-b border-bordercolor grid-overlay">
+        <div className="max-w-4xl mx-auto">
+          <Breadcrumb items={[{ label: 'Contact Us' }]} />
+          <div className="text-center">
+            <span className="text-xs font-bold uppercase tracking-[0.3em] text-textmuted mb-6 block">Research Enquiries</span>
+            <h1 className="mb-10 text-center">
+              <span className="block text-3xl md:text-4xl text-textmuted mb-3 font-semibold">Get in</span>
+              <span className="text-6xl md:text-[90px] block text-forest leading-none font-extrabold tracking-tight my-2">
+                <span className="text-underline-highlight">TOUCH</span>
+              </span>
+            </h1>
+            <p className="text-xl text-textmuted max-w-2xl mx-auto leading-relaxed font-medium">
+              Interested in our research? Reach out to subscribe or learn more about our coverage.
+            </p>
+          </div>
         </div>
       </header>
 

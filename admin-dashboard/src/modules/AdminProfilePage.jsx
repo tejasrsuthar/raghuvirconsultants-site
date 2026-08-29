@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-hot-toast';
-import { User, Mail, Lock, Save, CheckCircle2, ShieldCheck, ArrowLeft } from 'lucide-react';
 import { API_BASE_URL } from '../config/apiConfig';
+import AdminBreadcrumb from '../components/AdminBreadcrumb';
 
 export default function AdminProfilePage({ onBack }) {
   const [formData, setFormData] = useState({
@@ -70,14 +70,14 @@ export default function AdminProfilePage({ onBack }) {
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-6 border-b border-gray-200">
         <div>
-          {onBack && (
-            <button
-              onClick={onBack}
-              className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-gray-500 hover:text-gray-900 transition-colors mb-2"
-            >
-              <ArrowLeft className="w-4 h-4" /> Back to Overview
-            </button>
-          )}
+          <div className="mb-3">
+            <AdminBreadcrumb
+              onNavigateHome={onBack}
+              items={[
+                { label: 'Admin Profile Settings' }
+              ]}
+            />
+          </div>
           <h2 className="text-2xl font-extrabold text-gray-900 tracking-tight flex items-center gap-2.5">
             <ShieldCheck className="w-6 h-6 text-gray-700" />
             Edit Admin Profile Settings

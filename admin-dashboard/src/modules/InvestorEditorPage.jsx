@@ -6,6 +6,7 @@ import {
   Building, AlertCircle, Shield, Sparkles, UserCheck, UserPlus, Key
 } from 'lucide-react';
 import { API_BASE_URL } from '../config/apiConfig';
+import AdminBreadcrumb from '../components/AdminBreadcrumb';
 
 export default function InvestorEditorPage({ investor, onBack, onSaveSuccess }) {
   const isNew = !investor || !investor.id;
@@ -160,13 +161,15 @@ export default function InvestorEditorPage({ investor, onBack, onSaveSuccess }) 
       <div className="bg-white border border-gray-200 rounded-3xl p-6 sm:p-8 shadow-2xs">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <button
-              type="button"
-              onClick={onBack}
-              className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-gray-500 hover:text-gray-900 transition-colors mb-2"
-            >
-              <ArrowLeft className="w-4 h-4" /> Back to Investor Directory
-            </button>
+            <div className="mb-3">
+              <AdminBreadcrumb
+                onNavigateHome={onBack}
+                items={[
+                  { label: 'Investor Directory', onClick: onBack },
+                  { label: isNew ? 'Create New Investor' : `Edit: ${formData.full_name || formData.username}` }
+                ]}
+              />
+            </div>
             <h2 className="text-2xl font-extrabold text-gray-900 tracking-tight flex items-center gap-2.5">
               {isNew ? <UserPlus className="w-6 h-6 text-indigo-600" /> : <UserCheck className="w-6 h-6 text-indigo-600" />}
               {isNew ? 'Create New Investor Account' : 'Edit Investor Profile'}

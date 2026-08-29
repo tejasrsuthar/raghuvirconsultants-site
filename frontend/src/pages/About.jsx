@@ -1,12 +1,15 @@
 import React from 'react';
+import Breadcrumb from '../components/Breadcrumb';
 
 export default function About() {
   return (
     <div className="pt-20">
       {/* Hero Section */}
-      <header className="pt-40 pb-20 px-6 border-b border-bordercolor grid-overlay">
-        <div className="max-w-4xl mx-auto text-center">
-          <span className="text-xs font-bold uppercase tracking-[0.3em] text-textmuted mb-6 block">Founder &amp; Lead Research Analyst</span>
+      <header className="pt-32 pb-20 px-6 border-b border-bordercolor grid-overlay">
+        <div className="max-w-4xl mx-auto">
+          <Breadcrumb items={[{ label: 'About Us' }]} />
+          <div className="text-center">
+            <span className="text-xs font-bold uppercase tracking-[0.3em] text-textmuted mb-6 block">Founder &amp; Lead Research Analyst</span>
           <h1 className="mb-10 text-center">
             <span className="block text-3xl md:text-4xl text-textmuted mb-3 font-semibold">Meet</span>
             <span className="text-5xl md:text-[80px] block text-forest leading-none font-extrabold tracking-tight my-2">
@@ -16,6 +19,7 @@ export default function About() {
           <p className="text-xl text-textmuted max-w-2xl mx-auto leading-relaxed font-medium">
             SEBI Registered Research Analyst (Reg. No. INH-XXXXXXXXXX) dedicated to publishing independent, data-driven research for investors who demand more than opinion.
           </p>
+          </div>
         </div>
       </header>
 
