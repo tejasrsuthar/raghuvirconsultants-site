@@ -1,16 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-hot-toast';
-import { Bell, Plus, Trash2, Edit3, CheckSquare, Square, RefreshCw, ShieldAlert, AlertCircle, Info, CheckCircle2 } from 'lucide-react';
+import { Bell, Plus, Trash2, Edit3, CheckSquare, Square, RefreshCw, ArrowUpDown, Search, CheckCircle2, ShieldAlert } from 'lucide-react';
 import NotificationEditorPage from './NotificationEditorPage';
 import NumberedPagination from '../components/NumberedPagination';
 import ConfirmModal from '../components/ConfirmModal';
+import RowActionMenu from '../components/RowActionMenu';
+import DateRangeFilter, { isDateWithinRange } from '../components/DateRangeFilter';
 import { API_BASE_URL } from '../config/apiConfig';
 
 export default function NotificationsManager() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
   
+  // Date Range Filter State
+  const [dateFilter, setDateFilter] = useState({ range: 'all', customStart: '', customEnd: '' });
+
+  // Sorting State
+  const [sortField, setSortField] = useState('created_at');
+  const [sortDirection, setSortDirection] = useState('desc');
+
   // Pagination State
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -58,12 +68,19 @@ export default function NotificationsManager() {
     }
   };
 
-  const handleSingleStatusUpdate = async (id, newStatus) => {
-    const item = items.find(i => i.id === id);
-    if (!item) return;
-    const toastId = toast.loading(`Updating alert status...`);
+  const handleSort = (field) => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortDirection('asc');
+    }
+  };
+
+  const handleSingleStatusUpdate = async (item, newStatus) => {
+    const toastId = toast.loading(`Updating alert status to ${newStatus.toUpperCase()}...`);
     try {
-      const res = await fetch(`${API_BASE_URL}/api/notifications/${id}`, {
+      const res = await fetch(`${API_BASE_URL}/api/notifications/${item.id}`, {
         method: 'PUT',
         headers: { 
           'Content-Type': 'application/json',
@@ -76,7 +93,7 @@ export default function NotificationsManager() {
         })
       });
       if (res.ok) {
-        setItems(items.map(i => i.id === id ? { ...i, status: newStatus } : i));
+        setItems(items.map(i => i.id === item.id ? { ...i, status: newStatus } : i));
         toast.success(`Alert status updated to ${newStatus.toUpperCase()}`, { id: toastId });
       } else {
         toast.error('Failed to update alert status', { id: toastId });
@@ -139,10 +156,10 @@ export default function NotificationsManager() {
 
   // Selection Logic
   const toggleSelectAll = () => {
-    if (selectedIds.length === items.length) {
+    if (selectedIds.length === filteredItems.length) {
       setSelectedIds([]);
     } else {
-      setSelectedIds(items.map(i => i.id));
+      setSelectedIds(filteredItems.map(i => i.id));
     }
   };
 
@@ -180,6 +197,24 @@ export default function NotificationsManager() {
       setBulkActionLoading(false);
     }
   };
+
+  const filteredItems = items
+    .filter(i => {
+      const matchesSearch = searchQuery === '' ||
+        (i.title || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (i.message || '').toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesDate = isDateWithinRange(i.created_at, dateFilter.range, dateFilter.customStart, dateFilter.customEnd);
+      return matchesSearch && matchesDate;
+    })
+    .sort((a, b) => {
+      let valA = a[sortField] || '';
+      let valB = b[sortField] || '';
+      if (typeof valA === 'string') valA = valA.toLowerCase();
+      if (typeof valB === 'string') valB = valB.toLowerCase();
+      if (valA < valB) return sortDirection === 'asc' ? -1 : 1;
+      if (valA > valB) return sortDirection === 'asc' ? 1 : -1;
+      return 0;
+    });
 
   if (showEditor) {
     return (
@@ -235,10 +270,28 @@ export default function NotificationsManager() {
         </div>
       </div>
 
-      {/* Filter & Bulk Bar */}
+      {/* Filter & Table Container */}
       <div className="bg-white border border-gray-200 rounded-3xl p-6 shadow-2xs space-y-4">
-        <div className="flex flex-col sm:flex-row justify-between gap-4">
-          <div className="flex items-center gap-3">
+        <div className="flex flex-col xl:flex-row justify-between gap-4">
+          <div className="flex flex-wrap items-center gap-3 flex-1">
+            <div className="relative flex-1 min-w-[220px]">
+              <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <input
+                type="text"
+                placeholder="Search alerts by title or message..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-9 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-full text-xs text-gray-800 focus:outline-none focus:border-amber-500"
+              />
+            </div>
+
+            <DateRangeFilter
+              selectedRange={dateFilter.range}
+              customStart={dateFilter.customStart}
+              customEnd={dateFilter.customEnd}
+              onRangeChange={setDateFilter}
+            />
+
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
@@ -280,15 +333,15 @@ export default function NotificationsManager() {
           )}
         </div>
 
-        {/* Notifications Table */}
+        {/* Directory Table */}
         {loading ? (
           <div className="text-center py-12 text-xs text-gray-500 flex flex-col items-center gap-2">
             <RefreshCw className="w-5 h-5 animate-spin text-amber-600" />
             Loading notifications...
           </div>
-        ) : items.length === 0 ? (
+        ) : filteredItems.length === 0 ? (
           <div className="text-center py-12 text-xs text-gray-500">
-            No broadcast alerts found.
+            No broadcast alerts found matching the criteria.
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -297,23 +350,59 @@ export default function NotificationsManager() {
                 <tr className="border-b border-gray-200/80 text-gray-400 font-bold uppercase tracking-wider text-[11px]">
                   <th className="py-3.5 px-3 w-10">
                     <button onClick={toggleSelectAll} className="p-1">
-                      {selectedIds.length === items.length && items.length > 0 ? (
+                      {selectedIds.length === filteredItems.length && filteredItems.length > 0 ? (
                         <CheckSquare className="w-4 h-4 text-gray-900" />
                       ) : (
                         <Square className="w-4 h-4 text-gray-400" />
                       )}
                     </button>
                   </th>
-                  <th className="py-3.5 px-3">Alert Title</th>
+                  <th className="py-3.5 px-3 cursor-pointer select-none" onClick={() => handleSort('title')}>
+                    <div className="flex items-center gap-1.5">
+                      Alert Broadcast <ArrowUpDown className="w-3.5 h-3.5" />
+                    </div>
+                  </th>
                   <th className="py-3.5 px-3">Message Body</th>
-                  <th className="py-3.5 px-3">Status</th>
-                  <th className="py-3.5 px-3">Created</th>
+                  <th className="py-3.5 px-3 cursor-pointer select-none" onClick={() => handleSort('status')}>
+                    <div className="flex items-center gap-1.5">
+                      Status <ArrowUpDown className="w-3.5 h-3.5" />
+                    </div>
+                  </th>
+                  <th className="py-3.5 px-3 cursor-pointer select-none" onClick={() => handleSort('created_at')}>
+                    <div className="flex items-center gap-1.5">
+                      Created <ArrowUpDown className="w-3.5 h-3.5" />
+                    </div>
+                  </th>
                   <th className="py-3.5 px-3 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                {items.map((item) => {
+                {filteredItems.map((item) => {
                   const isSelected = selectedIds.includes(item.id);
+                  const isPublished = item.status === 'published';
+                  const rowActions = [
+                    {
+                      label: 'Edit Broadcast',
+                      icon: Edit3,
+                      onClick: () => {
+                        setEditingItem(item);
+                        setShowEditor(true);
+                      }
+                    },
+                    {
+                      label: isPublished ? 'Move to Draft' : 'Publish Broadcast',
+                      icon: CheckCircle2,
+                      onClick: () => handleSingleStatusUpdate(item, isPublished ? 'draft' : 'published')
+                    },
+                    { divider: true },
+                    {
+                      label: 'Delete Broadcast',
+                      icon: Trash2,
+                      isDestructive: true,
+                      onClick: () => setDeleteConfirmItem(item)
+                    }
+                  ];
+
                   return (
                     <tr key={item.id} className={`hover:bg-gray-50/60 transition-colors ${isSelected ? 'bg-amber-50/30' : ''}`}>
                       <td className="py-3.5 px-3">
@@ -325,45 +414,38 @@ export default function NotificationsManager() {
                           )}
                         </button>
                       </td>
-                      <td className="py-3.5 px-3 font-bold text-gray-900">{item.title}</td>
+                      <td className="py-3.5 px-3">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center font-bold shrink-0">
+                            <Bell className="w-4 h-4" />
+                          </div>
+                          <div>
+                            <span className="font-bold text-gray-900 block">{item.title}</span>
+                            <span className="text-[10px] text-gray-400 font-mono">ID: {item.id ? item.id.slice(0, 8) : '—'}</span>
+                          </div>
+                        </div>
+                      </td>
                       <td className="py-3.5 px-3 text-gray-600 max-w-sm truncate">{item.message}</td>
                       <td className="py-3.5 px-3">
-                        <select
-                          value={item.status}
-                          onChange={(e) => handleSingleStatusUpdate(item.id, e.target.value)}
-                          className={`px-2.5 py-1 rounded-xl text-[10px] font-bold uppercase border focus:outline-none transition-all cursor-pointer ${
-                            item.status === 'published' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
-                            item.status === 'draft' ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-gray-100 text-gray-600 border-gray-200'
-                          }`}
-                        >
-                          <option value="draft">DRAFT</option>
-                          <option value="published">PUBLISHED</option>
-                          <option value="archived">ARCHIVED</option>
-                        </select>
+                        <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider inline-flex items-center gap-1.5 ${
+                          item.status === 'published'
+                            ? 'bg-emerald-50 text-emerald-700 border border-emerald-200/60'
+                            : item.status === 'draft'
+                            ? 'bg-amber-50 text-amber-700 border border-amber-200/60'
+                            : 'bg-gray-100 text-gray-600 border border-gray-200/60'
+                        }`}>
+                          <span className={`w-1.5 h-1.5 rounded-full ${
+                            item.status === 'published' ? 'bg-emerald-500' :
+                            item.status === 'draft' ? 'bg-amber-500' : 'bg-gray-400'
+                          }`} />
+                          {(item.status || 'DRAFT').toUpperCase()}
+                        </span>
                       </td>
                       <td className="py-3.5 px-3 text-gray-400 font-medium">
                         {new Date(item.created_at || Date.now()).toLocaleDateString()}
                       </td>
                       <td className="py-3.5 px-3 text-right">
-                        <div className="flex items-center justify-end gap-1.5">
-                          <button
-                            onClick={() => {
-                              setEditingItem(item);
-                              setShowEditor(true);
-                            }}
-                            className="p-2 hover:bg-gray-100 rounded-xl text-gray-600 transition-colors"
-                            title="Edit Alert"
-                          >
-                            <Edit3 className="w-4 h-4" />
-                          </button>
-                          <button
-                            onClick={() => setDeleteConfirmItem(item)}
-                            className="p-2 hover:bg-red-50 rounded-xl text-red-600 transition-colors"
-                            title="Delete Alert"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </div>
+                        <RowActionMenu items={rowActions} />
                       </td>
                     </tr>
                   );
