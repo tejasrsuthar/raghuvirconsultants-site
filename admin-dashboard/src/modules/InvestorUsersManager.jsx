@@ -468,9 +468,24 @@ export default function InvestorUsersManager() {
                         </div>
                       </td>
 
-                      {/* Registered Date */}
-                      <td className="py-3.5 px-3 text-gray-400 font-medium">
-                        {new Date(user.created_at || Date.now()).toLocaleDateString()}
+                      {/* Registered Date & Time */}
+                      <td className="py-3.5 px-3">
+                        <div className="space-y-0.5">
+                          <span className="text-gray-800 font-medium text-xs block">
+                            {new Date(user.created_at || Date.now()).toLocaleDateString('en-IN', {
+                              day: '2-digit',
+                              month: 'short',
+                              year: 'numeric'
+                            })}
+                          </span>
+                          <span className="text-[10px] text-gray-400 font-mono font-medium block">
+                            {new Date(user.created_at || Date.now()).toLocaleTimeString('en-IN', {
+                              hour: '2-digit',
+                              minute: '2-digit',
+                              hour12: true
+                            })}
+                          </span>
+                        </div>
                       </td>
 
                       {/* Context Actions */}

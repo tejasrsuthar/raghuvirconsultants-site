@@ -174,7 +174,7 @@ export default function InvestorEditorPage({ investor, onBack, onSaveSuccess }) 
             <p className="text-xs text-gray-500 mt-1">
               {isNew 
                 ? 'Register a new investor profile with Indian financial compliance, residential address, and subscriptions'
-                : `Account ID: ${formData.id} • Registered on: ${new Date(investor?.created_at || Date.now()).toLocaleDateString()}`
+                : `Account ID: ${formData.id} • Registered on: ${new Date(investor?.created_at || Date.now()).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}, ${new Date(investor?.created_at || Date.now()).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true })}`
               }
             </p>
           </div>
