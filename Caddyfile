@@ -1,7 +1,7 @@
 # Local Caddy Reverse Proxy Configuration
-# Serves http://stock-analytics.local with relative /api/ path proxying to FastAPI backend
+# Serves http://raghuvircons.local with relative /api/ path proxying to FastAPI backend
 
-stock-analytics.local:80 {
+raghuvircons.local:80 {
     handle /api/* {
         reverse_proxy localhost:8000
     }

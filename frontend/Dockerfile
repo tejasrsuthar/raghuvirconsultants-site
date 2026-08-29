@@ -7,6 +7,8 @@ RUN npm ci
 COPY . .
 ARG VITE_GOOGLE_CLIENT_ID
 ENV VITE_GOOGLE_CLIENT_ID=$VITE_GOOGLE_CLIENT_ID
+ARG VITE_API_BASE_URL
+ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
 RUN npm run build
 
 # Stage 2: Production nginx (minimal attack surface)
