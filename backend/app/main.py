@@ -13,7 +13,7 @@ import os
 DEFAULT_ORIGINS = [
     "https://www.raghuvirconsultants.in",
     "https://raghuvirconsultants.in",
-    "https://app.raghuvirconsultants.in",
+    "https://admin.raghuvirconsultants.in",
     "http://raghuvircons.local",
     "http://app.raghuvircons.local",
     "http://localhost",
@@ -49,7 +49,7 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
 app = FastAPI(
     title="Raghuvir Consultants API",
     description="Enterprise Advisory System Backend",
-    version="2.10.2"
+    version="2.10.3"
 )
 
 # ── Middleware stack (order matters — outermost first) ─────────────────────────
@@ -60,7 +60,7 @@ app.add_middleware(
     allowed_hosts=[
         "www.raghuvirconsultants.in",
         "raghuvirconsultants.in",
-        "app.raghuvirconsultants.in",
+        "admin.raghuvirconsultants.in",
         "raghuvircons.local",
         "app.raghuvircons.local",
         "localhost",
@@ -125,11 +125,11 @@ def seed_admin():
 
 @app.get("/")
 def read_root():
-    return {"message": "Raghuvir Consultants API is running", "version": "2.10.2"}
+    return {"message": "Raghuvir Consultants API is running", "version": "2.10.3"}
 
 @app.get("/health")
 @app.get("/api/health")
 @app.get("/api/system/health")
 def health_check():
-    return {"status": "ok", "version": "2.10.2"}
+    return {"status": "ok", "version": "2.10.3"}
 

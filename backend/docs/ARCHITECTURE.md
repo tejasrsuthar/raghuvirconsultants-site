@@ -1,4 +1,4 @@
-# Enterprise System Architecture (v2.10.2)
+# Enterprise System Architecture (v2.10.3)
 
 This document provides complete technical specifications for the Raghuvir Consultants Enterprise Wealth & Advisory platform.
 
@@ -8,14 +8,14 @@ This document provides complete technical specifications for the Raghuvir Consul
 
 The platform operates on a decoupled client-server architecture serving unified and admin domain contexts:
 - **`raghuvircons.local` / `www.raghuvirconsultants.in` (Port 80/443)**: Main Public Portal, Investor Dashboard, & `/api/` reverse-proxied FastAPI backend.
-- **`app.raghuvircons.local` / `app.raghuvirconsultants.in` (Port 80/443)**: Zaga Admin Console context.
+- **`app.raghuvircons.local` / `admin.raghuvirconsultants.in` (Port 80/443)**: Zaga Admin Console context.
 - **FastAPI REST API Server (Port 8000)**: Asynchronous Python backend powered by MongoDB Atlas / Local MongoDB.
 
 ```mermaid
 graph TD
     subgraph ClientDomains["Client Domains & Port Routing"]
         PublicDomain["www.raghuvirconsultants.in (Public & Investor Portal + /api Reverse Proxy)"]
-        AdminDomain["app.raghuvirconsultants.in (Standalone Zaga Admin Console)"]
+        AdminDomain["admin.raghuvirconsultants.in (Standalone Zaga Admin Console)"]
     end
 
     subgraph ReactFrontend["React 18 + Vite Frontend Application"]
@@ -32,7 +32,7 @@ graph TD
         end
       end
 
-    subgraph FastAPIServer["FastAPI Asynchronous Backend (v2.10.2)"]
+    subgraph FastAPIServer["FastAPI Asynchronous Backend (v2.10.3)"]
         API["app/main.py (CORS & Middleware)"]
         AuthRouter["auth_router.py (/api/auth)"]
         AdminRouter["admin_router.py (/api/admin)"]
