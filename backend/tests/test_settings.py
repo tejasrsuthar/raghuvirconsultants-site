@@ -15,7 +15,7 @@ def test_platform_settings():
 def test_system_status_endpoint():
     data = get_system_status()
     assert data["api_status"] == "online"
-    assert data["api_version"] == "2.12.0"
+    assert data["api_version"] == "2.12.1"
     assert "database" in data
     assert "system_metrics" in data
 
@@ -29,7 +29,7 @@ def test_health_check_and_security_headers():
             res = await client.get("/health")
             assert res.status_code == 200
             assert res.json()["status"] == "ok"
-            assert res.json()["version"] == "2.12.0"
+            assert res.json()["version"] == "2.12.1"
             assert "x-content-type-options" in res.headers
             assert "server" not in res.headers
 
