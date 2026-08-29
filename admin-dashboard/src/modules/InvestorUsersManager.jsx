@@ -3,7 +3,7 @@ import { toast } from 'react-hot-toast';
 import { 
   Users, Search, RefreshCw, Key, Shield, UserX, UserCheck, 
   Trash2, Edit, AlertCircle, ArrowUpDown, MoreVertical, Calendar,
-  CreditCard, CheckCircle2, ShieldCheck, Mail
+  CreditCard, CheckCircle2, ShieldCheck, Mail, Phone
 } from 'lucide-react';
 import InvestorEditorPage from './InvestorEditorPage';
 import NumberedPagination from '../components/NumberedPagination';
@@ -287,12 +287,26 @@ export default function InvestorUsersManager() {
             <table className="w-full text-left border-collapse text-xs">
               <thead>
                 <tr className="border-b border-gray-200/80 text-gray-400 font-bold uppercase tracking-wider text-[11px]">
-                  <th className="py-3.5 px-3 cursor-pointer select-none" onClick={() => handleSort('username')}>
+                  <th className="py-3.5 px-3 cursor-pointer select-none" onClick={() => handleSort('full_name')}>
                     <div className="flex items-center gap-1.5">
                       Investor Profile <ArrowUpDown className="w-3.5 h-3.5" />
                     </div>
                   </th>
-                  <th className="py-3.5 px-3">PAN & Contact</th>
+                  <th className="py-3.5 px-3 cursor-pointer select-none" onClick={() => handleSort('email')}>
+                    <div className="flex items-center gap-1.5">
+                      Email Address <ArrowUpDown className="w-3.5 h-3.5" />
+                    </div>
+                  </th>
+                  <th className="py-3.5 px-3 cursor-pointer select-none" onClick={() => handleSort('pan_number')}>
+                    <div className="flex items-center gap-1.5">
+                      PAN Card <ArrowUpDown className="w-3.5 h-3.5" />
+                    </div>
+                  </th>
+                  <th className="py-3.5 px-3 cursor-pointer select-none" onClick={() => handleSort('phone')}>
+                    <div className="flex items-center gap-1.5">
+                      Mobile Number <ArrowUpDown className="w-3.5 h-3.5" />
+                    </div>
+                  </th>
                   <th className="py-3.5 px-3 cursor-pointer select-none" onClick={() => handleSort('role')}>
                     <div className="flex items-center gap-1.5">
                       Role <ArrowUpDown className="w-3.5 h-3.5" />
@@ -356,6 +370,7 @@ export default function InvestorUsersManager() {
                       className="hover:bg-indigo-50/40 transition-colors cursor-pointer group"
                       title="Click to edit investor profile & compliance details"
                     >
+                      {/* Investor Profile (Avatar, Full Name, @username) */}
                       <td className="py-3.5 px-3">
                         <div className="flex items-center gap-3">
                           <div className="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-700 flex items-center justify-center font-bold text-xs uppercase shrink-0 group-hover:bg-indigo-100 transition-colors">
@@ -369,26 +384,44 @@ export default function InvestorUsersManager() {
                           </div>
                         </div>
                       </td>
+
+                      {/* Email Address */}
                       <td className="py-3.5 px-3">
-                        <div className="space-y-0.5">
-                          <span className="text-gray-700 font-medium block">{user.email}</span>
-                          <div className="flex items-center gap-2">
-                            {user.pan_number ? (
-                              <span className="px-1.5 py-0.5 bg-amber-50 text-amber-800 border border-amber-200/60 rounded text-[10px] font-mono font-bold">
-                                PAN: {user.pan_number}
-                              </span>
-                            ) : null}
-                            {user.phone ? (
-                              <span className="text-[10px] text-gray-500">{user.phone}</span>
-                            ) : null}
-                          </div>
-                        </div>
+                        <span className="text-gray-800 font-medium font-sans block max-w-[200px] truncate" title={user.email}>
+                          {user.email}
+                        </span>
                       </td>
+
+                      {/* PAN Card Column */}
+                      <td className="py-3.5 px-3">
+                        {user.pan_number ? (
+                          <span className="px-2.5 py-1 bg-amber-50 text-amber-900 border border-amber-200/80 rounded-lg text-xs font-mono font-bold tracking-wider inline-block">
+                            {user.pan_number}
+                          </span>
+                        ) : (
+                          <span className="text-gray-400 font-mono text-xs">—</span>
+                        )}
+                      </td>
+
+                      {/* Mobile / Phone Column */}
+                      <td className="py-3.5 px-3">
+                        {user.phone ? (
+                          <span className="text-gray-700 font-mono text-xs font-semibold">
+                            {user.phone}
+                          </span>
+                        ) : (
+                          <span className="text-gray-400 text-xs">—</span>
+                        )}
+                      </td>
+
+                      {/* Role */}
                       <td className="py-3.5 px-3">
                         <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-gray-100 text-gray-700">
                           {user.role || 'INVESTOR'}
                         </span>
                       </td>
+
+                      {/* Status */}
                       <td className="py-3.5 px-3" onClick={(e) => e.stopPropagation()}>
                         <button
                           type="button"
@@ -404,6 +437,8 @@ export default function InvestorUsersManager() {
                           {(user.status || 'ACTIVE').toUpperCase()}
                         </button>
                       </td>
+
+                      {/* Subscriptions */}
                       <td className="py-3.5 px-3">
                         <div className="flex items-center gap-1.5">
                           {user.subscribed_reports && (
@@ -421,9 +456,13 @@ export default function InvestorUsersManager() {
                           )}
                         </div>
                       </td>
+
+                      {/* Registered Date */}
                       <td className="py-3.5 px-3 text-gray-400 font-medium">
                         {new Date(user.created_at || Date.now()).toLocaleDateString()}
                       </td>
+
+                      {/* Context Actions */}
                       <td className="py-3.5 px-3 text-right" onClick={(e) => e.stopPropagation()}>
                         <RowActionMenu items={rowActions} />
                       </td>
