@@ -10,7 +10,26 @@ from app.core.security import get_password_hash
 import os
 
 # ── Allowed origins (tightened from "*" for production) ───────────────────────
-ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "https://www.raghuvirconsultants.in,https://raghuvirconsultants.in,https://app.raghuvirconsultants.in,http://localhost,http://localhost:5173,http://localhost:5174,http://raghuvircons.local,http://app.raghuvircons.local").split(",")
+# ── Allowed origins & CORS configuration ──────────────────────────────────────
+DEFAULT_ORIGINS = [
+    "https://www.raghuvirconsultants.in",
+    "https://raghuvirconsultants.in",
+    "https://app.raghuvirconsultants.in",
+    "https://api.raghuvirconsultants.in",
+    "http://raghuvircons.local",
+    "http://app.raghuvircons.local",
+    "http://localhost",
+    "http://localhost:5173",
+    "http://localhost:5174",
+    "http://localhost:3000",
+    "http://127.0.0.1",
+    "http://127.0.0.1:5173",
+    "http://127.0.0.1:5174",
+]
+
+env_origins = os.getenv("ALLOWED_ORIGINS", "")
+custom_origins = [o.strip() for o in env_origins.split(",") if o.strip()]
+ALLOWED_ORIGINS = list(dict.fromkeys(DEFAULT_ORIGINS + custom_origins))
 
 # ── Security headers middleware ────────────────────────────────────────────────
 class SecurityHeadersMiddleware(BaseHTTPMiddleware):
@@ -32,7 +51,7 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
 app = FastAPI(
     title="Raghuvir Consultants API",
     description="Enterprise Advisory System Backend",
-    version="2.9.9"
+    version="2.10.0"
 )
 
 # ── Middleware stack (order matters — outermost first) ─────────────────────────
@@ -44,6 +63,7 @@ app.add_middleware(
         "www.raghuvirconsultants.in",
         "raghuvirconsultants.in",
         "app.raghuvirconsultants.in",
+        "api.raghuvirconsultants.in",
         "raghuvircons.local",
         "app.raghuvircons.local",
         "localhost",
@@ -60,13 +80,15 @@ app.add_middleware(GZipMiddleware, minimum_size=1000)
 # 3. Security headers on all responses
 app.add_middleware(SecurityHeadersMiddleware)
 
-# 4. CORS — restrict to known frontend origins
+# 4. CORS — restrict to known frontend origins with regex matching
 app.add_middleware(
     CORSMiddleware,
     allow_origins=ALLOWED_ORIGINS,
+    allow_origin_regex=r"^https?://([a-zA-Z0-9-]+\.)*(raghuvirconsultants\.in|raghuvircons\.local|localhost)(:\d+)?$",
     allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-    allow_headers=["Authorization", "Content-Type", "Accept"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+    expose_headers=["*"],
     max_age=86400,  # Cache preflight for 24h
 )
 
@@ -107,11 +129,11 @@ def seed_admin():
 
 @app.get("/")
 def read_root():
-    return {"message": "Raghuvir Consultants API is running", "version": "2.9.9"}
+    return {"message": "Raghuvir Consultants API is running", "version": "2.10.0"}
 
 @app.get("/health")
 @app.get("/api/health")
 @app.get("/api/system/health")
 def health_check():
-    return {"status": "ok", "version": "2.9.9"}
+    return {"status": "ok", "version": "2.10.0"}
 
