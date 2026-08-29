@@ -49,7 +49,9 @@ export default function ResearchReportsManager() {
     setLoading(true);
     setSelectedIds([]);
     try {
-      const res = await fetch(`${API_BASE_URL}/api/reports?page=${page}&limit=10`);
+      const res = await fetch(`${API_BASE_URL}/api/reports?page=${page}&limit=10`, {
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+      });
       if (res.ok) {
         const data = await res.json();
         setReports(data.items || []);

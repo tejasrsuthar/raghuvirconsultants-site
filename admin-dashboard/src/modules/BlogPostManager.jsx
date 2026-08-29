@@ -44,7 +44,9 @@ export default function BlogPostManager() {
       const url = selectedTag 
         ? `${API_BASE_URL}/api/blogs?page=${currentPage}&limit=10&tag=${encodeURIComponent(selectedTag)}`
         : `${API_BASE_URL}/api/blogs?page=${currentPage}&limit=10`;
-      const res = await fetch(url);
+      const res = await fetch(url, {
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+      });
       if (res.ok) {
         const data = await res.json();
         setBlogs(data.items || []);
