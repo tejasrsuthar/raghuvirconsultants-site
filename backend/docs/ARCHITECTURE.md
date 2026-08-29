@@ -1,4 +1,4 @@
-# Enterprise System Architecture (v2.12.9)
+# Enterprise System Architecture (v2.12.10)
 
 This document provides complete technical specifications for the Raghuvir Consultants Enterprise Wealth & Advisory platform.
 
@@ -33,7 +33,7 @@ graph TD
             end
         end
 
-        subgraph FastAPIServer["FastAPI Asynchronous Backend (v2.12.9)"]
+        subgraph FastAPIServer["FastAPI Asynchronous Backend (v2.12.10)"]
             API["app/main.py (CORS & Middleware)"]
             AuthRouter["auth_router.py (/api/auth)"]
             AdminRouter["admin_router.py (/api/admin)"]

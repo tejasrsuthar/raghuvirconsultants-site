@@ -234,49 +234,47 @@ export default function InvestorUsersManager() {
 
       {/* Filter & Table Container */}
       <div className="bg-white border border-gray-200 rounded-3xl p-6 shadow-2xs space-y-4">
-        {/* Search, Date Range & Role Filters */}
-        <div className="flex flex-col xl:flex-row justify-between gap-4">
-          <div className="flex flex-wrap items-center gap-3 flex-1">
-            <div className="relative flex-1 min-w-[220px]">
-              <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-              <input
-                type="text"
-                placeholder="Search by username, email, or ID..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-full text-xs text-gray-800 focus:outline-none focus:border-indigo-500"
-              />
-            </div>
-
-            <DateRangeFilter
-              selectedRange={dateFilter.range}
-              customStart={dateFilter.customStart}
-              customEnd={dateFilter.customEnd}
-              onRangeChange={setDateFilter}
+        {/* Stable Search, Date Range & Role Filters */}
+        <div className="flex flex-wrap items-center gap-3 w-full">
+          <div className="relative flex-1 min-w-[240px]">
+            <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              placeholder="Search by username, email, or ID..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-9 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-full text-xs text-gray-800 focus:outline-none focus:border-indigo-500"
             />
-
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="px-3.5 py-2 bg-gray-50 border border-gray-200 rounded-full text-xs font-semibold text-gray-700 focus:outline-none"
-            >
-              <option value="">All Statuses</option>
-              <option value="active">Active</option>
-              <option value="suspended">Suspended</option>
-              <option value="blacklisted">Blacklisted</option>
-              <option value="disabled">Disabled</option>
-            </select>
-
-            <select
-              value={roleFilter}
-              onChange={(e) => setRoleFilter(e.target.value)}
-              className="px-3.5 py-2 bg-gray-50 border border-gray-200 rounded-full text-xs font-semibold text-gray-700 focus:outline-none"
-            >
-              <option value="">All Roles</option>
-              <option value="investor">Investor</option>
-              <option value="admin">Admin</option>
-            </select>
           </div>
+
+          <DateRangeFilter
+            selectedRange={dateFilter.range}
+            customStart={dateFilter.customStart}
+            customEnd={dateFilter.customEnd}
+            onRangeChange={setDateFilter}
+          />
+
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="px-3.5 py-2 bg-gray-50 border border-gray-200 rounded-full text-xs font-semibold text-gray-700 focus:outline-none"
+          >
+            <option value="">All Statuses</option>
+            <option value="active">Active</option>
+            <option value="suspended">Suspended</option>
+            <option value="blacklisted">Blacklisted</option>
+            <option value="disabled">Disabled</option>
+          </select>
+
+          <select
+            value={roleFilter}
+            onChange={(e) => setRoleFilter(e.target.value)}
+            className="px-3.5 py-2 bg-gray-50 border border-gray-200 rounded-full text-xs font-semibold text-gray-700 focus:outline-none"
+          >
+            <option value="">All Roles</option>
+            <option value="investor">Investor</option>
+            <option value="admin">Admin</option>
+          </select>
         </div>
 
         {/* Directory Table */}
@@ -319,7 +317,7 @@ export default function InvestorUsersManager() {
                       Registration <ArrowUpDown className="w-3.5 h-3.5" />
                     </div>
                   </th>
-                  <th className="py-3.5 px-3 text-right">Actions</th>
+                  <th className="py-3.5 px-3 text-right w-20">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
@@ -357,14 +355,22 @@ export default function InvestorUsersManager() {
                   ];
 
                   return (
-                    <tr key={user.id} className="hover:bg-gray-50/60 transition-colors">
+                    <tr 
+                      key={user.id} 
+                      onClick={() => {
+                        setUsernameModalUser(user);
+                        setNewUsername(user.username || '');
+                      }}
+                      className="hover:bg-indigo-50/40 transition-colors cursor-pointer group"
+                      title="Click to edit investor username"
+                    >
                       <td className="py-3.5 px-3">
                         <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-xl bg-indigo-50 text-indigo-700 flex items-center justify-center font-bold text-xs uppercase shrink-0">
+                          <div className="w-8 h-8 rounded-xl bg-indigo-50 text-indigo-700 flex items-center justify-center font-bold text-xs uppercase shrink-0 group-hover:bg-indigo-100 transition-colors">
                             {(user.username || 'U').charAt(0)}
                           </div>
                           <div>
-                            <span className="font-bold text-gray-900 block">{user.username}</span>
+                            <span className="font-bold text-gray-900 block group-hover:text-indigo-900 transition-colors">{user.username}</span>
                             <span className="text-[10px] text-gray-400 font-mono">ID: {user.id ? user.id.slice(0, 8) : '—'}</span>
                           </div>
                         </div>
@@ -375,20 +381,25 @@ export default function InvestorUsersManager() {
                           {user.role || 'INVESTOR'}
                         </span>
                       </td>
-                      <td className="py-3.5 px-3">
-                        <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider inline-flex items-center gap-1.5 ${
-                          isActive
-                            ? 'bg-emerald-50 text-emerald-700 border border-emerald-200/60'
-                            : 'bg-red-50 text-red-700 border border-red-200/60'
-                        }`}>
+                      <td className="py-3.5 px-3" onClick={(e) => e.stopPropagation()}>
+                        <button
+                          type="button"
+                          onClick={() => handleToggleStatus(user)}
+                          title="Click to toggle status"
+                          className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider inline-flex items-center gap-1.5 transition-all hover:scale-105 ${
+                            isActive
+                              ? 'bg-emerald-50 text-emerald-700 border border-emerald-200/60 hover:bg-emerald-100'
+                              : 'bg-red-50 text-red-700 border border-red-200/60 hover:bg-red-100'
+                          }`}
+                        >
                           <span className={`w-1.5 h-1.5 rounded-full ${isActive ? 'bg-emerald-500' : 'bg-red-500'}`} />
                           {(user.status || 'ACTIVE').toUpperCase()}
-                        </span>
+                        </button>
                       </td>
                       <td className="py-3.5 px-3 text-gray-400 font-medium">
                         {new Date(user.created_at || Date.now()).toLocaleDateString()}
                       </td>
-                      <td className="py-3.5 px-3 text-right">
+                      <td className="py-3.5 px-3 text-right" onClick={(e) => e.stopPropagation()}>
                         <RowActionMenu items={rowActions} />
                       </td>
                     </tr>

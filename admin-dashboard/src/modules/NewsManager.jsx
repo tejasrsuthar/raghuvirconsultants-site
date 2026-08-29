@@ -164,26 +164,24 @@ export default function NewsManager() {
 
       {/* Filter & Table Container */}
       <div className="bg-white border border-gray-200 rounded-3xl p-6 shadow-2xs space-y-4">
-        <div className="flex flex-col xl:flex-row justify-between gap-4">
-          <div className="flex flex-wrap items-center gap-3 flex-1">
-            <div className="relative flex-1 min-w-[220px]">
-              <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-              <input
-                type="text"
-                placeholder="Search announcements by headline..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-full text-xs text-gray-800 focus:outline-none focus:border-rose-500"
-              />
-            </div>
-
-            <DateRangeFilter
-              selectedRange={dateFilter.range}
-              customStart={dateFilter.customStart}
-              customEnd={dateFilter.customEnd}
-              onRangeChange={setDateFilter}
+        <div className="flex flex-wrap items-center gap-3 w-full">
+          <div className="relative flex-1 min-w-[240px]">
+            <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              placeholder="Search announcements by headline..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-9 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-full text-xs text-gray-800 focus:outline-none focus:border-rose-500"
             />
           </div>
+
+          <DateRangeFilter
+            selectedRange={dateFilter.range}
+            customStart={dateFilter.customStart}
+            customEnd={dateFilter.customEnd}
+            onRangeChange={setDateFilter}
+          />
         </div>
 
         {/* Directory Table */}
@@ -212,7 +210,7 @@ export default function NewsManager() {
                       Broadcast Date <ArrowUpDown className="w-3.5 h-3.5" />
                     </div>
                   </th>
-                  <th className="py-3.5 px-3 text-right">Actions</th>
+                  <th className="py-3.5 px-3 text-right w-20">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
@@ -241,19 +239,27 @@ export default function NewsManager() {
                   ];
 
                   return (
-                    <tr key={news.id} className="hover:bg-gray-50/60 transition-colors">
+                    <tr 
+                      key={news.id} 
+                      onClick={() => {
+                        setEditingItem(news);
+                        setShowEditor(true);
+                      }}
+                      className="hover:bg-rose-50/40 transition-colors cursor-pointer group"
+                      title="Click to edit news announcement"
+                    >
                       <td className="py-3.5 px-3">
                         <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-xl bg-rose-50 text-rose-700 flex items-center justify-center font-bold shrink-0">
+                          <div className="w-8 h-8 rounded-xl bg-rose-50 text-rose-700 flex items-center justify-center font-bold shrink-0 group-hover:bg-rose-100 transition-colors">
                             <Radio className="w-4 h-4 text-rose-600" />
                           </div>
                           <div>
-                            <span className="font-bold text-gray-900 block max-w-md truncate">{news.title}</span>
+                            <span className="font-bold text-gray-900 block max-w-md truncate group-hover:text-rose-950 transition-colors">{news.title}</span>
                             <span className="text-[11px] text-gray-500 block max-w-md truncate">{news.summary || 'Live news broadcast'}</span>
                           </div>
                         </div>
                       </td>
-                      <td className="py-3.5 px-3">
+                      <td className="py-3.5 px-3" onClick={(e) => e.stopPropagation()}>
                         {news.source_url ? (
                           <a
                             href={news.source_url}
@@ -268,7 +274,7 @@ export default function NewsManager() {
                       <td className="py-3.5 px-3 text-gray-400 font-medium">
                         {new Date(news.published_at || news.created_at || Date.now()).toLocaleDateString()}
                       </td>
-                      <td className="py-3.5 px-3 text-right">
+                      <td className="py-3.5 px-3 text-right" onClick={(e) => e.stopPropagation()}>
                         <RowActionMenu items={rowActions} />
                       </td>
                     </tr>
