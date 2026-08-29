@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { toast } from 'react-hot-toast';
 import { 
   Users, Search, RefreshCw, Key, Shield, UserX, UserCheck, 
-  Trash2, Edit, AlertCircle, ArrowUpDown, MoreVertical, Calendar 
+  Trash2, Edit, AlertCircle, ArrowUpDown, MoreVertical, Calendar,
+  CreditCard, CheckCircle2, ShieldCheck, Mail
 } from 'lucide-react';
+import InvestorEditorPage from './InvestorEditorPage';
 import NumberedPagination from '../components/NumberedPagination';
 import ConfirmModal from '../components/ConfirmModal';
 import RowActionMenu from '../components/RowActionMenu';
@@ -29,15 +31,16 @@ export default function InvestorUsersManager() {
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
 
-  // Modal States
+  // Full-page Editor State
+  const [showEditor, setShowEditor] = useState(false);
+  const [editingInvestor, setEditingInvestor] = useState(null);
+
+  // Password Modal State
   const [passwordModalUser, setPasswordModalUser] = useState(null);
   const [newPassword, setNewPassword] = useState('');
   const [passwordLoading, setPasswordLoading] = useState(false);
 
-  const [usernameModalUser, setUsernameModalUser] = useState(null);
-  const [newUsername, setNewUsername] = useState('');
-  const [usernameLoading, setUsernameLoading] = useState(false);
-
+  // Delete Confirm State
   const [deleteConfirmUser, setDeleteConfirmUser] = useState(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
 
@@ -50,7 +53,7 @@ export default function InvestorUsersManager() {
   const fetchUsers = async (page = 1) => {
     setLoading(true);
     try {
-      const res = await fetch(`${API_BASE_URL}/api/admin/users?page=${page}&limit=10`, {
+      const res = await fetch(`${API_BASE_URL}/api/admin/investors?page=${page}&limit=10`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (res.ok) {
@@ -81,7 +84,7 @@ export default function InvestorUsersManager() {
     const nextStatus = user.status === 'active' ? 'suspended' : 'active';
     const toastId = toast.loading(`Updating ${user.username}'s status...`);
     try {
-      const res = await fetch(`${API_BASE_URL}/api/admin/users/${user.id}/status`, {
+      const res = await fetch(`${API_BASE_URL}/api/admin/investors/${user.id}/status`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -110,7 +113,7 @@ export default function InvestorUsersManager() {
     setPasswordLoading(true);
     const toastId = toast.loading(`Resetting password for ${passwordModalUser.username}...`);
     try {
-      const res = await fetch(`${API_BASE_URL}/api/admin/users/${passwordModalUser.id}/password`, {
+      const res = await fetch(`${API_BASE_URL}/api/admin/investors/${passwordModalUser.id}/password`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -132,41 +135,12 @@ export default function InvestorUsersManager() {
     }
   };
 
-  const handleUsernameUpdate = async (e) => {
-    e.preventDefault();
-    if (!usernameModalUser || !newUsername.trim()) return;
-    setUsernameLoading(true);
-    const toastId = toast.loading(`Updating username...`);
-    try {
-      const res = await fetch(`${API_BASE_URL}/api/admin/users/${usernameModalUser.id}/username`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ username: newUsername.trim() })
-      });
-      if (res.ok) {
-        toast.success('Username updated successfully', { id: toastId });
-        setUsernameModalUser(null);
-        setNewUsername('');
-        fetchUsers(currentPage);
-      } else {
-        toast.error('Failed to update username', { id: toastId });
-      }
-    } catch (e) {
-      toast.error('Network error updating username', { id: toastId });
-    } finally {
-      setUsernameLoading(false);
-    }
-  };
-
   const executeDelete = async () => {
     if (!deleteConfirmUser) return;
     setDeleteLoading(true);
     const toastId = toast.loading(`Deleting account ${deleteConfirmUser.username}...`);
     try {
-      const res = await fetch(`${API_BASE_URL}/api/admin/users/${deleteConfirmUser.id}`, {
+      const res = await fetch(`${API_BASE_URL}/api/admin/investors/${deleteConfirmUser.id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -188,7 +162,10 @@ export default function InvestorUsersManager() {
     .filter(u => {
       const matchesSearch = searchQuery === '' ||
         (u.username || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (u.full_name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
         (u.email || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (u.pan_number || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (u.phone || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
         (u.id || '').toLowerCase().includes(searchQuery.toLowerCase());
       const matchesRole = roleFilter === '' || u.role === roleFilter;
       const matchesStatus = statusFilter === '' || (u.status || 'active') === statusFilter;
@@ -205,6 +182,24 @@ export default function InvestorUsersManager() {
       return 0;
     });
 
+  if (showEditor) {
+    return (
+      <InvestorEditorPage
+        investor={editingInvestor}
+        onBack={() => {
+          setShowEditor(false);
+          setEditingInvestor(null);
+        }}
+        onSaveSuccess={() => {
+          setShowEditor(false);
+          setEditingInvestor(null);
+          toast.success('Investor profile updated!');
+          fetchUsers(currentPage);
+        }}
+      />
+    );
+  }
+
   return (
     <div className="w-full space-y-6">
       {/* Header Banner */}
@@ -216,7 +211,7 @@ export default function InvestorUsersManager() {
             </div>
             <div>
               <h2 className="text-xl font-bold text-gray-900">Investor Account Directory</h2>
-              <p className="text-xs text-gray-500 mt-0.5">Manage investor credentials, activate/suspend accounts, and monitor access</p>
+              <p className="text-xs text-gray-500 mt-0.5">Manage investor profiles, PAN numbers, KYC compliance, addresses, and subscription access</p>
             </div>
           </div>
 
@@ -240,7 +235,7 @@ export default function InvestorUsersManager() {
             <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
               type="text"
-              placeholder="Search by username, email, or ID..."
+              placeholder="Search by name, username, PAN, email, or mobile..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-9 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-full text-xs text-gray-800 focus:outline-none focus:border-indigo-500"
@@ -297,11 +292,7 @@ export default function InvestorUsersManager() {
                       Investor Profile <ArrowUpDown className="w-3.5 h-3.5" />
                     </div>
                   </th>
-                  <th className="py-3.5 px-3 cursor-pointer select-none" onClick={() => handleSort('email')}>
-                    <div className="flex items-center gap-1.5">
-                      Email Address <ArrowUpDown className="w-3.5 h-3.5" />
-                    </div>
-                  </th>
+                  <th className="py-3.5 px-3">PAN & Contact</th>
                   <th className="py-3.5 px-3 cursor-pointer select-none" onClick={() => handleSort('role')}>
                     <div className="flex items-center gap-1.5">
                       Role <ArrowUpDown className="w-3.5 h-3.5" />
@@ -312,9 +303,10 @@ export default function InvestorUsersManager() {
                       Account Status <ArrowUpDown className="w-3.5 h-3.5" />
                     </div>
                   </th>
+                  <th className="py-3.5 px-3">Subscriptions</th>
                   <th className="py-3.5 px-3 cursor-pointer select-none" onClick={() => handleSort('created_at')}>
                     <div className="flex items-center gap-1.5">
-                      Registration <ArrowUpDown className="w-3.5 h-3.5" />
+                      Registered <ArrowUpDown className="w-3.5 h-3.5" />
                     </div>
                   </th>
                   <th className="py-3.5 px-3 text-right w-20">Actions</th>
@@ -325,11 +317,11 @@ export default function InvestorUsersManager() {
                   const isActive = (user.status || 'active') === 'active';
                   const rowActions = [
                     {
-                      label: 'Edit Username',
+                      label: 'Edit Investor Profile',
                       icon: Edit,
                       onClick: () => {
-                        setUsernameModalUser(user);
-                        setNewUsername(user.username || '');
+                        setEditingInvestor(user);
+                        setShowEditor(true);
                       }
                     },
                     {
@@ -358,24 +350,40 @@ export default function InvestorUsersManager() {
                     <tr 
                       key={user.id} 
                       onClick={() => {
-                        setUsernameModalUser(user);
-                        setNewUsername(user.username || '');
+                        setEditingInvestor(user);
+                        setShowEditor(true);
                       }}
                       className="hover:bg-indigo-50/40 transition-colors cursor-pointer group"
-                      title="Click to edit investor username"
+                      title="Click to edit investor profile & compliance details"
                     >
                       <td className="py-3.5 px-3">
                         <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-xl bg-indigo-50 text-indigo-700 flex items-center justify-center font-bold text-xs uppercase shrink-0 group-hover:bg-indigo-100 transition-colors">
-                            {(user.username || 'U').charAt(0)}
+                          <div className="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-700 flex items-center justify-center font-bold text-xs uppercase shrink-0 group-hover:bg-indigo-100 transition-colors">
+                            {(user.full_name || user.username || 'U').charAt(0)}
                           </div>
                           <div>
-                            <span className="font-bold text-gray-900 block group-hover:text-indigo-900 transition-colors">{user.username}</span>
-                            <span className="text-[10px] text-gray-400 font-mono">ID: {user.id ? user.id.slice(0, 8) : '—'}</span>
+                            <span className="font-bold text-gray-900 block group-hover:text-indigo-950 transition-colors">
+                              {user.full_name || user.username}
+                            </span>
+                            <span className="text-[11px] text-gray-500 font-mono">@{user.username}</span>
                           </div>
                         </div>
                       </td>
-                      <td className="py-3.5 px-3 text-gray-600 font-medium">{user.email}</td>
+                      <td className="py-3.5 px-3">
+                        <div className="space-y-0.5">
+                          <span className="text-gray-700 font-medium block">{user.email}</span>
+                          <div className="flex items-center gap-2">
+                            {user.pan_number ? (
+                              <span className="px-1.5 py-0.5 bg-amber-50 text-amber-800 border border-amber-200/60 rounded text-[10px] font-mono font-bold">
+                                PAN: {user.pan_number}
+                              </span>
+                            ) : null}
+                            {user.phone ? (
+                              <span className="text-[10px] text-gray-500">{user.phone}</span>
+                            ) : null}
+                          </div>
+                        </div>
+                      </td>
                       <td className="py-3.5 px-3">
                         <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-gray-100 text-gray-700">
                           {user.role || 'INVESTOR'}
@@ -395,6 +403,23 @@ export default function InvestorUsersManager() {
                           <span className={`w-1.5 h-1.5 rounded-full ${isActive ? 'bg-emerald-500' : 'bg-red-500'}`} />
                           {(user.status || 'ACTIVE').toUpperCase()}
                         </button>
+                      </td>
+                      <td className="py-3.5 px-3">
+                        <div className="flex items-center gap-1.5">
+                          {user.subscribed_reports && (
+                            <span className="px-2 py-0.5 bg-purple-50 text-purple-700 border border-purple-200/60 rounded text-[10px] font-bold" title="Subscribed to Research Reports">
+                              Reports
+                            </span>
+                          )}
+                          {user.subscribed_portfolio && (
+                            <span className="px-2 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200/60 rounded text-[10px] font-bold" title="Subscribed to Model Portfolio">
+                              Portfolio
+                            </span>
+                          )}
+                          {!user.subscribed_reports && !user.subscribed_portfolio && (
+                            <span className="text-gray-400 text-[11px]">—</span>
+                          )}
+                        </div>
                       </td>
                       <td className="py-3.5 px-3 text-gray-400 font-medium">
                         {new Date(user.created_at || Date.now()).toLocaleDateString()}
@@ -464,53 +489,6 @@ export default function InvestorUsersManager() {
                   className="px-5 py-2 bg-gray-900 hover:bg-black text-white rounded-full text-xs font-bold transition-colors"
                 >
                   {passwordLoading ? 'Resetting...' : 'Save Password'}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* Edit Username Modal */}
-      {usernameModalUser && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl p-6 max-w-sm w-full shadow-2xl border border-gray-100 animate-in fade-in zoom-in-95">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="p-2.5 bg-indigo-50 rounded-xl text-indigo-700">
-                <Edit className="w-5 h-5" />
-              </div>
-              <div>
-                <h3 className="font-bold text-sm text-gray-900">Edit Username</h3>
-                <p className="text-[11px] text-gray-500">{usernameModalUser.email}</p>
-              </div>
-            </div>
-
-            <form onSubmit={handleUsernameUpdate} className="space-y-4">
-              <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider text-gray-500 mb-1.5">Username</label>
-                <input
-                  type="text"
-                  required
-                  value={newUsername}
-                  onChange={(e) => setNewUsername(e.target.value)}
-                  className="w-full px-3.5 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs focus:outline-none focus:border-indigo-500"
-                />
-              </div>
-
-              <div className="flex items-center justify-end gap-2 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setUsernameModalUser(null)}
-                  className="px-4 py-2 rounded-full text-xs font-bold text-gray-600 hover:bg-gray-100 transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={usernameLoading}
-                  className="px-5 py-2 bg-gray-900 hover:bg-black text-white rounded-full text-xs font-bold transition-colors"
-                >
-                  {usernameLoading ? 'Saving...' : 'Update Username'}
                 </button>
               </div>
             </form>

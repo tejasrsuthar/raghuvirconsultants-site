@@ -6,7 +6,7 @@ from app.interfaces.schemas import (
 )
 from app.interfaces.dependencies import require_admin
 from app.infrastructure.repositories import UserRepository, SubscriptionRepository
-from app.domain.entities import User, UserStatus, ServiceType, Subscription, SubscriptionStatus
+from app.domain.entities import User, UserStatus, UserRole, ServiceType, Subscription, SubscriptionStatus
 from app.core.security import get_password_hash
 from datetime import datetime, timedelta
 import math
@@ -14,6 +14,35 @@ import math
 router = APIRouter(prefix="/admin", tags=["Admin Operations"])
 user_repo = UserRepository()
 sub_repo = SubscriptionRepository()
+
+def _build_investor_list_item(user: User) -> InvestorListItem:
+    reports_sub = sub_repo.get_active_subscription(user.id, ServiceType.REPORTS.value)
+    portfolio_sub = sub_repo.get_active_subscription(user.id, ServiceType.PORTFOLIO.value)
+    
+    return InvestorListItem(
+        id=user.id,
+        username=user.username,
+        full_name=user.full_name,
+        email=user.email,
+        phone=user.phone,
+        address=user.address,
+        address_line1=user.address_line1,
+        address_line2=user.address_line2,
+        pincode=user.pincode,
+        city=user.city,
+        state=user.state,
+        country=user.country or "India",
+        pan_number=user.pan_number,
+        date_of_birth=user.date_of_birth,
+        kyc_status=user.kyc_status or "verified",
+        risk_profile=user.risk_profile or "Moderate",
+        admin_notes=user.admin_notes,
+        role=user.role,
+        status=user.status,
+        created_at=user.created_at,
+        subscribed_reports=reports_sub is not None,
+        subscribed_portfolio=portfolio_sub is not None
+    )
 
 @router.get("/investors", response_model=PaginatedResponse)
 @router.get("/users", response_model=PaginatedResponse)
@@ -25,22 +54,7 @@ def list_investors(
     users, total = user_repo.get_all_paginated(page, limit)
     pages = math.ceil(total / limit) if limit > 0 else 1
     
-    items = []
-    for user in users:
-        # Check active subscriptions
-        reports_sub = sub_repo.get_active_subscription(user.id, ServiceType.REPORTS.value)
-        portfolio_sub = sub_repo.get_active_subscription(user.id, ServiceType.PORTFOLIO.value)
-        
-        items.append(InvestorListItem(
-            id=user.id,
-            username=user.username,
-            email=user.email,
-            role=user.role,
-            status=user.status,
-            created_at=user.created_at,
-            subscribed_reports=reports_sub is not None,
-            subscribed_portfolio=portfolio_sub is not None
-        ))
+    items = [_build_investor_list_item(user) for user in users]
         
     return PaginatedResponse(
         items=items,
@@ -163,19 +177,7 @@ def get_investor_detail(
     if not user:
         raise HTTPException(status_code=404, detail="Investor not found")
         
-    reports_sub = sub_repo.get_active_subscription(user.id, ServiceType.REPORTS.value)
-    portfolio_sub = sub_repo.get_active_subscription(user.id, ServiceType.PORTFOLIO.value)
-    
-    return InvestorListItem(
-        id=user.id,
-        username=user.username,
-        email=user.email,
-        role=user.role,
-        status=user.status,
-        created_at=user.created_at,
-        subscribed_reports=reports_sub is not None,
-        subscribed_portfolio=portfolio_sub is not None
-    )
+    return _build_investor_list_item(user)
 
 @router.get("/investors/{investor_id}/activities")
 @router.get("/users/{investor_id}/activities")
@@ -199,20 +201,69 @@ def update_investor_profile_by_admin(
     if not user:
         raise HTTPException(status_code=404, detail="Investor not found")
         
-    # check for username/email uniqueness if changed
-    clean_username = req.username.replace(" ", "")
-    if clean_username != user.username:
-        existing = user_repo.get_by_username(clean_username)
-        if existing:
-            raise HTTPException(status_code=400, detail="Username already taken")
-            
     if req.email != user.email:
         existing = user_repo.get_by_email(req.email)
-        if existing:
-            raise HTTPException(status_code=400, detail="Email already registered")
+        if existing and existing.id != investor_id:
+            raise HTTPException(status_code=400, detail="Email already registered by another user")
 
-    user_repo.update_profile(investor_id, username=clean_username, email=req.email)
-    log_activity(investor_id, clean_username, "admin_edit_profile", f"Admin updated profile details: username={clean_username}, email={req.email}")
+    user_repo.update_profile(
+        investor_id,
+        email=req.email,
+        full_name=req.full_name,
+        phone=req.phone,
+        pan_number=req.pan_number,
+        address_line1=req.address_line1,
+        address_line2=req.address_line2,
+        pincode=req.pincode,
+        date_of_birth=req.date_of_birth,
+        city=req.city,
+        state=req.state,
+        country=req.country,
+        role=req.role,
+        status=req.status,
+        kyc_status=req.kyc_status,
+        risk_profile=req.risk_profile,
+        admin_notes=req.admin_notes
+    )
+
+    # Manage subscription flags if passed
+    if req.subscribed_reports is not None:
+        if req.subscribed_reports:
+            sub = Subscription(
+                user_id=investor_id,
+                service_type=ServiceType.REPORTS,
+                status=SubscriptionStatus.ACTIVE,
+                expires_at=datetime.utcnow() + timedelta(days=365)
+            )
+            sub_repo.create_or_update(sub)
+        else:
+            sub = Subscription(
+                user_id=investor_id,
+                service_type=ServiceType.REPORTS,
+                status=SubscriptionStatus.EXPIRED,
+                expires_at=datetime.utcnow() - timedelta(days=1)
+            )
+            sub_repo.create_or_update(sub)
+
+    if req.subscribed_portfolio is not None:
+        if req.subscribed_portfolio:
+            sub = Subscription(
+                user_id=investor_id,
+                service_type=ServiceType.PORTFOLIO,
+                status=SubscriptionStatus.ACTIVE,
+                expires_at=datetime.utcnow() + timedelta(days=365)
+            )
+            sub_repo.create_or_update(sub)
+        else:
+            sub = Subscription(
+                user_id=investor_id,
+                service_type=ServiceType.PORTFOLIO,
+                status=SubscriptionStatus.EXPIRED,
+                expires_at=datetime.utcnow() - timedelta(days=1)
+            )
+            sub_repo.create_or_update(sub)
+
+    log_activity(investor_id, user.username, "admin_edit_profile", f"Admin updated investor profile: {user.username} ({req.email})")
     return {"message": "Investor profile updated successfully"}
 
 @router.put("/investors/{investor_id}/subscriptions")
@@ -238,7 +289,6 @@ def update_investor_subscription_by_admin(
         sub_repo.create_or_update(sub)
         log_activity(investor_id, user.username, "admin_activate_sub", f"Admin activated {req.service_type.value} subscription")
     else:
-        # deactivate by expiring subscription
         sub = Subscription(
             user_id=investor_id,
             service_type=req.service_type,

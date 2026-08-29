@@ -96,9 +96,21 @@ class UserRoleUpdateRequest(BaseModel):
 class InvestorListItem(BaseModel):
     id: str
     username: Optional[str] = None
+    full_name: Optional[str] = None
     email: EmailStr
     phone: Optional[str] = None
     address: Optional[str] = None
+    address_line1: Optional[str] = None
+    address_line2: Optional[str] = None
+    pincode: Optional[str] = None
+    city: Optional[str] = None
+    state: Optional[str] = None
+    country: Optional[str] = "India"
+    pan_number: Optional[str] = None
+    date_of_birth: Optional[str] = None
+    kyc_status: Optional[str] = "verified"
+    risk_profile: Optional[str] = "Moderate"
+    admin_notes: Optional[str] = None
     role: UserRole
     status: UserStatus
     created_at: datetime
@@ -116,16 +128,36 @@ class PaginatedResponse(BaseModel):
 # Profile Update Schema
 class ProfileUpdateRequest(BaseModel):
     username: Optional[str] = None
+    full_name: Optional[str] = None
     email: Optional[str] = None
     phone: Optional[str] = None
     address: Optional[str] = None
+    address_line1: Optional[str] = None
+    address_line2: Optional[str] = None
+    pincode: Optional[str] = None
+    date_of_birth: Optional[str] = None
+    pan_number: Optional[str] = None
     password: Optional[str] = None
 
 class AdminInvestorProfileUpdate(BaseModel):
-    username: str
-    email: str
+    full_name: Optional[str] = None
+    email: EmailStr
     phone: Optional[str] = None
-    address: Optional[str] = None
+    pan_number: Optional[str] = None
+    address_line1: Optional[str] = None
+    address_line2: Optional[str] = None
+    pincode: Optional[str] = None
+    date_of_birth: Optional[str] = None
+    city: Optional[str] = None
+    state: Optional[str] = None
+    country: Optional[str] = None
+    role: Optional[UserRole] = None
+    status: Optional[UserStatus] = None
+    kyc_status: Optional[str] = None
+    risk_profile: Optional[str] = None
+    admin_notes: Optional[str] = None
+    subscribed_reports: Optional[bool] = None
+    subscribed_portfolio: Optional[bool] = None
 
 class AdminPasswordResetRequest(BaseModel):
     password: str
