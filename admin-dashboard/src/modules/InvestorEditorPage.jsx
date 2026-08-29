@@ -3,12 +3,12 @@ import { toast } from 'react-hot-toast';
 import { 
   ArrowLeft, Save, User, Mail, Phone, Calendar, CreditCard, 
   MapPin, ShieldCheck, CheckCircle2, Lock, FileText, Briefcase, 
-  Building, AlertCircle, Shield, Sparkles, UserCheck, UserPlus, Key
+  Building, AlertCircle, Shield, Sparkles, UserCheck, UserPlus, Key, Eye
 } from 'lucide-react';
 import { API_BASE_URL } from '../config/apiConfig';
 import AdminBreadcrumb from '../components/AdminBreadcrumb';
 
-export default function InvestorEditorPage({ investor, onBack, onSaveSuccess }) {
+export default function InvestorEditorPage({ investor, onBack, onSaveSuccess, onViewProfile }) {
   const isNew = !investor || !investor.id;
 
   const [formData, setFormData] = useState({
@@ -183,6 +183,15 @@ export default function InvestorEditorPage({ investor, onBack, onSaveSuccess }) 
           </div>
 
           <div className="flex items-center gap-3">
+            {onViewProfile && !isNew && (
+              <button
+                type="button"
+                onClick={onViewProfile}
+                className="px-4 py-2.5 rounded-full border border-blue-200 bg-blue-50 text-xs font-bold text-blue-700 hover:bg-blue-100 transition-all flex items-center gap-1.5"
+              >
+                <Eye className="w-4 h-4" /> View Profile
+              </button>
+            )}
             <button
               type="button"
               onClick={onBack}

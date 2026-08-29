@@ -1,4 +1,4 @@
-# Raghuvir Consultants Admin Console User Guide (v2.12.24)
+# Raghuvir Consultants Admin Console User Guide (v2.12.25)
 
 Complete operational manual for managing the Raghuvir Consultants advisory platform via `https://admin.raghuvirconsultants.in` (or `/adminDashboard`).
 
@@ -32,6 +32,7 @@ The left sidebar is organized into 5 distinct operational categories under **Rag
 
 ### Category 2: Investors
 - **Investor Directory**:
+  - **Facebook-Style Investor Profile Page**: Rich hero cover banner, circular avatar with active/suspended indicator, SEBI verified checkmark, 2-column Facebook feed layout, tabbed navigation (Overview & Timeline, About & KYC Compliance, Contact & Residential Address, Subscriptions & Portfolios, Security & Account Audit), and internal admin note posting.
   - Full Indian KYC Compliance fields (PAN number, Gender, Date of Birth, Full Address, Referral Source).
   - Dedicated Sub-Page Editor (`/investors/new` & `/investors/edit/:id`) with interactive breadcrumbs.
   - Account status options: **Activate**, **Disable**, or **Blacklist**.
