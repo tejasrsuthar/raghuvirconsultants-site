@@ -27,10 +27,16 @@ class UserRepository:
 
     def get_by_email(self, email: str) -> Optional[User]:
         data = self.collection.find_one({"email": email})
+        if not data and email:
+            import re
+            data = self.collection.find_one({"email": {"$regex": f"^{re.escape(email)}$", "$options": "i"}})
         return User(**data) if data else None
 
     def get_by_username(self, username: str) -> Optional[User]:
         data = self.collection.find_one({"username": username})
+        if not data and username:
+            import re
+            data = self.collection.find_one({"username": {"$regex": f"^{re.escape(username)}$", "$options": "i"}})
         return User(**data) if data else None
 
     def get_by_google_id(self, google_id: str) -> Optional[User]:

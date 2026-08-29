@@ -49,7 +49,7 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
 app = FastAPI(
     title="Raghuvir Consultants API",
     description="Enterprise Advisory System Backend",
-    version="2.12.14"
+    version="2.12.15"
 )
 
 # ── Middleware stack (order matters — outermost first) ─────────────────────────
@@ -101,23 +101,32 @@ app.include_router(system_router.router, prefix="/api")
 def seed_admin():
     user_repo = UserRepository()
     admin_email = "admin@raghuvir.com"
-    existing = user_repo.get_by_email(admin_email)
-    if not existing:
+    default_admin_password = get_password_hash("Raghuvir#Admin2026!")
+    
+    # 1. Ensure primary admin account exists and has Raghuvir#Admin2026!
+    existing_by_email = user_repo.get_by_email(admin_email)
+    existing_by_username = user_repo.get_by_username("admin")
+    
+    admin_user = existing_by_email or existing_by_username
+    if not admin_user:
         admin_user = User(
-            username="Admin",
+            username="admin",
+            full_name="System Administrator",
             email=admin_email,
-            hashed_password=get_password_hash("admin12345"),
+            hashed_password=default_admin_password,
             role=UserRole.ADMIN,
             status=UserStatus.ACTIVE
         )
         user_repo.create(admin_user)
-        print("Admin user seeded successfully!")
+        print("Admin user created successfully with Raghuvir#Admin2026!")
     else:
-        user_repo.update_password(existing.id, get_password_hash("admin12345"))
-        user_repo.update_role(existing.id, UserRole.ADMIN)
+        user_repo.update_password(admin_user.id, default_admin_password)
+        user_repo.update_role(admin_user.id, UserRole.ADMIN)
+        user_repo.update_status(admin_user.id, UserStatus.ACTIVE)
+        print(f"Admin user ({admin_user.username}) credentials updated to Raghuvir#Admin2026!")
 
-    # Automatically ensure admin accounts are granted ADMIN role
-    for username_or_email in ["tejassuthar1", "admin"]:
+    # 2. Automatically ensure admin accounts are granted ADMIN role
+    for username_or_email in ["tejassuthar1", "admin", "Admin"]:
         user = user_repo.get_by_username(username_or_email) or user_repo.get_by_email(username_or_email)
         if user and user.role != UserRole.ADMIN:
             user_repo.update_role(user.id, UserRole.ADMIN)
@@ -125,11 +134,11 @@ def seed_admin():
 
 @app.get("/")
 def read_root():
-    return {"message": "Raghuvir Consultants API is running", "version": "2.12.14"}
+    return {"message": "Raghuvir Consultants API is running", "version": "2.12.15"}
 
 @app.get("/health")
 @app.get("/api/health")
 @app.get("/api/system/health")
 def health_check():
-    return {"status": "ok", "version": "2.12.14"}
+    return {"status": "ok", "version": "2.12.15"}
 

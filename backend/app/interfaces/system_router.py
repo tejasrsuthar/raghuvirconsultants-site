@@ -50,7 +50,7 @@ def get_system_status():
 
     return {
         "api_status": "online",
-        "api_version": "2.12.14",
+        "api_version": "2.12.15",
         "environment": "production",
         "uptime_seconds": uptime_seconds,
         "database": {
