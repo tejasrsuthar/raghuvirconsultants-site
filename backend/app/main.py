@@ -49,7 +49,7 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
 app = FastAPI(
     title="Raghuvir Consultants API",
     description="Enterprise Advisory System Backend",
-    version="2.10.1"
+    version="2.10.2"
 )
 
 # ── Middleware stack (order matters — outermost first) ─────────────────────────
@@ -77,11 +77,10 @@ app.add_middleware(GZipMiddleware, minimum_size=1000)
 # 3. Security headers on all responses
 app.add_middleware(SecurityHeadersMiddleware)
 
-# 4. CORS — restrict to known frontend origins with regex matching
+# 4. CORS — strictly restricted to explicit allowed origins
 app.add_middleware(
     CORSMiddleware,
     allow_origins=ALLOWED_ORIGINS,
-    allow_origin_regex=r"^https?://([a-zA-Z0-9-]+\.)*(raghuvirconsultants\.in|raghuvircons\.local|localhost)(:\d+)?$",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -126,11 +125,11 @@ def seed_admin():
 
 @app.get("/")
 def read_root():
-    return {"message": "Raghuvir Consultants API is running", "version": "2.10.1"}
+    return {"message": "Raghuvir Consultants API is running", "version": "2.10.2"}
 
 @app.get("/health")
 @app.get("/api/health")
 @app.get("/api/system/health")
 def health_check():
-    return {"status": "ok", "version": "2.10.1"}
+    return {"status": "ok", "version": "2.10.2"}
 
