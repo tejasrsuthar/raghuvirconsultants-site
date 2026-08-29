@@ -39,11 +39,17 @@ def register(req: UserRegisterRequest):
     hashed_pwd = get_password_hash(req.password)
     user = User(
         username=clean_username,
+        full_name=req.full_name,
         email=email_to_use,
         phone=req.phone,
+        pan_number=req.pan_number,
+        date_of_birth=req.date_of_birth,
+        address_line1=req.address_line1,
+        address_line2=req.address_line2,
+        pincode=req.pincode,
         gender=req.gender,
         referral_source=req.referral_source,
-        country=req.country,
+        country=req.country or "India",
         state=req.state,
         city=req.city,
         hashed_password=hashed_pwd,
@@ -51,7 +57,7 @@ def register(req: UserRegisterRequest):
         status=UserStatus.ACTIVE
     )
     created_user = user_repo.create(user)
-    log_activity(created_user.id, created_user.username, "register", f"Registered a new investor account (location: {req.city or 'Unknown'}, {req.country or 'Unknown'})")
+    log_activity(created_user.id, created_user.username, "register", f"Registered a new investor account: {clean_username} ({req.email or 'no email'})")
     
     access_token = create_access_token(data={"sub": created_user.email, "role": created_user.role.value})
     return TokenResponse(
