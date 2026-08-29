@@ -1,6 +1,6 @@
 import pytest
-from app.interfaces.auth_router import validate_password_policy, register
-from app.interfaces.schemas import UserRegisterRequest, AdminInvestorCreateRequest
+from app.interfaces.auth_router import validate_password_policy, register, login
+from app.interfaces.schemas import UserRegisterRequest, AdminInvestorCreateRequest, UserLoginRequest
 from fastapi import HTTPException
 
 def test_password_policy_valid():
@@ -67,6 +67,25 @@ def test_investor_registration_with_full_profile():
     assert user.pincode == "380054"
     assert user.city == "Ahmedabad"
     repo.delete(user.id)
+
+def test_admin_seed_and_login_with_credentials():
+    from app.main import seed_admin
+    seed_admin()
+    
+    # 1. Login with username 'admin'
+    res_username = login(UserLoginRequest(email="admin", password="Raghuvir#Admin2026!"))
+    assert res_username.role == "admin"
+    assert res_username.access_token is not None
+
+    # 2. Login with uppercase 'Admin'
+    res_upper = login(UserLoginRequest(email="Admin", password="Raghuvir#Admin2026!"))
+    assert res_upper.role == "admin"
+    assert res_upper.access_token is not None
+
+    # 3. Login with email 'admin@raghuvir.com'
+    res_email = login(UserLoginRequest(email="admin@raghuvir.com", password="Raghuvir#Admin2026!"))
+    assert res_email.role == "admin"
+    assert res_email.access_token is not None
 
 def test_admin_create_investor_and_endpoints():
     from app.infrastructure.repositories import UserRepository
