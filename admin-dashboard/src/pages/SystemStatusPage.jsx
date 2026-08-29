@@ -44,7 +44,7 @@ export default function SystemStatusPage() {
   };
 
   return (
-    <div className="pt-28 pb-20 px-6 max-w-6xl mx-auto space-y-8 font-sans">
+    <div className="space-y-8 font-sans w-full">
       {/* Page Title & Auto-refresh Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-gray-200/80 pb-6">
         <div>
