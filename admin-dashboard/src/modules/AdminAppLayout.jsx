@@ -332,16 +332,13 @@ export default function AdminAppLayout() {
       <main className="flex-1 w-full min-w-0 p-6 md:p-8 lg:p-10 overflow-y-auto bg-[#F9FAFB]">
         <div className="w-full space-y-8">
           {/* Top Header Bar */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 border-b border-gray-200/70 pb-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 border-b border-gray-200/70 pb-4">
             <div>
-              <div className="flex items-center gap-2 text-xs text-gray-400 font-medium mb-1">
+              <div className="flex items-center gap-2 text-xs text-gray-400 font-medium">
                 <span>Raghuvir Consultants Console</span>
                 <ChevronRight className="w-3 h-3 text-gray-300" />
                 <span className="text-gray-800 capitalize font-semibold">{activeTab === 'notifications' ? 'Alerts' : activeTab}</span>
               </div>
-              <h1 className="text-2xl font-extrabold text-gray-900 tracking-tight">
-                Good morning, {adminUsername} 👋
-              </h1>
             </div>
 
             {/* Metric Badges */}
