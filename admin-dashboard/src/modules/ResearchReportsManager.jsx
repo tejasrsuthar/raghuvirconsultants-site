@@ -257,17 +257,26 @@ export default function ResearchReportsManager() {
           </select>
         </div>
 
-        {/* Dedicated Zero-Shift Bulk Action Bar */}
+        {/* Floating Zero-Shift Bulk Action Bar */}
         {selectedIds.length > 0 && (
-          <div className="flex items-center justify-between bg-blue-50 border border-blue-200/80 p-3 px-4 rounded-2xl text-xs animate-in fade-in slide-in-from-top-1 duration-150">
-            <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
-              <span className="font-bold text-blue-900">{selectedIds.length} Reports Selected</span>
+          <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 bg-gray-900/95 backdrop-blur-md text-white border border-gray-700/80 shadow-2xl px-5 py-3 rounded-2xl flex items-center gap-4 text-xs animate-in fade-in slide-in-from-bottom-4 duration-200">
+            <div className="flex items-center gap-2.5">
+              <span className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
+              <span className="font-semibold text-white tracking-wide">{selectedIds.length} report{selectedIds.length > 1 ? 's' : ''} selected</span>
             </div>
+            <div className="h-4 w-px bg-gray-700" />
             <button
+              type="button"
+              onClick={() => setSelectedIds([])}
+              className="text-gray-400 hover:text-white text-xs font-medium transition-colors"
+            >
+              Deselect All
+            </button>
+            <button
+              type="button"
               onClick={() => setBulkDeleteConfirm(true)}
               disabled={bulkActionLoading}
-              className="px-3.5 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-full font-bold text-[11px] flex items-center gap-1 shadow-xs transition-colors"
+              className="px-3.5 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold text-xs flex items-center gap-1.5 shadow-md transition-all active:scale-95"
             >
               <Trash2 className="w-3.5 h-3.5" /> Delete Selected
             </button>
