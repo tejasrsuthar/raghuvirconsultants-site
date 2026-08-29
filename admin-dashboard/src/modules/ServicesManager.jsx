@@ -169,26 +169,24 @@ export default function ServicesManager() {
 
       {/* Filter & Table Container */}
       <div className="bg-white border border-gray-200 rounded-3xl p-6 shadow-2xs space-y-4">
-        <div className="flex flex-col xl:flex-row justify-between gap-4">
-          <div className="flex flex-wrap items-center gap-3 flex-1">
-            <div className="relative flex-1 min-w-[220px]">
-              <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-              <input
-                type="text"
-                placeholder="Search services by title or description..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-full text-xs text-gray-800 focus:outline-none focus:border-purple-500"
-              />
-            </div>
-
-            <DateRangeFilter
-              selectedRange={dateFilter.range}
-              customStart={dateFilter.customStart}
-              customEnd={dateFilter.customEnd}
-              onRangeChange={setDateFilter}
+        <div className="flex flex-wrap items-center gap-3 w-full">
+          <div className="relative flex-1 min-w-[240px]">
+            <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              placeholder="Search services by title or description..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-9 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-full text-xs text-gray-800 focus:outline-none focus:border-purple-500"
             />
           </div>
+
+          <DateRangeFilter
+            selectedRange={dateFilter.range}
+            customStart={dateFilter.customStart}
+            customEnd={dateFilter.customEnd}
+            onRangeChange={setDateFilter}
+          />
         </div>
 
         {/* Directory Table */}
@@ -222,7 +220,7 @@ export default function ServicesManager() {
                       Created <ArrowUpDown className="w-3.5 h-3.5" />
                     </div>
                   </th>
-                  <th className="py-3.5 px-3 text-right">Actions</th>
+                  <th className="py-3.5 px-3 text-right w-20">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
@@ -246,14 +244,22 @@ export default function ServicesManager() {
                   ];
 
                   return (
-                    <tr key={service.id} className="hover:bg-gray-50/60 transition-colors">
+                    <tr 
+                      key={service.id} 
+                      onClick={() => {
+                        setEditingItem(service);
+                        setShowEditor(true);
+                      }}
+                      className="hover:bg-purple-50/40 transition-colors cursor-pointer group"
+                      title="Click to edit service tier"
+                    >
                       <td className="py-3.5 px-3">
                         <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-xl bg-purple-50 text-purple-700 flex items-center justify-center font-bold shrink-0">
+                          <div className="w-8 h-8 rounded-xl bg-purple-50 text-purple-700 flex items-center justify-center font-bold shrink-0 group-hover:bg-purple-100 transition-colors">
                             <Sparkles className="w-4 h-4" />
                           </div>
                           <div>
-                            <span className="font-bold text-gray-900 block">{service.title}</span>
+                            <span className="font-bold text-gray-900 block group-hover:text-purple-950 transition-colors">{service.title}</span>
                             <span className="text-[10px] text-gray-400 font-mono">ID: {service.id ? service.id.slice(0, 8) : '—'}</span>
                           </div>
                         </div>
@@ -268,7 +274,7 @@ export default function ServicesManager() {
                       <td className="py-3.5 px-3 text-gray-400 font-medium">
                         {new Date(service.created_at || Date.now()).toLocaleDateString()}
                       </td>
-                      <td className="py-3.5 px-3 text-right">
+                      <td className="py-3.5 px-3 text-right" onClick={(e) => e.stopPropagation()}>
                         <RowActionMenu items={rowActions} />
                       </td>
                     </tr>

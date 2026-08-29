@@ -167,36 +167,34 @@ export default function BlogPostManager() {
 
       {/* Filter & Table Container */}
       <div className="bg-white border border-gray-200 rounded-3xl p-6 shadow-2xs space-y-4">
-        <div className="flex flex-col xl:flex-row justify-between gap-4">
-          <div className="flex flex-wrap items-center gap-3 flex-1">
-            <div className="relative flex-1 min-w-[220px]">
-              <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-              <input
-                type="text"
-                placeholder="Search articles by title or keyword..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-full text-xs text-gray-800 focus:outline-none focus:border-amber-500"
-              />
-            </div>
-
-            <DateRangeFilter
-              selectedRange={dateFilter.range}
-              customStart={dateFilter.customStart}
-              customEnd={dateFilter.customEnd}
-              onRangeChange={setDateFilter}
+        <div className="flex flex-wrap items-center gap-3 w-full">
+          <div className="relative flex-1 min-w-[240px]">
+            <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              placeholder="Search articles by title or keyword..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-9 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-full text-xs text-gray-800 focus:outline-none focus:border-amber-500"
             />
+          </div>
 
-            <div className="relative min-w-[160px]">
-              <Tag className="w-3.5 h-3.5 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-              <input
-                type="text"
-                placeholder="Filter by tag..."
-                value={selectedTag}
-                onChange={(e) => setSelectedTag(e.target.value)}
-                className="w-full pl-9 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-full text-xs text-gray-800 focus:outline-none focus:border-amber-500"
-              />
-            </div>
+          <DateRangeFilter
+            selectedRange={dateFilter.range}
+            customStart={dateFilter.customStart}
+            customEnd={dateFilter.customEnd}
+            onRangeChange={setDateFilter}
+          />
+
+          <div className="relative min-w-[160px]">
+            <Tag className="w-3.5 h-3.5 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              placeholder="Filter by tag..."
+              value={selectedTag}
+              onChange={(e) => setSelectedTag(e.target.value)}
+              className="w-full pl-9 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-full text-xs text-gray-800 focus:outline-none focus:border-amber-500"
+            />
           </div>
         </div>
 
@@ -226,7 +224,7 @@ export default function BlogPostManager() {
                       Published Date <ArrowUpDown className="w-3.5 h-3.5" />
                     </div>
                   </th>
-                  <th className="py-3.5 px-3 text-right">Actions</th>
+                  <th className="py-3.5 px-3 text-right w-20">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
@@ -250,14 +248,22 @@ export default function BlogPostManager() {
                   ];
 
                   return (
-                    <tr key={post.id} className="hover:bg-gray-50/60 transition-colors">
+                    <tr 
+                      key={post.id} 
+                      onClick={() => {
+                        setEditingPost(post);
+                        setShowEditor(true);
+                      }}
+                      className="hover:bg-amber-50/40 transition-colors cursor-pointer group"
+                      title="Click to edit article"
+                    >
                       <td className="py-3.5 px-3">
                         <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center font-bold shrink-0">
+                          <div className="w-8 h-8 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center font-bold shrink-0 group-hover:bg-amber-100 transition-colors">
                             <FileText className="w-4 h-4" />
                           </div>
                           <div>
-                            <span className="font-bold text-gray-900 block max-w-md truncate">{post.title}</span>
+                            <span className="font-bold text-gray-900 block max-w-md truncate group-hover:text-amber-900 transition-colors">{post.title}</span>
                             <span className="text-[11px] text-gray-500 block max-w-md truncate">{post.summary || 'No summary'}</span>
                           </div>
                         </div>
@@ -275,7 +281,7 @@ export default function BlogPostManager() {
                       <td className="py-3.5 px-3 text-gray-400 font-medium">
                         {new Date(post.created_at || Date.now()).toLocaleDateString()}
                       </td>
-                      <td className="py-3.5 px-3 text-right">
+                      <td className="py-3.5 px-3 text-right" onClick={(e) => e.stopPropagation()}>
                         <RowActionMenu items={rowActions} />
                       </td>
                     </tr>

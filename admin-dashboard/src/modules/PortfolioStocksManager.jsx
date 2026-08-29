@@ -224,52 +224,54 @@ export default function PortfolioStocksManager() {
 
       {/* Filter & Table Container */}
       <div className="bg-white border border-gray-200 rounded-3xl p-6 shadow-2xs space-y-4">
-        <div className="flex flex-col xl:flex-row justify-between gap-4">
-          <div className="flex flex-wrap items-center gap-3 flex-1">
-            <div className="relative flex-1 min-w-[220px]">
-              <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-              <input
-                type="text"
-                placeholder="Search by ticker, company, or sector..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-full text-xs text-gray-800 focus:outline-none focus:border-emerald-500"
-              />
-            </div>
-
-            <DateRangeFilter
-              selectedRange={dateFilter.range}
-              customStart={dateFilter.customStart}
-              customEnd={dateFilter.customEnd}
-              onRangeChange={setDateFilter}
+        {/* Stable Search & Filter Bar */}
+        <div className="flex flex-wrap items-center gap-3 w-full">
+          <div className="relative flex-1 min-w-[240px]">
+            <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              placeholder="Search by ticker, company, or sector..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-9 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-full text-xs text-gray-800 focus:outline-none focus:border-emerald-500"
             />
-
-            <select
-              value={typeFilter}
-              onChange={(e) => setTypeFilter(e.target.value)}
-              className="px-3.5 py-2 bg-gray-50 border border-gray-200 rounded-full text-xs font-semibold text-gray-700 focus:outline-none"
-            >
-              <option value="">All Market Caps</option>
-              <option value="Large Cap">Large Cap</option>
-              <option value="Mid Cap">Mid Cap</option>
-              <option value="Small Cap">Small Cap</option>
-            </select>
           </div>
 
-          {/* Bulk Action Controls */}
-          {selectedIds.length > 0 && (
-            <div className="flex items-center gap-2 bg-emerald-50/70 border border-emerald-200 p-1.5 px-3 rounded-full text-xs animate-in fade-in">
-              <span className="font-bold text-emerald-900 mr-2">{selectedIds.length} Selected</span>
-              <button
-                onClick={() => setBulkDeleteConfirm(true)}
-                disabled={bulkActionLoading}
-                className="px-3 py-1 bg-red-600 hover:bg-red-700 text-white rounded-full font-bold text-[11px] flex items-center gap-1 transition-colors"
-              >
-                <Trash2 className="w-3 h-3" /> Delete Selected
-              </button>
-            </div>
-          )}
+          <DateRangeFilter
+            selectedRange={dateFilter.range}
+            customStart={dateFilter.customStart}
+            customEnd={dateFilter.customEnd}
+            onRangeChange={setDateFilter}
+          />
+
+          <select
+            value={typeFilter}
+            onChange={(e) => setTypeFilter(e.target.value)}
+            className="px-3.5 py-2 bg-gray-50 border border-gray-200 rounded-full text-xs font-semibold text-gray-700 focus:outline-none"
+          >
+            <option value="">All Market Caps</option>
+            <option value="Large Cap">Large Cap</option>
+            <option value="Mid Cap">Mid Cap</option>
+            <option value="Small Cap">Small Cap</option>
+          </select>
         </div>
+
+        {/* Dedicated Zero-Shift Bulk Action Bar */}
+        {selectedIds.length > 0 && (
+          <div className="flex items-center justify-between bg-emerald-50 border border-emerald-200/80 p-3 px-4 rounded-2xl text-xs animate-in fade-in slide-in-from-top-1 duration-150">
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="font-bold text-emerald-900">{selectedIds.length} Stock Positions Selected</span>
+            </div>
+            <button
+              onClick={() => setBulkDeleteConfirm(true)}
+              disabled={bulkActionLoading}
+              className="px-3.5 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-full font-bold text-[11px] flex items-center gap-1 shadow-xs transition-colors"
+            >
+              <Trash2 className="w-3.5 h-3.5" /> Delete Selected
+            </button>
+          </div>
+        )}
 
         {/* Directory Table */}
         {loading ? (
@@ -286,8 +288,8 @@ export default function PortfolioStocksManager() {
             <table className="w-full text-left border-collapse text-xs">
               <thead>
                 <tr className="border-b border-gray-200/80 text-gray-400 font-bold uppercase tracking-wider text-[11px]">
-                  <th className="py-3.5 px-3 w-10">
-                    <button onClick={toggleSelectAll} className="p-1">
+                  <th className="py-3.5 px-3 w-12 min-w-[48px] max-w-[48px] text-center">
+                    <button onClick={toggleSelectAll} className="p-1 inline-flex items-center justify-center">
                       {selectedIds.length === filteredStocks.length && filteredStocks.length > 0 ? (
                         <CheckSquare className="w-4 h-4 text-gray-900" />
                       ) : (
@@ -320,7 +322,7 @@ export default function PortfolioStocksManager() {
                       Target Price <ArrowUpDown className="w-3.5 h-3.5" />
                     </div>
                   </th>
-                  <th className="py-3.5 px-3 text-right">Actions</th>
+                  <th className="py-3.5 px-3 text-right w-20">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
@@ -345,9 +347,17 @@ export default function PortfolioStocksManager() {
                   ];
 
                   return (
-                    <tr key={item.id} className={`hover:bg-gray-50/60 transition-colors ${isSelected ? 'bg-emerald-50/30' : ''}`}>
-                      <td className="py-3.5 px-3">
-                        <button onClick={() => toggleSelect(item.id)} className="p-1">
+                    <tr 
+                      key={item.id} 
+                      onClick={() => {
+                        setEditingItem(item);
+                        setShowEditor(true);
+                      }}
+                      className={`hover:bg-emerald-50/40 transition-colors cursor-pointer group ${isSelected ? 'bg-emerald-50/30' : ''}`}
+                      title="Click to edit stock position"
+                    >
+                      <td className="py-3.5 px-3 w-12 min-w-[48px] max-w-[48px] text-center" onClick={(e) => e.stopPropagation()}>
+                        <button onClick={() => toggleSelect(item.id)} className="p-1 inline-flex items-center justify-center">
                           {isSelected ? (
                             <CheckSquare className="w-4 h-4 text-emerald-600" />
                           ) : (
@@ -357,10 +367,10 @@ export default function PortfolioStocksManager() {
                       </td>
                       <td className="py-3.5 px-3">
                         <div className="flex items-center gap-2">
-                          <span className="px-2.5 py-1 bg-gray-900 text-white font-mono font-bold rounded-lg text-xs">
+                          <span className="px-2.5 py-1 bg-gray-900 text-white font-mono font-bold rounded-lg text-xs group-hover:bg-emerald-900 transition-colors">
                             {item.ticker}
                           </span>
-                          <span className="font-bold text-gray-900">{item.company_name}</span>
+                          <span className="font-bold text-gray-900 group-hover:text-emerald-950 transition-colors">{item.company_name}</span>
                         </div>
                       </td>
                       <td className="py-3.5 px-3">
@@ -377,7 +387,7 @@ export default function PortfolioStocksManager() {
                       <td className="py-3.5 px-3 font-bold text-emerald-700">
                         ₹{Number(item.target_price || 0).toLocaleString()}
                       </td>
-                      <td className="py-3.5 px-3 text-right">
+                      <td className="py-3.5 px-3 text-right" onClick={(e) => e.stopPropagation()}>
                         <RowActionMenu items={rowActions} />
                       </td>
                     </tr>

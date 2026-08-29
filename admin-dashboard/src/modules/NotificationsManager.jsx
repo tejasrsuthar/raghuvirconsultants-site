@@ -271,67 +271,71 @@ export default function NotificationsManager() {
       </div>
 
       {/* Filter & Table Container */}
-      <div className="bg-white border border-gray-200 rounded-3xl p-6 shadow-2xs space-y-4">
-        <div className="flex flex-col xl:flex-row justify-between gap-4">
-          <div className="flex flex-wrap items-center gap-3 flex-1">
-            <div className="relative flex-1 min-w-[220px]">
-              <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-              <input
-                type="text"
-                placeholder="Search alerts by title or message..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-full text-xs text-gray-800 focus:outline-none focus:border-amber-500"
-              />
-            </div>
-
-            <DateRangeFilter
-              selectedRange={dateFilter.range}
-              customStart={dateFilter.customStart}
-              customEnd={dateFilter.customEnd}
-              onRangeChange={setDateFilter}
+      <div className="bg-white border border-gray-200 rounded-3xl p-6 shadow-2xs space-y-4 relative">
+        {/* Stable Search & Filter Bar (Never shifts when checkboxes are selected) */}
+        <div className="flex flex-wrap items-center gap-3 w-full">
+          <div className="relative flex-1 min-w-[240px]">
+            <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              placeholder="Search alerts by title or message..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-9 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-full text-xs text-gray-800 focus:outline-none focus:border-amber-500"
             />
-
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="px-4 py-2 bg-gray-50 border border-gray-200 rounded-full text-xs font-semibold text-gray-700 focus:outline-none"
-            >
-              <option value="">All Broadcast Statuses</option>
-              <option value="published">Published</option>
-              <option value="draft">Draft</option>
-              <option value="archived">Archived</option>
-            </select>
           </div>
 
-          {/* Bulk Action Controls */}
-          {selectedIds.length > 0 && (
-            <div className="flex items-center gap-2 bg-amber-50/70 border border-amber-200 p-1.5 px-3 rounded-full text-xs animate-in fade-in">
-              <span className="font-bold text-amber-900 mr-2">{selectedIds.length} Selected</span>
+          <DateRangeFilter
+            selectedRange={dateFilter.range}
+            customStart={dateFilter.customStart}
+            customEnd={dateFilter.customEnd}
+            onRangeChange={setDateFilter}
+          />
+
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="px-4 py-2 bg-gray-50 border border-gray-200 rounded-full text-xs font-semibold text-gray-700 focus:outline-none"
+          >
+            <option value="">All Broadcast Statuses</option>
+            <option value="published">Published</option>
+            <option value="draft">Draft</option>
+            <option value="archived">Archived</option>
+          </select>
+        </div>
+
+        {/* Dedicated Zero-Shift Bulk Action Bar */}
+        {selectedIds.length > 0 && (
+          <div className="flex items-center justify-between bg-amber-50 border border-amber-200/80 p-3 px-4 rounded-2xl text-xs animate-in fade-in slide-in-from-top-1 duration-150">
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+              <span className="font-bold text-amber-900">{selectedIds.length} Alerts Selected</span>
+            </div>
+            <div className="flex items-center gap-2">
               <button
                 onClick={() => handleBulkStatusChange('published')}
                 disabled={bulkActionLoading}
-                className="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full font-bold text-[11px] transition-colors"
+                className="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full font-bold text-[11px] shadow-xs transition-colors"
               >
                 Broadcast
               </button>
               <button
                 onClick={() => handleBulkStatusChange('draft')}
                 disabled={bulkActionLoading}
-                className="px-3 py-1 bg-amber-600 hover:bg-amber-700 text-white rounded-full font-bold text-[11px] transition-colors"
+                className="px-3.5 py-1.5 bg-amber-600 hover:bg-amber-700 text-white rounded-full font-bold text-[11px] shadow-xs transition-colors"
               >
-                Draft
+                Move to Draft
               </button>
               <button
                 onClick={() => setBulkDeleteConfirm(true)}
                 disabled={bulkActionLoading}
-                className="px-3 py-1 bg-red-600 hover:bg-red-700 text-white rounded-full font-bold text-[11px] flex items-center gap-1 transition-colors"
+                className="px-3.5 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-full font-bold text-[11px] flex items-center gap-1 shadow-xs transition-colors"
               >
-                <Trash2 className="w-3 h-3" /> Delete
+                <Trash2 className="w-3.5 h-3.5" /> Delete
               </button>
             </div>
-          )}
-        </div>
+          </div>
+        )}
 
         {/* Directory Table */}
         {loading ? (
@@ -348,8 +352,8 @@ export default function NotificationsManager() {
             <table className="w-full text-left border-collapse text-xs">
               <thead>
                 <tr className="border-b border-gray-200/80 text-gray-400 font-bold uppercase tracking-wider text-[11px]">
-                  <th className="py-3.5 px-3 w-10">
-                    <button onClick={toggleSelectAll} className="p-1">
+                  <th className="py-3.5 px-3 w-12 min-w-[48px] max-w-[48px] text-center">
+                    <button onClick={toggleSelectAll} className="p-1 inline-flex items-center justify-center">
                       {selectedIds.length === filteredItems.length && filteredItems.length > 0 ? (
                         <CheckSquare className="w-4 h-4 text-gray-900" />
                       ) : (
@@ -373,7 +377,7 @@ export default function NotificationsManager() {
                       Created <ArrowUpDown className="w-3.5 h-3.5" />
                     </div>
                   </th>
-                  <th className="py-3.5 px-3 text-right">Actions</th>
+                  <th className="py-3.5 px-3 text-right w-20">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
@@ -404,9 +408,17 @@ export default function NotificationsManager() {
                   ];
 
                   return (
-                    <tr key={item.id} className={`hover:bg-gray-50/60 transition-colors ${isSelected ? 'bg-amber-50/30' : ''}`}>
-                      <td className="py-3.5 px-3">
-                        <button onClick={() => toggleSelect(item.id)} className="p-1">
+                    <tr 
+                      key={item.id} 
+                      onClick={() => {
+                        setEditingItem(item);
+                        setShowEditor(true);
+                      }}
+                      className={`hover:bg-amber-50/40 transition-colors cursor-pointer group ${isSelected ? 'bg-amber-50/30' : ''}`}
+                      title="Click to edit broadcast alert"
+                    >
+                      <td className="py-3.5 px-3 w-12 min-w-[48px] max-w-[48px] text-center" onClick={(e) => e.stopPropagation()}>
+                        <button onClick={() => toggleSelect(item.id)} className="p-1 inline-flex items-center justify-center">
                           {isSelected ? (
                             <CheckSquare className="w-4 h-4 text-amber-600" />
                           ) : (
@@ -416,11 +428,11 @@ export default function NotificationsManager() {
                       </td>
                       <td className="py-3.5 px-3">
                         <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center font-bold shrink-0">
+                          <div className="w-8 h-8 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center font-bold shrink-0 group-hover:bg-amber-100 transition-colors">
                             <Bell className="w-4 h-4" />
                           </div>
                           <div>
-                            <span className="font-bold text-gray-900 block">{item.title}</span>
+                            <span className="font-bold text-gray-900 block group-hover:text-amber-900 transition-colors">{item.title}</span>
                             <span className="text-[10px] text-gray-400 font-mono">ID: {item.id ? item.id.slice(0, 8) : '—'}</span>
                           </div>
                         </div>
@@ -444,7 +456,7 @@ export default function NotificationsManager() {
                       <td className="py-3.5 px-3 text-gray-400 font-medium">
                         {new Date(item.created_at || Date.now()).toLocaleDateString()}
                       </td>
-                      <td className="py-3.5 px-3 text-right">
+                      <td className="py-3.5 px-3 text-right" onClick={(e) => e.stopPropagation()}>
                         <RowActionMenu items={rowActions} />
                       </td>
                     </tr>
