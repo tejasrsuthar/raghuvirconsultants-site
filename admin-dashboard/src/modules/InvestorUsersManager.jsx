@@ -6,6 +6,7 @@ import {
   CreditCard, CheckCircle2, ShieldCheck, Mail, Phone
 } from 'lucide-react';
 import InvestorEditorPage from './InvestorEditorPage';
+import InvestorFacebookProfilePage from './InvestorFacebookProfilePage';
 import NumberedPagination from '../components/NumberedPagination';
 import ConfirmModal from '../components/ConfirmModal';
 import RowActionMenu from '../components/RowActionMenu';
@@ -30,6 +31,9 @@ export default function InvestorUsersManager() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
+
+  // Profile View State (Facebook Style)
+  const [viewingProfileInvestor, setViewingProfileInvestor] = useState(null);
 
   // Full-page Editor State
   const [showEditor, setShowEditor] = useState(false);
@@ -182,6 +186,31 @@ export default function InvestorUsersManager() {
       return 0;
     });
 
+  if (viewingProfileInvestor) {
+    return (
+      <InvestorFacebookProfilePage
+        investor={viewingProfileInvestor}
+        onBack={() => {
+          setViewingProfileInvestor(null);
+        }}
+        onEdit={() => {
+          setEditingInvestor(viewingProfileInvestor);
+          setViewingProfileInvestor(null);
+          setShowEditor(true);
+        }}
+        onToggleStatus={() => handleToggleStatus(viewingProfileInvestor)}
+        onResetPassword={() => {
+          setPasswordModalUser(viewingProfileInvestor);
+          setNewPassword('');
+        }}
+        onUpdateInvestor={(updated) => {
+          setViewingProfileInvestor(updated);
+          fetchUsers(currentPage);
+        }}
+      />
+    );
+  }
+
   if (showEditor) {
     return (
       <InvestorEditorPage
@@ -190,6 +219,11 @@ export default function InvestorUsersManager() {
           setShowEditor(false);
           setEditingInvestor(null);
         }}
+        onViewProfile={editingInvestor ? () => {
+          setViewingProfileInvestor(editingInvestor);
+          setShowEditor(false);
+          setEditingInvestor(null);
+        } : null}
         onSaveSuccess={() => {
           setShowEditor(false);
           setEditingInvestor(null);
@@ -342,6 +376,13 @@ export default function InvestorUsersManager() {
                   const isActive = (user.status || 'active') === 'active';
                   const rowActions = [
                     {
+                      label: 'View Facebook Profile',
+                      icon: User,
+                      onClick: () => {
+                        setViewingProfileInvestor(user);
+                      }
+                    },
+                    {
                       label: 'Edit Investor Profile',
                       icon: Edit,
                       onClick: () => {
@@ -375,11 +416,10 @@ export default function InvestorUsersManager() {
                     <tr 
                       key={user.id} 
                       onClick={() => {
-                        setEditingInvestor(user);
-                        setShowEditor(true);
+                        setViewingProfileInvestor(user);
                       }}
-                      className="hover:bg-indigo-50/40 transition-colors cursor-pointer group"
-                      title="Click to edit investor profile & compliance details"
+                      className="hover:bg-blue-50/50 transition-colors cursor-pointer group"
+                      title="Click to view Facebook-style investor profile"
                     >
                       {/* Investor Profile (Avatar, Full Name, @username) */}
                       <td className="py-3.5 px-3">
