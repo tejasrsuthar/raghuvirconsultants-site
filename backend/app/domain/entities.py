@@ -37,14 +37,23 @@ class NotificationStatus(str, Enum):
 class User(BaseModel):
     id: Optional[str] = None
     username: Optional[str] = None
+    full_name: Optional[str] = None
     email: EmailStr
     phone: Optional[str] = None
     gender: Optional[str] = None
     referral_source: Optional[str] = None
-    country: Optional[str] = None
+    country: Optional[str] = "India"
     state: Optional[str] = None
     city: Optional[str] = None
     address: Optional[str] = None
+    address_line1: Optional[str] = None
+    address_line2: Optional[str] = None
+    pincode: Optional[str] = None
+    pan_number: Optional[str] = None
+    date_of_birth: Optional[str] = None
+    kyc_status: Optional[str] = "verified"
+    risk_profile: Optional[str] = "Moderate"
+    admin_notes: Optional[str] = None
     hashed_password: Optional[str] = None
     google_id: Optional[str] = None
     role: UserRole = UserRole.INVESTOR

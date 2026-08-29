@@ -51,23 +51,59 @@ class UserRepository:
 
     def update_profile(
         self, user_id: str, username: Optional[str] = None, email: Optional[str] = None, 
-        phone: Optional[str] = None, address: Optional[str] = None, hashed_password: Optional[str] = None
+        phone: Optional[str] = None, address: Optional[str] = None, hashed_password: Optional[str] = None,
+        full_name: Optional[str] = None, pan_number: Optional[str] = None,
+        address_line1: Optional[str] = None, address_line2: Optional[str] = None,
+        pincode: Optional[str] = None, date_of_birth: Optional[str] = None,
+        city: Optional[str] = None, state: Optional[str] = None, country: Optional[str] = None,
+        kyc_status: Optional[str] = None, risk_profile: Optional[str] = None,
+        admin_notes: Optional[str] = None, role: Optional[str] = None, status: Optional[str] = None,
+        **extra
     ) -> bool:
         update_fields = {}
-        if username:
+        if username is not None:
             update_fields["username"] = username
-        if email:
+        if email is not None:
             update_fields["email"] = email
         if phone is not None:
             update_fields["phone"] = phone
         if address is not None:
             update_fields["address"] = address
-        if hashed_password:
+        if hashed_password is not None:
             update_fields["hashed_password"] = hashed_password
+        if full_name is not None:
+            update_fields["full_name"] = full_name
+        if pan_number is not None:
+            update_fields["pan_number"] = pan_number.upper().strip()
+        if address_line1 is not None:
+            update_fields["address_line1"] = address_line1
+        if address_line2 is not None:
+            update_fields["address_line2"] = address_line2
+        if pincode is not None:
+            update_fields["pincode"] = pincode
+        if date_of_birth is not None:
+            update_fields["date_of_birth"] = date_of_birth
+        if city is not None:
+            update_fields["city"] = city
+        if state is not None:
+            update_fields["state"] = state
+        if country is not None:
+            update_fields["country"] = country
+        if kyc_status is not None:
+            update_fields["kyc_status"] = kyc_status
+        if risk_profile is not None:
+            update_fields["risk_profile"] = risk_profile
+        if admin_notes is not None:
+            update_fields["admin_notes"] = admin_notes
+        if role is not None:
+            update_fields["role"] = role.value if hasattr(role, 'value') else role
+        if status is not None:
+            update_fields["status"] = status.value if hasattr(status, 'value') else status
+
         if not update_fields:
             return False
         res = self.collection.update_one({"id": user_id}, {"$set": update_fields})
-        return res.modified_count > 0
+        return res.modified_count > 0 or res.matched_count > 0
 
     def get_all_paginated(self, page: int = 1, limit: int = 10) -> Tuple[List[User], int]:
         total = self.collection.count_documents({})
