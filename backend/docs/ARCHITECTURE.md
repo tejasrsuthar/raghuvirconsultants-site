@@ -1,4 +1,4 @@
-# Enterprise System Architecture (v2.10.3)
+# Enterprise System Architecture (v2.11.0)
 
 This document provides complete technical specifications for the Raghuvir Consultants Enterprise Wealth & Advisory platform.
 
@@ -6,7 +6,7 @@ This document provides complete technical specifications for the Raghuvir Consul
 
 ## 1. System Overview & Domain Topology
 
-The platform operates on a decoupled client-server architecture serving unified and admin domain contexts:
+The platform operates on a decoupled client-server architecture serving unified and admin domain contexts managed via **Docker Compose**:
 - **`raghuvircons.local` / `www.raghuvirconsultants.in` (Port 80/443)**: Main Public Portal, Investor Dashboard, & `/api/` reverse-proxied FastAPI backend.
 - **`app.raghuvircons.local` / `admin.raghuvirconsultants.in` (Port 80/443)**: Zaga Admin Console context.
 - **FastAPI REST API Server (Port 8000)**: Asynchronous Python backend powered by MongoDB Atlas / Local MongoDB.
@@ -18,29 +18,31 @@ graph TD
         AdminDomain["admin.raghuvirconsultants.in (Standalone Zaga Admin Console)"]
     end
 
-    subgraph ReactFrontend["React 18 + Vite Frontend Application"]
-        AppRouter["App.jsx Dual Domain Router"]
-        
-        subgraph PublicPortal["Public & Investor Portal"]
-          PublicViews["Home / Services / Smallcases / News"]
-          InvestorPortal["Investor Dashboard & Subscribed Services"]
+    subgraph ComposeStack["Unified Docker Compose Stack (raghuvir-net)"]
+        subgraph ReactFrontend["React 18 + Vite Frontend Application"]
+            AppRouter["App.jsx Dual Domain Router"]
+            
+            subgraph PublicPortal["Public & Investor Portal"]
+              PublicViews["Home / Services / Smallcases / News"]
+              InvestorPortal["Investor Dashboard & Subscribed Services"]
+            end
+
+            subgraph ZagaAdmin["Standalone Admin Console"]
+              AdminLayout["AdminAppLayout (Zaga Design System)"]
+              AdminModules["CRUD Modules: Users, Reports, Portfolio, Smallcases, Services, News, Alerts, Blogs, Telemetry"]
+            end
         end
 
-        subgraph ZagaAdmin["Standalone Admin Console"]
-          AdminLayout["AdminAppLayout (Zaga Design System)"]
-          AdminModules["CRUD Modules: Users, Reports, Portfolio, Smallcases, Services, News, Alerts, Blogs, Telemetry"]
+        subgraph FastAPIServer["FastAPI Asynchronous Backend (v2.11.0)"]
+            API["app/main.py (CORS & Middleware)"]
+            AuthRouter["auth_router.py (/api/auth)"]
+            AdminRouter["admin_router.py (/api/admin)"]
+            ReportsRouter["reports_router.py (/api/reports)"]
+            PortfolioRouter["portfolio_router.py (/api/portfolio)"]
+            PaymentsRouter["payments_router.py (/api/payments)"]
+            CRUDRouters["crud_routers.py (/api/smallcases, /services, /blogs)"]
+            SystemRouter["system_router.py (/api/system/status)"]
         end
-      end
-
-    subgraph FastAPIServer["FastAPI Asynchronous Backend (v2.10.3)"]
-        API["app/main.py (CORS & Middleware)"]
-        AuthRouter["auth_router.py (/api/auth)"]
-        AdminRouter["admin_router.py (/api/admin)"]
-        ReportsRouter["reports_router.py (/api/reports)"]
-        PortfolioRouter["portfolio_router.py (/api/portfolio)"]
-        PaymentsRouter["payments_router.py (/api/payments)"]
-        CRUDRouters["crud_routers.py (/api/smallcases, /services, /blogs)"]
-        SystemRouter["system_router.py (/api/system/status)"]
     end
 
     subgraph DataStore["MongoDB Storage Layer"]
