@@ -52,7 +52,9 @@ export default function NotificationsManager() {
       const url = statusFilter 
         ? `${API_BASE_URL}/api/notifications?page=${page}&limit=10&status=${statusFilter}`
         : `${API_BASE_URL}/api/notifications?page=${page}&limit=10`;
-      const res = await fetch(url);
+      const res = await fetch(url, {
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+      });
       if (res.ok) {
         const data = await res.json();
         setItems(data.items || []);

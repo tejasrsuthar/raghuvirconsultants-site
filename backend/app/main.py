@@ -49,7 +49,7 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
 app = FastAPI(
     title="Raghuvir Consultants API",
     description="Enterprise Advisory System Backend",
-    version="2.12.17"
+    version="2.12.18"
 )
 
 # ── Middleware stack (order matters — outermost first) ─────────────────────────
@@ -134,11 +134,11 @@ def seed_admin():
 
 @app.get("/")
 def read_root():
-    return {"message": "Raghuvir Consultants API is running", "version": "2.12.17"}
+    return {"message": "Raghuvir Consultants API is running", "version": "2.12.18"}
 
 @app.get("/health")
 @app.get("/api/health")
 @app.get("/api/system/health")
 def health_check():
-    return {"status": "ok", "version": "2.12.17"}
+    return {"status": "ok", "version": "2.12.18"}
 

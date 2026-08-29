@@ -23,6 +23,8 @@ def get_current_user(token: str = Depends(oauth2_scheme)) -> User:
     user = user_repo.get_by_email(email)
     if user is None:
         raise credentials_exception
+    if user.status == UserStatus.SUSPENDED:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Account is suspended")
     if user.status == UserStatus.DISABLED:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Account is disabled")
     if user.status == UserStatus.BLACKLISTED:

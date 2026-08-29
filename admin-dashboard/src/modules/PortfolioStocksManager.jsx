@@ -49,7 +49,9 @@ export default function PortfolioStocksManager() {
     setLoading(true);
     setSelectedIds([]);
     try {
-      const res = await fetch(`${API_BASE_URL}/api/portfolio?page=${page}&limit=10`);
+      const res = await fetch(`${API_BASE_URL}/api/portfolio?page=${page}&limit=10`, {
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+      });
       if (res.ok) {
         const data = await res.json();
         setStocks(data.items || []);

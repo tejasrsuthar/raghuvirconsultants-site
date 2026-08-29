@@ -42,7 +42,9 @@ export default function NewsManager() {
   const fetchItems = async (page = 1) => {
     setLoading(true);
     try {
-      const res = await fetch(`${API_BASE_URL}/api/news?page=${page}&limit=10`);
+      const res = await fetch(`${API_BASE_URL}/api/news?page=${page}&limit=10`, {
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+      });
       if (res.ok) {
         const data = await res.json();
         setItems(data.items || []);
