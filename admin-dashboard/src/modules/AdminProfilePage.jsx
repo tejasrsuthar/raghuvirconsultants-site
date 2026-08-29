@@ -70,7 +70,11 @@ export default function AdminProfilePage({ onBack }) {
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-6 border-b border-gray-200">
         <div>
-          <div className="mb-3">
+          <h2 className="text-2xl font-extrabold text-gray-900 tracking-tight flex items-center gap-2.5">
+            <ShieldCheck className="w-6 h-6 text-gray-700" />
+            Edit Admin Profile Settings
+          </h2>
+          <div className="mt-1 mb-1">
             <AdminBreadcrumb
               onNavigateHome={onBack}
               items={[
@@ -78,11 +82,7 @@ export default function AdminProfilePage({ onBack }) {
               ]}
             />
           </div>
-          <h2 className="text-2xl font-extrabold text-gray-900 tracking-tight flex items-center gap-2.5">
-            <ShieldCheck className="w-6 h-6 text-gray-700" />
-            Edit Admin Profile Settings
-          </h2>
-          <p className="text-xs text-gray-500 mt-1">Manage admin credentials, email preferences, and password security</p>
+          <p className="text-xs text-gray-500">Manage admin credentials, email preferences, and password security</p>
         </div>
       </div>
 

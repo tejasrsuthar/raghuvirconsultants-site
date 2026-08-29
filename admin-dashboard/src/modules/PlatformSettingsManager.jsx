@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-hot-toast';
 import { Settings, Save, CheckCircle, CheckCircle2, ShieldAlert } from 'lucide-react';
+import AdminBreadcrumb from '../components/AdminBreadcrumb';
 import { API_BASE_URL } from '../config/apiConfig';
 
 export default function PlatformSettingsManager() {
@@ -74,7 +75,10 @@ export default function PlatformSettingsManager() {
           </div>
           <div>
             <h2 className="text-xl sm:text-2xl font-extrabold text-gray-900 tracking-tight">Platform-Wide Global Settings</h2>
-            <p className="text-xs text-gray-500 mt-1">Configure system defaults, pagination parameters, and security policies</p>
+            <div className="mt-1 mb-1">
+              <AdminBreadcrumb items={[{ label: 'Platform Settings' }]} />
+            </div>
+            <p className="text-xs text-gray-500">Configure system defaults, pagination parameters, and security policies</p>
           </div>
         </div>
       </div>

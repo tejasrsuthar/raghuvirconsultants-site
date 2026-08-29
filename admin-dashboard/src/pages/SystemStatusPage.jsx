@@ -49,8 +49,12 @@ export default function SystemStatusPage({ onBack }) {
       {/* Page Title & Auto-refresh Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-gray-200/80 pb-6">
         <div>
+          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-emerald-700 mb-1">
+            <Activity className="w-4 h-4 text-emerald-600 animate-pulse" /> Live System Status
+          </div>
+          <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">System Status & Infrastructure</h1>
           {onBack && (
-            <div className="mb-3">
+            <div className="mt-1 mb-1">
               <AdminBreadcrumb
                 onNavigateHome={onBack}
                 items={[
@@ -59,11 +63,7 @@ export default function SystemStatusPage({ onBack }) {
               />
             </div>
           )}
-          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-emerald-700 mb-1">
-            <Activity className="w-4 h-4 text-emerald-600 animate-pulse" /> Live System Status
-          </div>
-          <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">System Status & Infrastructure</h1>
-          <p className="text-xs text-gray-500 mt-1">Real-time health, version telemetry, database ping speed, and hardware telemetry</p>
+          <p className="text-xs text-gray-500">Real-time health, version telemetry, database ping speed, and hardware telemetry</p>
         </div>
 
         <div className="flex items-center gap-3">

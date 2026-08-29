@@ -132,28 +132,6 @@ export default function AdminAppLayout() {
             </div>
           </div>
 
-          {/* + New Article Action Pill Button */}
-          <button 
-            onClick={() => setActiveTab('blogs')}
-            className="w-full bg-white border border-[#E5E5E7] hover:bg-gray-50 py-2.5 px-4 rounded-full font-semibold text-xs text-gray-800 flex items-center justify-center gap-1.5 shadow-xs transition-all"
-          >
-            <Plus className="w-4 h-4 text-gray-500" /> New Article
-          </button>
-
-          {/* Search Box Pill */}
-          <div className="relative">
-            <Search className="w-3.5 h-3.5 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-            <input 
-              type="text" 
-              placeholder="Search..." 
-              className="w-full pl-9 pr-14 py-2 bg-white border border-[#E5E5E7] rounded-full text-xs text-gray-800 placeholder-gray-400 focus:outline-none focus:border-gray-400 shadow-xs"
-            />
-            <div className="absolute right-2.5 top-1/2 -translate-y-1/2 flex items-center gap-1">
-              <span className="px-1.5 py-0.5 bg-white border border-[#E5E5E7] rounded text-[10px] font-mono text-gray-500 shadow-2xs">⌘</span>
-              <span className="px-1.5 py-0.5 bg-white border border-[#E5E5E7] rounded text-[10px] font-mono text-gray-500 shadow-2xs">K</span>
-            </div>
-          </div>
-
           {/* Categorized Navigation Hierarchy */}
           <div className="space-y-4">
             {/* 1. Dashboard Overview */}
@@ -350,26 +328,27 @@ export default function AdminAppLayout() {
       {/* Main Right Content Panel */}
       <main className="flex-1 w-full min-w-0 p-6 md:p-8 lg:p-10 overflow-y-auto bg-[#F9FAFB]">
         <div className="w-full space-y-8">
-          {/* Top Header Bar */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 border-b border-gray-200/70 pb-4">
-              <AdminBreadcrumb
-                onNavigateHome={() => setActiveTab('home')}
-                items={activeTab === 'home' ? [{ label: 'Dashboard' }] : [{ label: getTabBreadcrumbLabel(activeTab) }]}
-              />
-
-            {/* Metric Badges */}
-            <div className="flex items-center gap-3 bg-white p-2 rounded-2xl border border-gray-200/80 shadow-2xs text-xs font-semibold text-gray-600">
-              <span className="px-3 py-1 bg-gray-100/80 rounded-xl">{stats.investors} Investors</span>
-              <span className="px-3 py-1 bg-gray-100/80 rounded-xl">{stats.reports} Reports</span>
-              <span className="px-3 py-1 bg-emerald-50 text-emerald-700 rounded-xl font-bold flex items-center gap-1">
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" /> 99.9% Uptime
-              </span>
-            </div>
-          </div>
-
           {/* Tab Components Rendering */}
           {activeTab === 'home' && (
             <div className="space-y-8">
+              {/* Header Banner */}
+              <div className="bg-white border border-gray-200 rounded-3xl p-6 sm:p-8 shadow-2xs">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                  <div className="flex items-center gap-3.5">
+                    <div className="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-700 flex items-center justify-center font-bold">
+                      <Home className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <h2 className="text-xl font-bold text-gray-900">Dashboard Overview</h2>
+                      <div className="mt-1">
+                        <AdminBreadcrumb items={[{ label: 'Dashboard' }]} />
+                      </div>
+                      <p className="text-xs text-gray-500 mt-1">Real-time platform metrics, research publications, portfolio status, and editorial overview</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               {/* Metric Overview Grid */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 <div className="bg-white border border-[#EAEAEA] p-6 rounded-3xl shadow-2xs">

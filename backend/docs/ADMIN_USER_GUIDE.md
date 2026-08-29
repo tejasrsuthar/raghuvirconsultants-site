@@ -1,4 +1,4 @@
-# Raghuvir Consultants Admin Console User Guide (v2.12.27)
+# Raghuvir Consultants Admin Console User Guide (v2.12.28)
 
 Complete operational manual for managing the Raghuvir Consultants advisory platform via `https://admin.raghuvirconsultants.in` (or `/adminDashboard`).
 

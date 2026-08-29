@@ -161,7 +161,11 @@ export default function InvestorEditorPage({ investor, onBack, onSaveSuccess, on
       <div className="bg-white border border-gray-200 rounded-3xl p-6 sm:p-8 shadow-2xs">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <div className="mb-3">
+            <h2 className="text-2xl font-extrabold text-gray-900 tracking-tight flex items-center gap-2.5">
+              {isNew ? <UserPlus className="w-6 h-6 text-indigo-600" /> : <UserCheck className="w-6 h-6 text-indigo-600" />}
+              {isNew ? 'Create New Investor Account' : 'Edit Investor Profile'}
+            </h2>
+            <div className="mt-1 mb-1">
               <AdminBreadcrumb
                 onNavigateHome={onBack}
                 items={[
@@ -170,11 +174,7 @@ export default function InvestorEditorPage({ investor, onBack, onSaveSuccess, on
                 ]}
               />
             </div>
-            <h2 className="text-2xl font-extrabold text-gray-900 tracking-tight flex items-center gap-2.5">
-              {isNew ? <UserPlus className="w-6 h-6 text-indigo-600" /> : <UserCheck className="w-6 h-6 text-indigo-600" />}
-              {isNew ? 'Create New Investor Account' : 'Edit Investor Profile'}
-            </h2>
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-gray-500">
               {isNew 
                 ? 'Register a new investor profile with Indian financial compliance, residential address, and subscriptions'
                 : `Account ID: ${formData.id} • Registered on: ${new Date(investor?.created_at || Date.now()).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}, ${new Date(investor?.created_at || Date.now()).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true })}`

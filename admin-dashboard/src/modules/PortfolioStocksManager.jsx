@@ -6,6 +6,7 @@ import NumberedPagination from '../components/NumberedPagination';
 import ConfirmModal from '../components/ConfirmModal';
 import RowActionMenu from '../components/RowActionMenu';
 import DateRangeFilter, { isDateWithinRange } from '../components/DateRangeFilter';
+import AdminBreadcrumb from '../components/AdminBreadcrumb';
 import { API_BASE_URL } from '../config/apiConfig';
 
 export default function PortfolioStocksManager() {
@@ -199,7 +200,10 @@ export default function PortfolioStocksManager() {
             </div>
             <div>
               <h2 className="text-xl font-bold text-gray-900">Model Portfolio Stock Positions</h2>
-              <p className="text-xs text-gray-500 mt-0.5">Manage curated equity allocations, buy prices, target estimates, and sector weights</p>
+              <div className="mt-1 mb-1">
+                <AdminBreadcrumb items={[{ label: 'Model Portfolio' }]} />
+              </div>
+              <p className="text-xs text-gray-500">Manage curated equity allocations, buy prices, target estimates, and sector weights</p>
             </div>
           </div>
 

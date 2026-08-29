@@ -127,17 +127,19 @@ export default function InvestorFacebookProfilePage({
       <div className="bg-white border border-gray-200 rounded-3xl p-4 sm:p-6 shadow-2xs">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <AdminBreadcrumb
-              onNavigateHome={onBack}
-              items={[
-                { label: 'Investor Directory', onClick: onBack },
-                { label: `${investor?.full_name || investor?.username || 'Investor'} Profile` }
-              ]}
-            />
-            <h1 className="text-xl font-bold text-gray-900 mt-2 flex items-center gap-2">
+            <h1 className="text-xl font-bold text-gray-900 flex items-center gap-2">
               <User className="w-5 h-5 text-blue-600" />
               Investor Profile Dossier
             </h1>
+            <div className="mt-1">
+              <AdminBreadcrumb
+                onNavigateHome={onBack}
+                items={[
+                  { label: 'Investor Directory', onClick: onBack },
+                  { label: `${investor?.full_name || investor?.username || 'Investor'} Profile` }
+                ]}
+              />
+            </div>
           </div>
 
           <div className="flex items-center gap-2.5">

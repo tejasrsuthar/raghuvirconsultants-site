@@ -6,6 +6,7 @@ import ConfirmModal from '../components/ConfirmModal';
 import RowActionMenu from '../components/RowActionMenu';
 import DateRangeFilter, { isDateWithinRange } from '../components/DateRangeFilter';
 import NumberedPagination from '../components/NumberedPagination';
+import AdminBreadcrumb from '../components/AdminBreadcrumb';
 import { API_BASE_URL } from '../config/apiConfig';
 
 export default function NewsManager() {
@@ -139,7 +140,10 @@ export default function NewsManager() {
             </div>
             <div>
               <h2 className="text-xl font-bold text-gray-900">Market Wire & Announcements</h2>
-              <p className="text-xs text-gray-500 mt-0.5">Publish market intelligence, macroeconomic developments, and regulatory bulletins</p>
+              <div className="mt-1 mb-1">
+                <AdminBreadcrumb items={[{ label: 'News & Announcements' }]} />
+              </div>
+              <p className="text-xs text-gray-500">Publish market intelligence, macroeconomic developments, and regulatory bulletins</p>
             </div>
           </div>
 

@@ -6,6 +6,7 @@ import ConfirmModal from '../components/ConfirmModal';
 import RowActionMenu from '../components/RowActionMenu';
 import DateRangeFilter, { isDateWithinRange } from '../components/DateRangeFilter';
 import NumberedPagination from '../components/NumberedPagination';
+import AdminBreadcrumb from '../components/AdminBreadcrumb';
 import { API_BASE_URL } from '../config/apiConfig';
 
 export default function BlogPostManager() {
@@ -142,7 +143,10 @@ export default function BlogPostManager() {
             </div>
             <div>
               <h2 className="text-xl font-bold text-gray-900">Blog & Editorial Directory</h2>
-              <p className="text-xs text-gray-500 mt-0.5">Manage market insights, educational guides, and thought leadership articles</p>
+              <div className="mt-1 mb-1">
+                <AdminBreadcrumb items={[{ label: 'Blog Posts' }]} />
+              </div>
+              <p className="text-xs text-gray-500">Manage market insights, educational guides, and thought leadership articles</p>
             </div>
           </div>
 

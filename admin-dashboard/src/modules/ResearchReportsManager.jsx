@@ -6,6 +6,7 @@ import NumberedPagination from '../components/NumberedPagination';
 import ConfirmModal from '../components/ConfirmModal';
 import RowActionMenu from '../components/RowActionMenu';
 import DateRangeFilter, { isDateWithinRange } from '../components/DateRangeFilter';
+import AdminBreadcrumb from '../components/AdminBreadcrumb';
 import { API_BASE_URL } from '../config/apiConfig';
 
 export default function ResearchReportsManager() {
@@ -199,7 +200,10 @@ export default function ResearchReportsManager() {
             </div>
             <div>
               <h2 className="text-xl font-bold text-gray-900">Institutional Research Reports</h2>
-              <p className="text-xs text-gray-500 mt-0.5">Publish in-depth company valuations, target models, and Google Docs research</p>
+              <div className="mt-1 mb-1">
+                <AdminBreadcrumb items={[{ label: 'Research Reports' }]} />
+              </div>
+              <p className="text-xs text-gray-500">Publish in-depth company valuations, target models, and Google Docs research</p>
             </div>
           </div>
 

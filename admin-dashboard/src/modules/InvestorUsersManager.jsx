@@ -11,6 +11,7 @@ import NumberedPagination from '../components/NumberedPagination';
 import ConfirmModal from '../components/ConfirmModal';
 import RowActionMenu from '../components/RowActionMenu';
 import DateRangeFilter, { isDateWithinRange } from '../components/DateRangeFilter';
+import AdminBreadcrumb from '../components/AdminBreadcrumb';
 import { API_BASE_URL } from '../config/apiConfig';
 
 export default function InvestorUsersManager() {
@@ -245,7 +246,10 @@ export default function InvestorUsersManager() {
             </div>
             <div>
               <h2 className="text-xl font-bold text-gray-900">Investor Account Directory</h2>
-              <p className="text-xs text-gray-500 mt-0.5">Manage investor profiles, PAN numbers, KYC compliance, addresses, and subscription access</p>
+              <div className="mt-1 mb-1">
+                <AdminBreadcrumb items={[{ label: 'Investor Directory' }]} />
+              </div>
+              <p className="text-xs text-gray-500">Manage investor profiles, PAN numbers, KYC compliance, addresses, and subscription access</p>
             </div>
           </div>
 

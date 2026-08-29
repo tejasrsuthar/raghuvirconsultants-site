@@ -6,6 +6,7 @@ import ConfirmModal from '../components/ConfirmModal';
 import RowActionMenu from '../components/RowActionMenu';
 import DateRangeFilter, { isDateWithinRange } from '../components/DateRangeFilter';
 import NumberedPagination from '../components/NumberedPagination';
+import AdminBreadcrumb from '../components/AdminBreadcrumb';
 import { API_BASE_URL } from '../config/apiConfig';
 
 export default function SmallCasesManager() {
@@ -144,7 +145,10 @@ export default function SmallCasesManager() {
             </div>
             <div>
               <h2 className="text-xl font-bold text-gray-900">Smallcase Strategy Directory</h2>
-              <p className="text-xs text-gray-500 mt-0.5">Manage thematic equity baskets, CAGR track records, and execution URLs</p>
+              <div className="mt-1 mb-1">
+                <AdminBreadcrumb items={[{ label: 'Smallcases Manager' }]} />
+              </div>
+              <p className="text-xs text-gray-500">Manage thematic equity baskets, CAGR track records, and execution URLs</p>
             </div>
           </div>
 

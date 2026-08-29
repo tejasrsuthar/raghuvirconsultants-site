@@ -6,6 +6,7 @@ import NumberedPagination from '../components/NumberedPagination';
 import ConfirmModal from '../components/ConfirmModal';
 import RowActionMenu from '../components/RowActionMenu';
 import DateRangeFilter, { isDateWithinRange } from '../components/DateRangeFilter';
+import AdminBreadcrumb from '../components/AdminBreadcrumb';
 import { API_BASE_URL } from '../config/apiConfig';
 
 export default function NotificationsManager() {
@@ -247,7 +248,10 @@ export default function NotificationsManager() {
             </div>
             <div>
               <h2 className="text-xl font-bold text-gray-900">Investor System Alerts & Broadcasts</h2>
-              <p className="text-xs text-gray-500 mt-0.5">Send urgent market notices, trade recommendations, and platform maintenance broadcasts</p>
+              <div className="mt-1 mb-1">
+                <AdminBreadcrumb items={[{ label: 'Alerts & Broadcasts' }]} />
+              </div>
+              <p className="text-xs text-gray-500">Send urgent market notices, trade recommendations, and platform maintenance broadcasts</p>
             </div>
           </div>
 
