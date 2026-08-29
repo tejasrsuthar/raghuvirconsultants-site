@@ -79,7 +79,7 @@ export default function AdminAppLayout() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F9FAFB] font-sans text-gray-900 flex flex-col md:flex-row">
+    <div className="min-h-screen bg-[#F0F2F5] font-sans text-gray-900 flex justify-center">
       <Toaster 
         position="bottom-center"
         toastOptions={{
@@ -95,8 +95,10 @@ export default function AdminAppLayout() {
           }
         }}
       />
-      {/* Zaga Left Sidebar */}
-      <aside className="w-full md:w-64 bg-[#F6F6F6] border-r border-[#EBEBEB] p-5 flex flex-col justify-between shrink-0 min-h-screen">
+      {/* Centered Application Shell: Sidebar + Content as a unified unit */}
+      <div className="w-full max-w-[1440px] 2xl:max-w-[1560px] min-h-screen bg-white flex flex-col md:flex-row shadow-sm border-x border-[#E5E7EB]">
+        {/* Zaga Left Sidebar */}
+        <aside className="w-full md:w-64 bg-[#F6F6F6] border-r border-[#EBEBEB] p-5 flex flex-col justify-between shrink-0 min-h-screen">
         <div className="space-y-5">
           {/* Top Brand Logo */}
           <div className="flex items-center justify-between mb-2 px-1">
@@ -408,6 +410,7 @@ export default function AdminAppLayout() {
           {activeTab === 'settings' && <PlatformSettingsManager />}
         </div>
       </main>
+      </div>
     </div>
   );
 }
