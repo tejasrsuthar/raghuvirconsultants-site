@@ -327,84 +327,86 @@ export default function AdminAppLayout() {
       </aside>
 
       {/* Main Right Content Panel */}
-      <main className="flex-grow p-6 md:p-8 max-w-7xl overflow-y-auto">
-        {/* Top Header Bar */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 border-b border-gray-200/70 pb-4">
-          <div>
-            <div className="flex items-center gap-2 text-xs text-gray-400 font-medium mb-1">
-              <span>Raghuvir Consultants Console</span>
-              <ChevronRight className="w-3 h-3 text-gray-300" />
-              <span className="text-gray-800 capitalize font-semibold">{activeTab === 'notifications' ? 'Alerts' : activeTab}</span>
+      <main className="flex-1 w-full p-6 md:p-10 lg:p-12 overflow-y-auto bg-[#F9FAFB]">
+        <div className="max-w-[1600px] mx-auto w-full space-y-8">
+          {/* Top Header Bar */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 border-b border-gray-200/70 pb-4">
+            <div>
+              <div className="flex items-center gap-2 text-xs text-gray-400 font-medium mb-1">
+                <span>Raghuvir Consultants Console</span>
+                <ChevronRight className="w-3 h-3 text-gray-300" />
+                <span className="text-gray-800 capitalize font-semibold">{activeTab === 'notifications' ? 'Alerts' : activeTab}</span>
+              </div>
+              <h1 className="text-2xl font-extrabold text-gray-900 tracking-tight">
+                Good morning, {adminUsername} 👋
+              </h1>
             </div>
-            <h1 className="text-2xl font-extrabold text-gray-900 tracking-tight">
-              Good morning, {adminUsername} 👋
-            </h1>
+
+            {/* Metric Badges */}
+            <div className="flex items-center gap-3 bg-white p-2 rounded-2xl border border-gray-200/80 shadow-2xs text-xs font-semibold text-gray-600">
+              <span className="px-3 py-1 bg-gray-100/80 rounded-xl">{stats.investors} Investors</span>
+              <span className="px-3 py-1 bg-gray-100/80 rounded-xl">{stats.reports} Reports</span>
+              <span className="px-3 py-1 bg-emerald-50 text-emerald-700 rounded-xl font-bold flex items-center gap-1">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" /> 99.9% Uptime
+              </span>
+            </div>
           </div>
 
-          {/* Metric Badges */}
-          <div className="flex items-center gap-3 bg-white p-2 rounded-2xl border border-gray-200/80 shadow-2xs text-xs font-semibold text-gray-600">
-            <span className="px-3 py-1 bg-gray-100/80 rounded-xl">{stats.investors} Investors</span>
-            <span className="px-3 py-1 bg-gray-100/80 rounded-xl">{stats.reports} Reports</span>
-            <span className="px-3 py-1 bg-emerald-50 text-emerald-700 rounded-xl font-bold flex items-center gap-1">
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" /> 99.9% Uptime
-            </span>
-          </div>
+          {/* Tab Components Rendering */}
+          {activeTab === 'home' && (
+            <div className="space-y-8">
+              {/* Top Priority Banner Card */}
+              <div className="bg-amber-50/70 border border-amber-200/80 p-6 rounded-3xl flex items-start gap-4 shadow-2xs">
+                <div className="p-3 bg-amber-100 rounded-2xl text-amber-800 shrink-0">
+                  <Shield className="w-6 h-6" />
+                </div>
+                <div>
+                  <span className="text-[10px] font-extrabold uppercase tracking-widest text-amber-700 block mb-1">System Health & Security</span>
+                  <h3 className="text-lg font-bold text-gray-900">All 50,000+ Record Database Indexes & Security Rules Active</h3>
+                  <p className="text-xs text-gray-600 mt-1 leading-relaxed">
+                    Server-side skip/limit pagination, strict password policies (min 7 chars with !@#$%), and multi-domain host validation are enforced across all services.
+                  </p>
+                </div>
+              </div>
+
+              {/* Metric Overview Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="bg-white border border-[#EAEAEA] p-6 rounded-3xl shadow-2xs">
+                  <span className="text-xs font-bold uppercase tracking-wider text-gray-400">Total Investors</span>
+                  <h3 className="text-3xl font-extrabold text-gray-900 mt-2">{stats.investors}</h3>
+                  <span className="text-xs font-semibold text-emerald-600 mt-2 inline-block">Active Subscriptions</span>
+                </div>
+                <div className="bg-white border border-[#EAEAEA] p-6 rounded-3xl shadow-2xs">
+                  <span className="text-xs font-bold uppercase tracking-wider text-gray-400">Research Reports</span>
+                  <h3 className="text-3xl font-extrabold text-gray-900 mt-2">{stats.reports}</h3>
+                  <span className="text-xs font-semibold text-gray-500 mt-2 inline-block">Published Research</span>
+                </div>
+                <div className="bg-white border border-[#EAEAEA] p-6 rounded-3xl shadow-2xs">
+                  <span className="text-xs font-bold uppercase tracking-wider text-gray-400">Model Portfolio Stocks</span>
+                  <h3 className="text-3xl font-extrabold text-gray-900 mt-2">{stats.stocks}</h3>
+                  <span className="text-xs font-semibold text-gray-500 mt-2 inline-block">Active Stock Allocations</span>
+                </div>
+                <div className="bg-white border border-[#EAEAEA] p-6 rounded-3xl shadow-2xs">
+                  <span className="text-xs font-bold uppercase tracking-wider text-gray-400">Blog Posts</span>
+                  <h3 className="text-3xl font-extrabold text-gray-900 mt-2">{stats.blogs}</h3>
+                  <span className="text-xs font-semibold text-gray-500 mt-2 inline-block">Articles with Tags</span>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'investors' && <InvestorUsersManager />}
+          {activeTab === 'blogs' && <BlogPostManager />}
+          {activeTab === 'services' && <ServicesManager />}
+          {activeTab === 'smallcases' && <SmallCasesManager />}
+          {activeTab === 'reports' && <ResearchReportsManager />}
+          {activeTab === 'portfolio' && <PortfolioStocksManager />}
+          {activeTab === 'news' && <NewsManager />}
+          {activeTab === 'notifications' && <NotificationsManager />}
+          {activeTab === 'system-status' && <SystemStatusPage />}
+          {activeTab === 'admin-profile' && <AdminProfilePage onBack={() => setActiveTab('home')} />}
+          {activeTab === 'settings' && <PlatformSettingsManager />}
         </div>
-
-        {/* Tab Components Rendering */}
-        {activeTab === 'home' && (
-          <div className="space-y-8">
-            {/* Top Priority Banner Card */}
-            <div className="bg-amber-50/70 border border-amber-200/80 p-6 rounded-3xl flex items-start gap-4 shadow-2xs">
-              <div className="p-3 bg-amber-100 rounded-2xl text-amber-800 shrink-0">
-                <Shield className="w-6 h-6" />
-              </div>
-              <div>
-                <span className="text-[10px] font-extrabold uppercase tracking-widest text-amber-700 block mb-1">System Health & Security</span>
-                <h3 className="text-lg font-bold text-gray-900">All 50,000+ Record Database Indexes & Security Rules Active</h3>
-                <p className="text-xs text-gray-600 mt-1 leading-relaxed">
-                  Server-side skip/limit pagination, strict password policies (min 7 chars with !@#$%), and multi-domain host validation are enforced across all services.
-                </p>
-              </div>
-            </div>
-
-            {/* Metric Overview Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-              <div className="bg-white border border-[#EAEAEA] p-6 rounded-3xl shadow-2xs">
-                <span className="text-xs font-bold uppercase tracking-wider text-gray-400">Total Investors</span>
-                <h3 className="text-3xl font-extrabold text-gray-900 mt-2">{stats.investors}</h3>
-                <span className="text-xs font-semibold text-emerald-600 mt-2 inline-block">Active Subscriptions</span>
-              </div>
-              <div className="bg-white border border-[#EAEAEA] p-6 rounded-3xl shadow-2xs">
-                <span className="text-xs font-bold uppercase tracking-wider text-gray-400">Research Reports</span>
-                <h3 className="text-3xl font-extrabold text-gray-900 mt-2">{stats.reports}</h3>
-                <span className="text-xs font-semibold text-gray-500 mt-2 inline-block">Published Research</span>
-              </div>
-              <div className="bg-white border border-[#EAEAEA] p-6 rounded-3xl shadow-2xs">
-                <span className="text-xs font-bold uppercase tracking-wider text-gray-400">Model Portfolio Stocks</span>
-                <h3 className="text-3xl font-extrabold text-gray-900 mt-2">{stats.stocks}</h3>
-                <span className="text-xs font-semibold text-gray-500 mt-2 inline-block">Active Stock Allocations</span>
-              </div>
-              <div className="bg-white border border-[#EAEAEA] p-6 rounded-3xl shadow-2xs">
-                <span className="text-xs font-bold uppercase tracking-wider text-gray-400">Blog Posts</span>
-                <h3 className="text-3xl font-extrabold text-gray-900 mt-2">{stats.blogs}</h3>
-                <span className="text-xs font-semibold text-gray-500 mt-2 inline-block">Articles with Tags</span>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {activeTab === 'investors' && <InvestorUsersManager />}
-        {activeTab === 'blogs' && <BlogPostManager />}
-        {activeTab === 'services' && <ServicesManager />}
-        {activeTab === 'smallcases' && <SmallCasesManager />}
-        {activeTab === 'reports' && <ResearchReportsManager />}
-        {activeTab === 'portfolio' && <PortfolioStocksManager />}
-        {activeTab === 'news' && <NewsManager />}
-        {activeTab === 'notifications' && <NotificationsManager />}
-        {activeTab === 'system-status' && <SystemStatusPage />}
-        {activeTab === 'admin-profile' && <AdminProfilePage onBack={() => setActiveTab('home')} />}
-        {activeTab === 'settings' && <PlatformSettingsManager />}
       </main>
     </div>
   );

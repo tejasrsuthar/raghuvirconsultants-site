@@ -66,7 +66,7 @@ export default function AdminProfilePage({ onBack }) {
   };
 
   return (
-    <div className="bg-white border border-gray-200 rounded-3xl p-8 shadow-2xs space-y-6 max-w-3xl">
+    <div className="bg-white border border-gray-200 rounded-3xl p-8 shadow-2xs space-y-6 w-full max-w-4xl mx-auto">
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-6 border-b border-gray-200">
         <div>
