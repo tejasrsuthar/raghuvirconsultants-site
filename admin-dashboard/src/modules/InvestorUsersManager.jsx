@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-hot-toast';
 import { 
-  Users, Search, RefreshCw, Key, Shield, UserX, UserCheck, 
+  Users, User, Search, RefreshCw, Key, Shield, UserX, UserCheck, 
   Trash2, Edit, AlertCircle, ArrowUpDown, MoreVertical, Calendar,
-  CreditCard, CheckCircle2, ShieldCheck, Mail, Phone
+  CreditCard, CheckCircle2, ShieldCheck, Mail, Phone, Eye
 } from 'lucide-react';
 import InvestorEditorPage from './InvestorEditorPage';
 import InvestorFacebookProfilePage from './InvestorFacebookProfilePage';
