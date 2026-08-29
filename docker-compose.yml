@@ -43,11 +43,13 @@ services:
       start_period: 10s
     labels:
       - "traefik.enable=true"
+      - "traefik.docker.network=coolify"
       - "traefik.http.routers.frontend.rule=Host(`www.raghuvirconsultants.in`) || Host(`raghuvirconsultants.in`)"
       - "traefik.http.routers.frontend.entrypoints=https"
       - "traefik.http.routers.frontend.tls.certresolver=letsencrypt"
       - "traefik.http.services.frontend.loadbalancer.server.port=80"
     networks:
+      - coolify
       - raghuvir-net
 
   admin-dashboard:
@@ -72,13 +74,17 @@ services:
       start_period: 10s
     labels:
       - "traefik.enable=true"
+      - "traefik.docker.network=coolify"
       - "traefik.http.routers.admin.rule=Host(`admin.raghuvirconsultants.in`)"
       - "traefik.http.routers.admin.entrypoints=https"
       - "traefik.http.routers.admin.tls.certresolver=letsencrypt"
       - "traefik.http.services.admin.loadbalancer.server.port=80"
     networks:
+      - coolify
       - raghuvir-net
 
 networks:
+  coolify:
+    external: true
   raghuvir-net:
     driver: bridge
