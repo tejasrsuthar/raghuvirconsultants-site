@@ -223,6 +223,17 @@ export default function InvestorUsersManager() {
             >
               <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
             </button>
+            <button
+              type="button"
+              onClick={() => {
+                setEditingInvestor(null);
+                setShowEditor(true);
+              }}
+              className="px-5 py-2.5 bg-gray-900 hover:bg-black text-white text-xs font-bold uppercase tracking-wider rounded-full shadow-md transition-all flex items-center gap-2"
+            >
+              <Users className="w-4 h-4" />
+              + Add New Investor
+            </button>
           </div>
         </div>
       </div>

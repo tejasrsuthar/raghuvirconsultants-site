@@ -3,14 +3,17 @@ import { toast } from 'react-hot-toast';
 import { 
   ArrowLeft, Save, User, Mail, Phone, Calendar, CreditCard, 
   MapPin, ShieldCheck, CheckCircle2, Lock, FileText, Briefcase, 
-  Building, AlertCircle, Shield, Sparkles, UserCheck 
+  Building, AlertCircle, Shield, Sparkles, UserCheck, UserPlus, Key
 } from 'lucide-react';
 import { API_BASE_URL } from '../config/apiConfig';
 
 export default function InvestorEditorPage({ investor, onBack, onSaveSuccess }) {
+  const isNew = !investor || !investor.id;
+
   const [formData, setFormData] = useState({
     id: investor?.id || '',
     username: investor?.username || '',
+    password: '',
     full_name: investor?.full_name || '',
     email: investor?.email || '',
     phone: investor?.phone || '',
@@ -48,6 +51,18 @@ export default function InvestorEditorPage({ investor, onBack, onSaveSuccess }) 
     setError('');
     setSuccess(false);
 
+    if (isNew && !formData.username.trim()) {
+      setError('Username is required for new accounts.');
+      toast.error('Username is required');
+      return;
+    }
+
+    if (isNew && (!formData.password || formData.password.length < 7)) {
+      setError('A temporary password of at least 7 characters is required for new accounts.');
+      toast.error('Password must be at least 7 characters');
+      return;
+    }
+
     if (!formData.email.trim()) {
       setError('Email address is required.');
       toast.error('Email address is required');
@@ -61,50 +76,79 @@ export default function InvestorEditorPage({ investor, onBack, onSaveSuccess }) 
     }
 
     setLoading(true);
-    const toastId = toast.loading(`Updating investor profile for ${formData.username}...`);
+    const toastId = toast.loading(isNew ? 'Creating new investor profile...' : `Updating profile for ${formData.username}...`);
 
     try {
-      const res = await fetch(`${API_BASE_URL}/api/admin/investors/${formData.id}/profile`, {
-        method: 'PUT',
+      const url = isNew 
+        ? `${API_BASE_URL}/api/admin/investors` 
+        : `${API_BASE_URL}/api/admin/investors/${formData.id}/profile`;
+
+      const method = isNew ? 'POST' : 'PUT';
+
+      const payload = isNew ? {
+        username: formData.username.trim().replace(/\s+/g, ''),
+        password: formData.password,
+        full_name: formData.full_name.trim(),
+        email: formData.email.trim(),
+        phone: formData.phone.trim(),
+        pan_number: formData.pan_number.trim(),
+        date_of_birth: formData.date_of_birth,
+        address_line1: formData.address_line1.trim(),
+        address_line2: formData.address_line2.trim(),
+        pincode: formData.pincode.trim(),
+        city: formData.city.trim(),
+        state: formData.state.trim(),
+        country: formData.country.trim(),
+        role: formData.role,
+        status: formData.status,
+        kyc_status: formData.kyc_status,
+        risk_profile: formData.risk_profile,
+        admin_notes: formData.admin_notes.trim(),
+        subscribed_reports: formData.subscribed_reports,
+        subscribed_portfolio: formData.subscribed_portfolio
+      } : {
+        full_name: formData.full_name.trim(),
+        email: formData.email.trim(),
+        phone: formData.phone.trim(),
+        pan_number: formData.pan_number.trim(),
+        date_of_birth: formData.date_of_birth,
+        address_line1: formData.address_line1.trim(),
+        address_line2: formData.address_line2.trim(),
+        pincode: formData.pincode.trim(),
+        city: formData.city.trim(),
+        state: formData.state.trim(),
+        country: formData.country.trim(),
+        role: formData.role,
+        status: formData.status,
+        kyc_status: formData.kyc_status,
+        risk_profile: formData.risk_profile,
+        admin_notes: formData.admin_notes.trim(),
+        subscribed_reports: formData.subscribed_reports,
+        subscribed_portfolio: formData.subscribed_portfolio
+      };
+
+      const res = await fetch(url, {
+        method,
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({
-          full_name: formData.full_name.trim(),
-          email: formData.email.trim(),
-          phone: formData.phone.trim(),
-          pan_number: formData.pan_number.trim(),
-          date_of_birth: formData.date_of_birth,
-          address_line1: formData.address_line1.trim(),
-          address_line2: formData.address_line2.trim(),
-          pincode: formData.pincode.trim(),
-          city: formData.city.trim(),
-          state: formData.state.trim(),
-          country: formData.country.trim(),
-          role: formData.role,
-          status: formData.status,
-          kyc_status: formData.kyc_status,
-          risk_profile: formData.risk_profile,
-          admin_notes: formData.admin_notes.trim(),
-          subscribed_reports: formData.subscribed_reports,
-          subscribed_portfolio: formData.subscribed_portfolio
-        })
+        body: JSON.stringify(payload)
       });
 
       if (!res.ok) {
         const errData = await res.json();
-        throw new Error(errData.detail || 'Failed to update investor profile');
+        throw new Error(errData.detail || `Failed to ${isNew ? 'create' : 'update'} investor profile`);
       }
 
       setSuccess(true);
-      toast.success('Investor profile updated successfully!', { id: toastId });
+      toast.success(isNew ? 'New investor account created successfully!' : 'Investor profile updated successfully!', { id: toastId });
       setTimeout(() => {
         if (onSaveSuccess) onSaveSuccess();
       }, 700);
     } catch (err) {
       setError(err.message);
-      toast.error(err.message || 'Error updating profile', { id: toastId });
+      toast.error(err.message || 'Error processing investor account', { id: toastId });
     } finally {
       setLoading(false);
     }
@@ -124,11 +168,14 @@ export default function InvestorEditorPage({ investor, onBack, onSaveSuccess }) 
               <ArrowLeft className="w-4 h-4" /> Back to Investor Directory
             </button>
             <h2 className="text-2xl font-extrabold text-gray-900 tracking-tight flex items-center gap-2.5">
-              <UserCheck className="w-6 h-6 text-indigo-600" />
-              Edit Investor Profile
+              {isNew ? <UserPlus className="w-6 h-6 text-indigo-600" /> : <UserCheck className="w-6 h-6 text-indigo-600" />}
+              {isNew ? 'Create New Investor Account' : 'Edit Investor Profile'}
             </h2>
             <p className="text-xs text-gray-500 mt-1">
-              Account ID: <span className="font-mono text-gray-700 font-semibold">{formData.id || '—'}</span> &bull; Registered on: {new Date(investor?.created_at || Date.now()).toLocaleDateString()}
+              {isNew 
+                ? 'Register a new investor profile with Indian financial compliance, residential address, and subscriptions'
+                : `Account ID: ${formData.id} • Registered on: ${new Date(investor?.created_at || Date.now()).toLocaleDateString()}`
+              }
             </p>
           </div>
 
@@ -147,7 +194,7 @@ export default function InvestorEditorPage({ investor, onBack, onSaveSuccess }) 
               className="px-6 py-2.5 rounded-full bg-gray-900 hover:bg-black text-white text-xs font-bold uppercase tracking-wider flex items-center gap-2 shadow-md disabled:opacity-50 transition-all"
             >
               <Save className="w-4 h-4" />
-              {loading ? 'Saving Profile...' : 'Save Investor Profile'}
+              {loading ? (isNew ? 'Creating Account...' : 'Saving Profile...') : (isNew ? 'Create Investor' : 'Save Investor Profile')}
             </button>
           </div>
         </div>
@@ -155,7 +202,7 @@ export default function InvestorEditorPage({ investor, onBack, onSaveSuccess }) 
 
       {success && (
         <div className="p-4 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-2xl text-xs font-bold flex items-center gap-2">
-          <CheckCircle2 className="w-4 h-4 text-emerald-600" /> Profile saved successfully! Redirecting...
+          <CheckCircle2 className="w-4 h-4 text-emerald-600" /> {isNew ? 'Account created successfully! Redirecting...' : 'Profile saved successfully! Redirecting...'}
         </div>
       )}
 
@@ -172,7 +219,7 @@ export default function InvestorEditorPage({ investor, onBack, onSaveSuccess }) 
             <User className="w-5 h-5 text-indigo-600" />
             <div>
               <h3 className="text-sm font-bold text-gray-900">Personal Identity & KYC Credentials</h3>
-              <p className="text-[11px] text-gray-500">Legal investor credentials, permanent username identifier, and identity verification</p>
+              <p className="text-[11px] text-gray-500">Legal investor credentials, username identifier, and identity verification</p>
             </div>
           </div>
 
@@ -190,21 +237,48 @@ export default function InvestorEditorPage({ investor, onBack, onSaveSuccess }) 
 
             <div>
               <label className="block text-xs font-bold text-gray-700 uppercase mb-1.5 flex items-center gap-1.5">
-                <Lock className="w-3 h-3 text-gray-400" /> Username (Not Editable)
+                {!isNew && <Lock className="w-3 h-3 text-gray-400" />} Username {isNew ? <span className="text-red-500">*</span> : '(Not Editable)'}
               </label>
-              <input
-                type="text"
-                disabled
-                value={formData.username}
-                className="w-full px-4 py-3 bg-gray-100 border border-gray-200 rounded-2xl text-xs font-mono font-bold text-gray-500 cursor-not-allowed"
-                title="Username is permanently locked for account integrity"
-              />
+              {isNew ? (
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. harshitsuthar"
+                  value={formData.username}
+                  onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl text-xs font-mono font-bold text-gray-900 focus:outline-none focus:border-indigo-500"
+                />
+              ) : (
+                <input
+                  type="text"
+                  disabled
+                  value={formData.username}
+                  className="w-full px-4 py-3 bg-gray-100 border border-gray-200 rounded-2xl text-xs font-mono font-bold text-gray-500 cursor-not-allowed"
+                  title="Username is permanently locked for account integrity"
+                />
+              )}
               <span className="text-[10px] text-gray-400 mt-1 block">Permanent system identifier</span>
             </div>
 
+            {isNew && (
+              <div>
+                <label className="block text-xs font-bold text-gray-700 uppercase mb-1.5 flex items-center gap-1.5">
+                  <Key className="w-3.5 h-3.5 text-gray-400" /> Temporary Password <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="password"
+                  required
+                  placeholder="Min 7 characters..."
+                  value={formData.password}
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl text-xs font-mono font-bold text-gray-900 focus:outline-none focus:border-indigo-500"
+                />
+              </div>
+            )}
+
             <div>
               <label className="block text-xs font-bold text-gray-700 uppercase mb-1.5 flex items-center gap-1.5">
-                <Mail className="w-3.5 h-3.5 text-gray-400" /> Email Address
+                <Mail className="w-3.5 h-3.5 text-gray-400" /> Email Address <span className="text-red-500">*</span>
               </label>
               <input
                 type="email"
@@ -331,7 +405,7 @@ export default function InvestorEditorPage({ investor, onBack, onSaveSuccess }) 
             <MapPin className="w-5 h-5 text-amber-600" />
             <div>
               <h3 className="text-sm font-bold text-gray-900">Residential Address & Location</h3>
-              <p className="text-[11px] text-gray-500">Official billing and correspondence street address</p>
+              <p className="text-[11px] text-gray-500">Official correspondence and billing address</p>
             </div>
           </div>
 
@@ -497,7 +571,7 @@ export default function InvestorEditorPage({ investor, onBack, onSaveSuccess }) 
             className="px-8 py-2.5 rounded-full bg-gray-900 hover:bg-black text-white text-xs font-bold uppercase tracking-wider flex items-center gap-2 shadow-md disabled:opacity-50 transition-all"
           >
             <Save className="w-4 h-4" />
-            {loading ? 'Saving Profile...' : 'Save Investor Profile'}
+            {loading ? (isNew ? 'Creating Account...' : 'Saving Profile...') : (isNew ? 'Create Investor' : 'Save Investor Profile')}
           </button>
         </div>
       </form>

@@ -7,11 +7,17 @@ from app.domain.entities import UserRole, UserStatus, ServiceType, SubscriptionS
 class UserRegisterRequest(BaseModel):
     username: str
     password: str
+    full_name: Optional[str] = None
     email: Optional[str] = None
     phone: Optional[str] = None
+    pan_number: Optional[str] = None
+    date_of_birth: Optional[str] = None
+    address_line1: Optional[str] = None
+    address_line2: Optional[str] = None
+    pincode: Optional[str] = None
     gender: Optional[str] = None
     referral_source: Optional[str] = None
-    country: Optional[str] = None
+    country: Optional[str] = "India"
     state: Optional[str] = None
     city: Optional[str] = None
 
@@ -138,6 +144,28 @@ class ProfileUpdateRequest(BaseModel):
     date_of_birth: Optional[str] = None
     pan_number: Optional[str] = None
     password: Optional[str] = None
+
+class AdminInvestorCreateRequest(BaseModel):
+    username: str
+    password: str
+    full_name: Optional[str] = None
+    email: Optional[str] = None
+    phone: Optional[str] = None
+    pan_number: Optional[str] = None
+    date_of_birth: Optional[str] = None
+    address_line1: Optional[str] = None
+    address_line2: Optional[str] = None
+    pincode: Optional[str] = None
+    city: Optional[str] = None
+    state: Optional[str] = None
+    country: Optional[str] = "India"
+    role: Optional[UserRole] = UserRole.INVESTOR
+    status: Optional[UserStatus] = UserStatus.ACTIVE
+    kyc_status: Optional[str] = "verified"
+    risk_profile: Optional[str] = "Moderate"
+    admin_notes: Optional[str] = None
+    subscribed_reports: Optional[bool] = False
+    subscribed_portfolio: Optional[bool] = False
 
 class AdminInvestorProfileUpdate(BaseModel):
     full_name: Optional[str] = None

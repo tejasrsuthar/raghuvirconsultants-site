@@ -1,5 +1,6 @@
 import pytest
-from app.interfaces.auth_router import validate_password_policy
+from app.interfaces.auth_router import validate_password_policy, register
+from app.interfaces.schemas import UserRegisterRequest, AdminInvestorCreateRequest
 from fastapi import HTTPException
 
 def test_password_policy_valid():
@@ -37,29 +38,75 @@ def test_user_role_update():
     assert fetched.role == UserRole.ADMIN
     repo.delete(created.id)
 
-def test_admin_user_endpoints():
+def test_investor_registration_with_full_profile():
+    from app.infrastructure.repositories import UserRepository
+    repo = UserRepository()
+    req = UserRegisterRequest(
+        username="reg_investor_full",
+        password="ValidPassword123!",
+        full_name="Tejas Suthar",
+        email="tejas_full@example.com",
+        phone="+91 9924748572",
+        pan_number="ABCDE1234F",
+        date_of_birth="1995-05-15",
+        address_line1="402 Royal Palms",
+        address_line2="SG Highway",
+        pincode="380054",
+        city="Ahmedabad",
+        state="Gujarat",
+        country="India"
+    )
+    token_resp = register(req)
+    assert token_resp.access_token is not None
+    assert token_resp.email == "tejas_full@example.com"
+    
+    user = repo.get_by_username("reg_investor_full")
+    assert user is not None
+    assert user.full_name == "Tejas Suthar"
+    assert user.pan_number == "ABCDE1234F"
+    assert user.pincode == "380054"
+    assert user.city == "Ahmedabad"
+    repo.delete(user.id)
+
+def test_admin_create_investor_and_endpoints():
     from app.infrastructure.repositories import UserRepository
     from app.domain.entities import User, UserRole, UserStatus
-    from app.interfaces.admin_router import list_investors, update_investor_username, reset_investor_password, delete_investor
+    from app.interfaces.admin_router import (
+        list_investors, create_investor_by_admin, update_investor_username, 
+        reset_investor_password, delete_investor
+    )
     from app.interfaces.schemas import AdminUsernameUpdateRequest, AdminPasswordResetRequest
 
     repo = UserRepository()
     admin_user = User(username="superadmin", email="admin@rc.com", role=UserRole.ADMIN, status=UserStatus.ACTIVE)
-    investor = User(username="test_inv", email="inv@test.com", hashed_password="pwd", role=UserRole.INVESTOR, status=UserStatus.ACTIVE)
-    created_inv = repo.create(investor)
+
+    # Test admin create investor
+    create_req = AdminInvestorCreateRequest(
+        username="admin_created_inv",
+        password="AdminSetPassword123!",
+        full_name="Harshit Suthar",
+        email="harshit_admin_inv@example.com",
+        pan_number="XYZAB5678K",
+        phone="+91 9876543210",
+        subscribed_reports=True,
+        subscribed_portfolio=True
+    )
+    c_res = create_investor_by_admin(create_req, admin=admin_user)
+    assert "successfully" in c_res["message"]
+    inv_id = c_res["id"]
 
     # Test list
     res = list_investors(page=1, limit=10, admin=admin_user)
     assert res.total >= 1
 
     # Test update username
-    u_res = update_investor_username(created_inv.id, AdminUsernameUpdateRequest(username="test_inv_updated"), admin=admin_user)
+    u_res = update_investor_username(inv_id, AdminUsernameUpdateRequest(username="admin_created_updated"), admin=admin_user)
     assert "successfully" in u_res["message"]
 
     # Test password reset
-    p_res = reset_investor_password(created_inv.id, AdminPasswordResetRequest(password="NewSecret123!"), admin=admin_user)
+    p_res = reset_investor_password(inv_id, AdminPasswordResetRequest(password="NewSecret123!"), admin=admin_user)
     assert "successfully" in p_res["message"]
 
     # Test delete
-    d_res = delete_investor(created_inv.id, admin=admin_user)
+    d_res = delete_investor(inv_id, admin=admin_user)
     assert "deleted" in d_res["message"]

@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
 from app.interfaces.schemas import (
     UserStatusUpdateRequest, UserRoleUpdateRequest, InvestorListItem, PaginatedResponse, 
-    AdminInvestorProfileUpdate, AdminInvestorSubscriptionUpdate,
+    AdminInvestorCreateRequest, AdminInvestorProfileUpdate, AdminInvestorSubscriptionUpdate,
     AdminPasswordResetRequest, AdminUsernameUpdateRequest
 )
 from app.interfaces.dependencies import require_admin
@@ -63,6 +63,73 @@ def list_investors(
         limit=limit,
         pages=pages
     )
+
+@router.post("/investors")
+@router.post("/users")
+def create_investor_by_admin(
+    req: AdminInvestorCreateRequest,
+    admin: User = Depends(require_admin)
+):
+    from app.infrastructure.logging_utils import log_activity
+    clean_username = req.username.strip().replace(" ", "")
+    if not clean_username:
+        raise HTTPException(status_code=400, detail="Username cannot be empty")
+        
+    existing_username = user_repo.get_by_username(clean_username)
+    if existing_username:
+        raise HTTPException(status_code=400, detail="Username already taken")
+        
+    email_to_use = req.email.strip() if req.email else f"{clean_username}@rc.placeholder"
+    existing_email = user_repo.get_by_email(email_to_use)
+    if existing_email:
+        raise HTTPException(status_code=400, detail="Email already registered")
+        
+    if len(req.password) < 7:
+        raise HTTPException(status_code=400, detail="Password must be at least 7 characters long")
+        
+    hashed_pwd = get_password_hash(req.password)
+    user = User(
+        username=clean_username,
+        full_name=req.full_name,
+        email=email_to_use,
+        phone=req.phone,
+        pan_number=req.pan_number,
+        date_of_birth=req.date_of_birth,
+        address_line1=req.address_line1,
+        address_line2=req.address_line2,
+        pincode=req.pincode,
+        city=req.city,
+        state=req.state,
+        country=req.country or "India",
+        role=req.role or UserRole.INVESTOR,
+        status=req.status or UserStatus.ACTIVE,
+        kyc_status=req.kyc_status or "verified",
+        risk_profile=req.risk_profile or "Moderate",
+        admin_notes=req.admin_notes,
+        hashed_password=hashed_pwd
+    )
+    created = user_repo.create(user)
+    
+    if req.subscribed_reports:
+        sub = Subscription(
+            user_id=created.id,
+            service_type=ServiceType.REPORTS,
+            status=SubscriptionStatus.ACTIVE,
+            expires_at=datetime.utcnow() + timedelta(days=365)
+        )
+        sub_repo.create_or_update(sub)
+        
+    if req.subscribed_portfolio:
+        sub = Subscription(
+            user_id=created.id,
+            service_type=ServiceType.PORTFOLIO,
+            status=SubscriptionStatus.ACTIVE,
+            expires_at=datetime.utcnow() + timedelta(days=365)
+        )
+        sub_repo.create_or_update(sub)
+
+    log_activity(created.id, created.username, "admin_create_investor", f"Admin created new investor account: {created.username} ({created.email})")
+    return {"message": "Investor account successfully created", "id": created.id}
 
 @router.put("/investors/{investor_id}/status")
 @router.put("/users/{investor_id}/status")
