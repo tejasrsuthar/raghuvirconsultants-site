@@ -80,6 +80,8 @@ def login(req: UserLoginRequest):
     if not verify_password(req.password, user.hashed_password):
         raise HTTPException(status_code=400, detail="Incorrect email or password")
         
+    if user.status == UserStatus.SUSPENDED:
+        raise HTTPException(status_code=403, detail="Account is suspended. Please contact administrator.")
     if user.status == UserStatus.DISABLED:
         raise HTTPException(status_code=403, detail="Account is disabled")
     if user.status == UserStatus.BLACKLISTED:
