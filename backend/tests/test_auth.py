@@ -150,6 +150,25 @@ def test_admin_create_investor_and_endpoints():
     p_res = reset_investor_password(inv_id, AdminPasswordResetRequest(password="NewSecret123!"), admin=admin_user)
     assert "successfully" in p_res["message"]
 
+    # Test update subscription
+    from app.interfaces.admin_router import update_investor_subscription_by_admin, update_investor_profile_by_admin
+    from app.interfaces.schemas import AdminInvestorSubscriptionUpdate, AdminInvestorProfileUpdate
+    from app.domain.entities import ServiceType
+    sub_res = update_investor_subscription_by_admin(
+        inv_id,
+        AdminInvestorSubscriptionUpdate(service_type=ServiceType.REPORTS, active=False),
+        admin=admin_user
+    )
+    assert "successfully" in sub_res["message"]
+
+    # Test update profile
+    prof_res = update_investor_profile_by_admin(
+        inv_id,
+        AdminInvestorProfileUpdate(email="harshit_admin_inv@example.com", admin_notes="VIP Client Note"),
+        admin=admin_user
+    )
+    assert "successfully" in prof_res["message"]
+
     # Test delete
     d_res = delete_investor(inv_id, admin=admin_user)
     assert "deleted" in d_res["message"]

@@ -1,4 +1,4 @@
-# Enterprise System Architecture (v2.12.28)
+# Enterprise System Architecture (v2.12.29)
 
 This document provides complete technical specifications for the Raghuvir Consultants Enterprise Wealth & Advisory platform.
 

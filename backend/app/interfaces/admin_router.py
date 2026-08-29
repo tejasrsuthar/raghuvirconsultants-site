@@ -256,6 +256,8 @@ def get_investor_activities(
     activity_repo = ActivityLogRepository()
     return activity_repo.get_by_user_id(investor_id)
 
+@router.put("/investors/{investor_id}")
+@router.put("/users/{investor_id}")
 @router.put("/investors/{investor_id}/profile")
 @router.put("/users/{investor_id}/profile")
 def update_investor_profile_by_admin(

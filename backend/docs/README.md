@@ -1,4 +1,4 @@
-# Technical Documentation Index (v2.12.28)
+# Technical Documentation Index (v2.12.29)
 
 Welcome to the official technical documentation directory for Raghuvir Consultants Enterprise Advisory Platform.
 
@@ -16,8 +16,8 @@ Welcome to the official technical documentation directory for Raghuvir Consultan
 ---
 
 ## System Quick Facts
-- **API Version**: `v2.12.28`
-- **Frontend App Version**: `v2.12.28`
+- **API Version**: `v2.12.29`
+- **Frontend App Version**: `v2.12.29`
 - **Supported Capacity**: 50,000+ Records with Direct Page-Numbered Pagination
 - **Public Domain**: `https://raghuvirconsultants.in`
 - **Admin Domain**: `https://admin.raghuvirconsultants.in`

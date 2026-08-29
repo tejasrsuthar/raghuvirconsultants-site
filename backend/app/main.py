@@ -49,7 +49,7 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
 app = FastAPI(
     title="Raghuvir Consultants API",
     description="Enterprise Advisory System Backend",
-    version="2.12.28"
+    version="2.12.29"
 )
 
 # ── Middleware stack (order matters — outermost first) ─────────────────────────

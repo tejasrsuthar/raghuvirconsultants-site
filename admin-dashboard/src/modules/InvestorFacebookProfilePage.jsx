@@ -45,7 +45,7 @@ export default function InvestorFacebookProfilePage({
     setSavingNote(true);
     const toastId = toast.loading('Saving admin note...');
     try {
-      const res = await fetch(`${API_BASE_URL}/api/admin/investors/${investor.id}`, {
+      const res = await fetch(`${API_BASE_URL}/api/admin/investors/${investor.id}/profile`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -62,7 +62,8 @@ export default function InvestorFacebookProfilePage({
           onUpdateInvestor({ ...investor, admin_notes: adminNote });
         }
       } else {
-        toast.error('Failed to save admin note', { id: toastId });
+        const data = await res.json().catch(() => ({}));
+        toast.error(data.detail || 'Failed to save admin note', { id: toastId });
       }
     } catch (e) {
       toast.error('Network error saving note', { id: toastId });
@@ -75,19 +76,19 @@ export default function InvestorFacebookProfilePage({
     setTogglingSub(true);
     const nextReports = serviceType === 'reports' ? !subReports : subReports;
     const nextPortfolio = serviceType === 'portfolio' ? !subPortfolio : subPortfolio;
+    const nextActive = serviceType === 'reports' ? nextReports : nextPortfolio;
 
     const toastId = toast.loading(`Updating ${serviceType === 'reports' ? 'Research Reports' : 'Model Portfolio'} access...`);
     try {
-      const res = await fetch(`${API_BASE_URL}/api/admin/investors/${investor.id}`, {
+      const res = await fetch(`${API_BASE_URL}/api/admin/investors/${investor.id}/subscriptions`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
-          ...investor,
-          subscribed_reports: nextReports,
-          subscribed_portfolio: nextPortfolio
+          service_type: serviceType,
+          active: nextActive
         })
       });
       if (res.ok) {
@@ -102,7 +103,8 @@ export default function InvestorFacebookProfilePage({
           });
         }
       } else {
-        toast.error('Failed to update subscription', { id: toastId });
+        const data = await res.json().catch(() => ({}));
+        toast.error(data.detail || 'Failed to update subscription', { id: toastId });
       }
     } catch (e) {
       toast.error('Network error updating subscription', { id: toastId });
