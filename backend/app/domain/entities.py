@@ -9,6 +9,7 @@ class UserRole(str, Enum):
 
 class UserStatus(str, Enum):
     ACTIVE = "active"
+    SUSPENDED = "suspended"
     DISABLED = "disabled"
     BLACKLISTED = "blacklisted"
 

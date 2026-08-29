@@ -1,6 +1,8 @@
 import pytest
 from app.interfaces.auth_router import validate_password_policy, register, login
-from app.interfaces.schemas import UserRegisterRequest, AdminInvestorCreateRequest, UserLoginRequest
+from app.interfaces.schemas import (
+    UserRegisterRequest, AdminInvestorCreateRequest, UserLoginRequest, UserStatusUpdateRequest
+)
 from fastapi import HTTPException
 
 def test_password_policy_valid():
@@ -86,6 +88,28 @@ def test_admin_seed_and_login_with_credentials():
     res_email = login(UserLoginRequest(email="admin@raghuvir.com", password="Raghuvir#Admin2026!"))
     assert res_email.role == "admin"
     assert res_email.access_token is not None
+
+def test_update_investor_status_endpoints():
+    from app.infrastructure.repositories import UserRepository
+    from app.domain.entities import User, UserRole, UserStatus
+    from app.interfaces.admin_router import update_investor_status
+
+    repo = UserRepository()
+    admin_user = User(username="superadmin", email="admin@rc.com", role=UserRole.ADMIN, status=UserStatus.ACTIVE)
+    test_user = User(username="status_test_user", email="status_test@example.com", hashed_password="pwd", role=UserRole.INVESTOR, status=UserStatus.ACTIVE)
+    created = repo.create(test_user)
+
+    # 1. Test updating status to SUSPENDED
+    res_suspend = update_investor_status(created.id, UserStatusUpdateRequest(status=UserStatus.SUSPENDED), admin=admin_user)
+    assert "suspended" in res_suspend["message"]
+    assert repo.get_by_id(created.id).status == UserStatus.SUSPENDED
+
+    # 2. Test updating status back to ACTIVE
+    res_active = update_investor_status(created.id, UserStatusUpdateRequest(status=UserStatus.ACTIVE), admin=admin_user)
+    assert "active" in res_active["message"]
+    assert repo.get_by_id(created.id).status == UserStatus.ACTIVE
+
+    repo.delete(created.id)
 
 def test_admin_create_investor_and_endpoints():
     from app.infrastructure.repositories import UserRepository
