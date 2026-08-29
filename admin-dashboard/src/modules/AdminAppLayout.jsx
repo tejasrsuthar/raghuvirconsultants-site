@@ -354,20 +354,6 @@ export default function AdminAppLayout() {
           {/* Tab Components Rendering */}
           {activeTab === 'home' && (
             <div className="space-y-8">
-              {/* Top Priority Banner Card */}
-              <div className="bg-amber-50/70 border border-amber-200/80 p-6 rounded-3xl flex items-start gap-4 shadow-2xs">
-                <div className="p-3 bg-amber-100 rounded-2xl text-amber-800 shrink-0">
-                  <Shield className="w-6 h-6" />
-                </div>
-                <div>
-                  <span className="text-[10px] font-extrabold uppercase tracking-widest text-amber-700 block mb-1">System Health & Security</span>
-                  <h3 className="text-lg font-bold text-gray-900">All 50,000+ Record Database Indexes & Security Rules Active</h3>
-                  <p className="text-xs text-gray-600 mt-1 leading-relaxed">
-                    Server-side skip/limit pagination, strict password policies (min 7 chars with !@#$%), and multi-domain host validation are enforced across all services.
-                  </p>
-                </div>
-              </div>
-
               {/* Metric Overview Grid */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 <div className="bg-white border border-[#EAEAEA] p-6 rounded-3xl shadow-2xs">
