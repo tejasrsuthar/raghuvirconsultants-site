@@ -3,6 +3,8 @@ import { toast } from 'react-hot-toast';
 import { ArrowLeft, Save, FileText, CheckCircle2 } from 'lucide-react';
 import { API_BASE_URL } from '../config/apiConfig';
 
+import AdminBreadcrumb from '../components/AdminBreadcrumb';
+
 export default function ReportEditorPage({ initialData, onBack, onSaveSuccess }) {
   const [editingId] = useState(initialData?.id || null);
   const [formData, setFormData] = useState({
@@ -56,16 +58,19 @@ export default function ReportEditorPage({ initialData, onBack, onSaveSuccess })
   };
 
   return (
-    <div className="bg-white border border-gray-200 rounded-3xl p-8 shadow-2xs space-y-6 w-full max-w-5xl mx-auto">
+    <div className="bg-white border border-gray-200 rounded-3xl p-8 shadow-2xs space-y-6 w-full">
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-6 border-b border-gray-200">
         <div>
-          <button
-            onClick={onBack}
-            className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-gray-500 hover:text-gray-900 transition-colors mb-2"
-          >
-            <ArrowLeft className="w-4 h-4" /> Back to Research Reports
-          </button>
+          <div className="mb-3">
+            <AdminBreadcrumb
+              onNavigateHome={onBack}
+              items={[
+                { label: 'Research Reports', onClick: onBack },
+                { label: editingId ? `Edit: ${formData.title || 'Report'}` : 'Create Research Report' }
+              ]}
+            />
+          </div>
           <h2 className="text-2xl font-extrabold text-gray-900 tracking-tight flex items-center gap-2.5">
             <FileText className="w-6 h-6 text-gray-700" />
             {editingId ? 'Edit Research Report' : 'Create Research Report'}

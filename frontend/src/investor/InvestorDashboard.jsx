@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { FileText, Briefcase, Newspaper, Bell, ArrowRight, CheckCircle2, AlertCircle, RefreshCw } from 'lucide-react';
+import Breadcrumb from '../components/Breadcrumb';
 import { API_BASE_URL } from '../config/apiConfig';
 
 export default function InvestorDashboard() {
@@ -125,7 +126,10 @@ export default function InvestorDashboard() {
   };
 
   return (
-    <div className="pt-32 pb-24 px-6 max-w-6xl mx-auto min-h-[90vh] space-y-12">
+    <div className="pt-32 pb-24 px-6 max-w-6xl mx-auto min-h-[90vh] space-y-10">
+      {/* Breadcrumb Navigation */}
+      <Breadcrumb items={[{ label: 'Investor Dashboard' }]} />
+
       {/* Dashboard Top Bar */}
       <div className="flex justify-between items-end flex-wrap gap-4 border-b border-bordercolor pb-6">
         <div>

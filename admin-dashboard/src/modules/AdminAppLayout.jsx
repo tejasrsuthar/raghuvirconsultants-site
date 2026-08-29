@@ -16,12 +16,31 @@ import PlatformSettingsManager from './PlatformSettingsManager';
 import NewsManager from './NewsManager';
 import AdminProfilePage from './AdminProfilePage';
 import SystemStatusPage from '../pages/SystemStatusPage';
+import AdminBreadcrumb from '../components/AdminBreadcrumb';
 import { API_BASE_URL } from '../config/apiConfig';
 
 export default function AdminAppLayout() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('home');
   const [adminUsername, setAdminUsername] = useState('Admin');
+
+  const getTabBreadcrumbLabel = (tab) => {
+    switch (tab) {
+      case 'home': return 'Dashboard Overview';
+      case 'investors': return 'Investor Directory';
+      case 'blogs': return 'Blog Posts';
+      case 'services': return 'Services Catalog';
+      case 'smallcases': return 'Smallcases Manager';
+      case 'reports': return 'Research Reports';
+      case 'portfolio': return 'Model Portfolio';
+      case 'news': return 'News & Announcements';
+      case 'notifications': return 'Alerts & Broadcasts';
+      case 'system-status': return 'System Status Telemetry';
+      case 'admin-profile': return 'Admin Profile Settings';
+      case 'settings': return 'Platform Settings';
+      default: return tab;
+    }
+  };
   const [stats, setStats] = useState({ investors: 0, reports: 0, stocks: 0, blogs: 0 });
   const [profilePopoverOpen, setProfilePopoverOpen] = useState(false);
   const popoverRef = useRef(null);
@@ -333,13 +352,10 @@ export default function AdminAppLayout() {
         <div className="w-full space-y-8">
           {/* Top Header Bar */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 border-b border-gray-200/70 pb-4">
-            <div>
-              <div className="flex items-center gap-2 text-xs text-gray-400 font-medium">
-                <span>Raghuvir Consultants Console</span>
-                <ChevronRight className="w-3 h-3 text-gray-300" />
-                <span className="text-gray-800 capitalize font-semibold">{activeTab === 'notifications' ? 'Alerts' : activeTab}</span>
-              </div>
-            </div>
+              <AdminBreadcrumb
+                onNavigateHome={() => setActiveTab('home')}
+                items={activeTab === 'home' ? [{ label: 'Dashboard' }] : [{ label: getTabBreadcrumbLabel(activeTab) }]}
+              />
 
             {/* Metric Badges */}
             <div className="flex items-center gap-3 bg-white p-2 rounded-2xl border border-gray-200/80 shadow-2xs text-xs font-semibold text-gray-600">

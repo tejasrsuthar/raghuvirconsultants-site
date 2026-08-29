@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import Breadcrumb from '../components/Breadcrumb';
 import { API_BASE_URL } from '../config/apiConfig';
 
 export default function ForgotPassword() {
@@ -38,7 +39,15 @@ export default function ForgotPassword() {
   };
 
   return (
-    <div className="pt-32 pb-24 px-6 flex justify-center items-center min-h-[90vh]">
+    <div className="pt-32 pb-24 px-6 flex flex-col justify-center items-center min-h-[90vh]">
+      <div className="w-full max-w-md mb-4">
+        <Breadcrumb
+          items={[
+            { label: 'Portal Login', to: '/login' },
+            { label: 'Forgot Password' }
+          ]}
+        />
+      </div>
       <div className="bg-white border border-bordercolor p-8 rounded-3xl w-full max-w-md shadow-sm">
         <h2 className="text-3xl font-extrabold mb-2 text-forest text-center">Recover Password</h2>
         <p className="text-sm text-textmuted text-center mb-8">We'll send you recovery instructions</p>
