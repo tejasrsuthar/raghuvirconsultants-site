@@ -1,4 +1,4 @@
-# Enterprise System Architecture (v2.11.1)
+# Enterprise System Architecture (v2.12.0)
 
 This document provides complete technical specifications for the Raghuvir Consultants Enterprise Wealth & Advisory platform.
 
@@ -18,7 +18,7 @@ graph TD
         AdminDomain["admin.raghuvirconsultants.in (Standalone Zaga Admin Console)"]
     end
 
-    subgraph ComposeStack["Unified Docker Compose Stack (raghuvir-net + coolify)"]
+    subgraph ComposeStack["Unified Docker Compose Stack (raghuvir-net)"]
         subgraph ReactFrontend["React 18 + Vite Frontend Application"]
             AppRouter["App.jsx Dual Domain Router"]
             
@@ -33,7 +33,7 @@ graph TD
             end
         end
 
-        subgraph FastAPIServer["FastAPI Asynchronous Backend (v2.11.1)"]
+        subgraph FastAPIServer["FastAPI Asynchronous Backend (v2.12.0)"]
             API["app/main.py (CORS & Middleware)"]
             AuthRouter["auth_router.py (/api/auth)"]
             AdminRouter["admin_router.py (/api/admin)"]
