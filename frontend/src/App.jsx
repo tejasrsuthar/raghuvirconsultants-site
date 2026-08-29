@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import ScrollToTop from './components/ScrollToTop';
@@ -31,6 +32,21 @@ export default function App() {
   return (
     <Router>
       <ScrollToTop />
+      <Toaster 
+        position="bottom-center"
+        toastOptions={{
+          duration: 3500,
+          style: {
+            background: '#18181B',
+            color: '#FFFFFF',
+            borderRadius: '14px',
+            fontSize: '12px',
+            fontWeight: '600',
+            padding: '12px 18px',
+            boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1)'
+          }
+        }}
+      />
       <div className="flex flex-col min-h-screen">
         <Header />
         <main className="flex-grow">
