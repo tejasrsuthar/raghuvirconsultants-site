@@ -5,7 +5,7 @@ import {
   CheckCircle2, AlertCircle, Edit, ArrowLeft, Key, Lock, Briefcase, 
   FileText, Clock, ExternalLink, Shield, Sparkles, MessageSquare, 
   TrendingUp, Award, Check, Copy, UserX, UserCheck, Send, MoreHorizontal,
-  Share2, Eye, HelpCircle, Activity, Bookmark
+  Share2, Eye, EyeOff, HelpCircle, Activity, Bookmark
 } from 'lucide-react';
 import AdminBreadcrumb from '../components/AdminBreadcrumb';
 import { API_BASE_URL } from '../config/apiConfig';
@@ -112,7 +112,7 @@ export default function InvestorFacebookProfilePage({
   };
 
   const formattedRegDate = investor?.created_at 
-    ? new Date(investor.created_at).toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' })
+    ? new Date(investor.created_at).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })
     : 'Unknown';
     
   const formattedRegTime = investor?.created_at 
@@ -143,13 +143,13 @@ export default function InvestorFacebookProfilePage({
           <div className="flex items-center gap-2.5">
             <button
               onClick={onBack}
-              className="px-4 py-2 rounded-full border border-gray-200 text-xs font-bold text-gray-600 hover:bg-gray-50 transition-all flex items-center gap-1.5"
+              className="px-4 py-2 rounded-full border border-gray-200 text-xs font-bold text-gray-600 hover:bg-gray-50 transition-all flex items-center gap-1.5 cursor-pointer"
             >
               <ArrowLeft className="w-3.5 h-3.5" /> Back to Directory
             </button>
             <button
               onClick={onEdit}
-              className="px-5 py-2 rounded-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold flex items-center gap-1.5 shadow-sm transition-all"
+              className="px-5 py-2 rounded-full bg-[#1877F2] hover:bg-[#166FE5] text-white text-xs font-bold flex items-center gap-1.5 shadow-sm transition-all cursor-pointer"
             >
               <Edit className="w-3.5 h-3.5" /> Edit Profile
             </button>
@@ -161,89 +161,57 @@ export default function InvestorFacebookProfilePage({
       {/* FACEBOOK STYLE PROFILE HEADER & HERO BANNER CARD                         */}
       {/* ========================================================================= */}
       <div className="bg-white border border-gray-200 rounded-3xl overflow-hidden shadow-sm">
+        
         {/* Cover Photo / Gradient Area */}
         <div className="relative h-48 sm:h-64 bg-gradient-to-r from-blue-700 via-indigo-700 to-slate-900 overflow-hidden">
-          {/* Subtle Geometric Overlay */}
+          {/* Subtle Geometric Texture */}
           <div className="absolute inset-0 opacity-20 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px]" />
           
-          {/* Cover Decorative Financial Waves */}
+          {/* Cover Bottom Shadow Overlay */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
 
-          {/* Top Right Cover Badges */}
+          {/* Top Right Cover Badge */}
           <div className="absolute top-4 right-4 flex items-center gap-2">
-            <span className="px-3 py-1.5 bg-white/90 backdrop-blur-md rounded-full text-xs font-bold text-gray-800 shadow-sm flex items-center gap-1.5">
+            <span className="px-3 py-1.5 bg-white/95 backdrop-blur-md rounded-full text-xs font-bold text-gray-900 shadow-md flex items-center gap-1.5">
               <ShieldCheck className="w-4 h-4 text-blue-600" /> SEBI-Registered Client
             </span>
           </div>
         </div>
 
-        {/* Profile Avatar & Info Bar */}
-        <div className="px-6 sm:px-10 pb-6 relative">
-          <div className="flex flex-col md:flex-row items-center md:items-end justify-between -mt-20 md:-mt-24 gap-6">
+        {/* Profile Avatar, Names, Badges, and Action Buttons */}
+        <div className="px-6 sm:px-10 pb-4 pt-0">
+          
+          {/* Top Row: Avatar overlapping cover + Action Buttons on Right */}
+          <div className="flex flex-col md:flex-row items-center md:items-end justify-between gap-4 -mt-16 sm:-mt-20">
             
-            {/* Avatar + Main Details */}
-            <div className="flex flex-col sm:flex-row items-center sm:items-end gap-5 text-center sm:text-left">
-              {/* Circular Avatar */}
-              <div className="relative group">
-                <div className="w-32 h-32 sm:w-36 sm:h-36 rounded-full border-4 border-white bg-gradient-to-br from-blue-600 to-indigo-800 text-white flex items-center justify-center text-5xl font-black shadow-xl ring-2 ring-gray-100">
-                  {avatarLetter}
-                </div>
-                {/* Active/Suspended indicator dot */}
-                <div 
-                  className={`absolute bottom-2 right-2 w-6 h-6 rounded-full border-2 border-white flex items-center justify-center shadow-md ${
-                    isActive ? 'bg-emerald-500 text-white' : 'bg-red-500 text-white'
-                  }`}
-                  title={isActive ? 'Active Account' : 'Suspended Account'}
-                >
-                  <Check className="w-3.5 h-3.5 stroke-[3]" />
-                </div>
+            {/* Avatar on Left with Ring */}
+            <div className="relative shrink-0">
+              <div className="w-32 h-32 sm:w-36 sm:h-36 rounded-full border-4 border-white bg-gradient-to-br from-blue-600 to-indigo-800 text-white flex items-center justify-center text-5xl font-black shadow-xl ring-2 ring-gray-100">
+                {avatarLetter}
               </div>
-
-              {/* Names & Taglines */}
-              <div className="mb-2 space-y-1">
-                <div className="flex items-center justify-center sm:justify-start gap-2 flex-wrap">
-                  <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight">
-                    {investor?.full_name || investor?.username || 'Unnamed Investor'}
-                  </h2>
-                  <span className="p-1 bg-blue-50 text-blue-600 rounded-full" title="Verified Investor Account">
-                    <CheckCircle2 className="w-5 h-5 fill-blue-600 text-white" />
-                  </span>
-                </div>
-
-                <p className="text-xs font-mono font-medium text-gray-500">
-                  @{investor?.username} • ID: <span className="text-gray-700">{investor?.id}</span>
-                </p>
-
-                <div className="flex items-center justify-center sm:justify-start gap-2 flex-wrap pt-1">
-                  <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider ${
-                    isActive ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-red-50 text-red-700 border border-red-200'
-                  }`}>
-                    {isActive ? 'Active Account' : 'Suspended'}
-                  </span>
-
-                  <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider bg-blue-50 text-blue-700 border border-blue-200">
-                    {investor?.role || 'INVESTOR'}
-                  </span>
-
-                  <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider bg-purple-50 text-purple-700 border border-purple-200">
-                    {investor?.risk_profile || 'Moderate'} Risk
-                  </span>
-                </div>
+              {/* Active/Suspended Indicator Dot */}
+              <div 
+                className={`absolute bottom-2 right-2 w-6 h-6 rounded-full border-2 border-white flex items-center justify-center shadow-md ${
+                  isActive ? 'bg-emerald-500 text-white' : 'bg-red-500 text-white'
+                }`}
+                title={isActive ? 'Active Account' : 'Suspended Account'}
+              >
+                <Check className="w-3.5 h-3.5 stroke-[3]" />
               </div>
             </div>
 
-            {/* Action Buttons (Facebook Style) */}
-            <div className="flex items-center gap-2.5 flex-wrap justify-center pb-2">
+            {/* Action Buttons (Right-aligned in desktop, centered in mobile) */}
+            <div className="flex items-center gap-2.5 flex-wrap justify-center mt-2 md:mt-0">
               <button
                 onClick={onEdit}
-                className="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold flex items-center gap-2 shadow-xs transition-all"
+                className="px-4 py-2.5 rounded-xl bg-[#1877F2] hover:bg-[#166FE5] text-white text-xs font-bold flex items-center gap-2 shadow-xs transition-all cursor-pointer"
               >
                 <Edit className="w-4 h-4" /> Edit Profile
               </button>
 
               <button
                 onClick={onToggleStatus}
-                className={`px-4 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2 transition-all shadow-xs ${
+                className={`px-4 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2 transition-all shadow-xs cursor-pointer ${
                   isActive 
                     ? 'bg-red-50 text-red-700 border border-red-200 hover:bg-red-100' 
                     : 'bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100'
@@ -255,15 +223,49 @@ export default function InvestorFacebookProfilePage({
 
               <button
                 onClick={onResetPassword}
-                className="px-4 py-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs font-bold flex items-center gap-2 transition-all shadow-xs"
+                className="px-4 py-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs font-bold flex items-center gap-2 transition-all shadow-xs cursor-pointer"
               >
                 <Key className="w-4 h-4 text-gray-600" /> Reset Password
               </button>
             </div>
           </div>
 
+          {/* Profile Name, Username, Account ID & Status Badges */}
+          <div className="mt-4 text-center md:text-left space-y-2">
+            <div className="flex items-center justify-center md:justify-start gap-2 flex-wrap">
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight">
+                {investor?.full_name || investor?.username || 'Unnamed Investor'}
+              </h2>
+              <span className="p-0.5 bg-blue-50 text-blue-600 rounded-full" title="Verified Investor Account">
+                <CheckCircle2 className="w-5 h-5 fill-[#1877F2] text-white" />
+              </span>
+            </div>
+
+            <p className="text-xs text-gray-600 font-medium flex items-center justify-center md:justify-start gap-2 flex-wrap">
+              <span className="font-mono text-gray-700 font-bold">@{investor?.username}</span>
+              <span className="text-gray-300">•</span>
+              <span>Account ID: <span className="font-mono text-gray-700 font-semibold">{investor?.id}</span></span>
+            </p>
+
+            <div className="flex items-center justify-center md:justify-start gap-2 flex-wrap pt-1">
+              <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider ${
+                isActive ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-red-50 text-red-700 border border-red-200'
+              }`}>
+                {isActive ? 'Active Account' : 'Suspended'}
+              </span>
+
+              <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider bg-blue-50 text-blue-700 border border-blue-200">
+                {investor?.role || 'INVESTOR'}
+              </span>
+
+              <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider bg-purple-50 text-purple-700 border border-purple-200">
+                {investor?.risk_profile || 'Moderate'} Risk
+              </span>
+            </div>
+          </div>
+
           {/* Facebook-style Horizontal Tab Bar */}
-          <div className="mt-8 border-t border-gray-200 pt-1 flex items-center gap-1 overflow-x-auto no-scrollbar">
+          <div className="mt-6 border-t border-gray-200 pt-1 flex items-center gap-1 overflow-x-auto no-scrollbar">
             {[
               { id: 'overview', label: 'Overview & Timeline', icon: Activity },
               { id: 'about', label: 'About & KYC Compliance', icon: User },
@@ -277,10 +279,10 @@ export default function InvestorFacebookProfilePage({
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center gap-2 px-4 py-3 border-b-2 text-xs font-bold whitespace-nowrap transition-all ${
+                  className={`flex items-center gap-2 px-4 py-3 border-b-2 text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
                     isCurrent
-                      ? 'border-blue-600 text-blue-600'
-                      : 'border-transparent text-gray-500 hover:text-gray-900 hover:border-gray-300'
+                      ? 'border-[#1877F2] text-[#1877F2] bg-blue-50/40 rounded-t-xl'
+                      : 'border-transparent text-gray-500 hover:text-gray-900 hover:bg-gray-50 rounded-t-xl'
                   }`}
                 >
                   <Icon className="w-4 h-4" />
@@ -321,7 +323,7 @@ export default function InvestorFacebookProfilePage({
                 {investor?.email && (
                   <button
                     onClick={() => copyToClipboard(investor.email, 'Email')}
-                    className="p-1 hover:bg-gray-100 rounded text-gray-400 hover:text-gray-700"
+                    className="p-1 hover:bg-gray-100 rounded text-gray-400 hover:text-gray-700 cursor-pointer"
                     title="Copy Email"
                   >
                     {copiedField === 'Email' ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
@@ -333,12 +335,16 @@ export default function InvestorFacebookProfilePage({
               <div className="flex items-center justify-between text-gray-700 gap-2">
                 <div className="flex items-center gap-2.5 min-w-0">
                   <Phone className="w-4 h-4 text-emerald-600 shrink-0" />
-                  <span className="font-mono font-medium">{investor?.phone || 'No phone provided'}</span>
+                  {investor?.phone ? (
+                    <span className="font-mono font-bold text-gray-900">{investor.phone}</span>
+                  ) : (
+                    <span className="text-gray-400 font-medium">No phone provided</span>
+                  )}
                 </div>
                 {investor?.phone && (
                   <button
                     onClick={() => copyToClipboard(investor.phone, 'Phone')}
-                    className="p-1 hover:bg-gray-100 rounded text-gray-400 hover:text-gray-700"
+                    className="p-1 hover:bg-gray-100 rounded text-gray-400 hover:text-gray-700 cursor-pointer"
                     title="Copy Phone"
                   >
                     {copiedField === 'Phone' ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
@@ -350,24 +356,26 @@ export default function InvestorFacebookProfilePage({
               <div className="flex items-center justify-between text-gray-700 gap-2">
                 <div className="flex items-center gap-2.5 min-w-0">
                   <CreditCard className="w-4 h-4 text-amber-600 shrink-0" />
-                  <span className="font-mono font-bold tracking-wider">
-                    {investor?.pan_number 
-                      ? (showPan ? investor.pan_number : `••••••${investor.pan_number.slice(-4)}`) 
-                      : 'No PAN on record'}
-                  </span>
+                  {investor?.pan_number ? (
+                    <span className="font-mono font-bold tracking-wider text-gray-900">
+                      {showPan ? investor.pan_number : `••••••${investor.pan_number.slice(-4)}`}
+                    </span>
+                  ) : (
+                    <span className="text-gray-400 font-medium">No PAN on record</span>
+                  )}
                 </div>
                 {investor?.pan_number && (
                   <div className="flex items-center gap-1">
                     <button
                       onClick={() => setShowPan(!showPan)}
-                      className="p-1 hover:bg-gray-100 rounded text-gray-400 hover:text-gray-700"
+                      className="p-1 hover:bg-gray-100 rounded text-gray-400 hover:text-gray-700 cursor-pointer"
                       title={showPan ? "Hide PAN" : "Reveal PAN"}
                     >
-                      <Eye className="w-3.5 h-3.5" />
+                      {showPan ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
                     </button>
                     <button
                       onClick={() => copyToClipboard(investor.pan_number, 'PAN Number')}
-                      className="p-1 hover:bg-gray-100 rounded text-gray-400 hover:text-gray-700"
+                      className="p-1 hover:bg-gray-100 rounded text-gray-400 hover:text-gray-700 cursor-pointer"
                       title="Copy PAN"
                     >
                       {copiedField === 'PAN Number' ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
@@ -379,8 +387,8 @@ export default function InvestorFacebookProfilePage({
               {/* Location */}
               <div className="flex items-center gap-2.5 text-gray-700">
                 <MapPin className="w-4 h-4 text-red-500 shrink-0" />
-                <span className="font-medium">
-                  {[investor?.city, investor?.state, investor?.country].filter(Boolean).join(', ') || 'Address not specified'}
+                <span className="font-medium text-gray-800">
+                  {[investor?.city, investor?.state, investor?.country].filter(Boolean).join(', ') || 'India'}
                 </span>
               </div>
 
@@ -388,7 +396,7 @@ export default function InvestorFacebookProfilePage({
               <div className="flex items-center gap-2.5 text-gray-700">
                 <Calendar className="w-4 h-4 text-purple-600 shrink-0" />
                 <span>
-                  DOB: <strong>{investor?.date_of_birth || 'Not recorded'}</strong> {investor?.gender ? `(${investor.gender})` : ''}
+                  DOB: <strong className="text-gray-900">{investor?.date_of_birth || 'Not recorded'}</strong> {investor?.gender ? `(${investor.gender})` : ''}
                 </span>
               </div>
 
@@ -396,7 +404,7 @@ export default function InvestorFacebookProfilePage({
               <div className="flex items-start gap-2.5 text-gray-700">
                 <Clock className="w-4 h-4 text-gray-500 shrink-0 mt-0.5" />
                 <div>
-                  <span className="block font-medium">Joined {formattedRegDate}</span>
+                  <span className="block font-medium text-gray-800">Joined {formattedRegDate}</span>
                   {formattedRegTime && (
                     <span className="block text-[11px] text-gray-400 font-mono">at {formattedRegTime}</span>
                   )}
@@ -406,7 +414,7 @@ export default function InvestorFacebookProfilePage({
 
             <button
               onClick={onEdit}
-              className="w-full py-2.5 mt-2 bg-gray-100 hover:bg-gray-200 text-gray-900 rounded-xl text-xs font-bold transition-all text-center"
+              className="w-full py-2.5 mt-2 bg-gray-100 hover:bg-gray-200 text-gray-900 rounded-xl text-xs font-bold transition-all text-center cursor-pointer"
             >
               Edit Details
             </button>
@@ -496,13 +504,13 @@ export default function InvestorFacebookProfilePage({
                 onChange={(e) => setAdminNote(e.target.value)}
                 placeholder="Write private notes on investor interactions, payment references, KYC verification remarks..."
                 rows={3}
-                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl text-xs text-gray-800 placeholder-gray-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-all resize-none"
+                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl text-xs text-gray-800 placeholder-gray-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-[#1877F2] transition-all resize-none"
               />
               <div className="flex justify-end">
                 <button
                   type="submit"
                   disabled={savingNote}
-                  className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-full shadow-xs flex items-center gap-1.5 disabled:opacity-50 transition-all"
+                  className="px-5 py-2 bg-[#1877F2] hover:bg-[#166FE5] text-white text-xs font-bold rounded-full shadow-xs flex items-center gap-1.5 disabled:opacity-50 transition-all cursor-pointer"
                 >
                   <Send className="w-3.5 h-3.5" />
                   {savingNote ? 'Saving Note...' : 'Post Admin Note'}
@@ -533,7 +541,7 @@ export default function InvestorFacebookProfilePage({
 
                 <div className="p-4 bg-gray-50 rounded-2xl text-xs text-gray-700 space-y-2">
                   <p>
-                    Account <strong>@{investor?.username}</strong> was created with role <strong>{investor?.role || 'INVESTOR'}</strong>.
+                    Account <strong className="text-gray-900">@{investor?.username}</strong> was created with role <strong className="text-gray-900">{investor?.role || 'INVESTOR'}</strong>.
                   </p>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 pt-2 border-t border-gray-200/60 text-[11px]">
                     <div>
@@ -564,7 +572,9 @@ export default function InvestorFacebookProfilePage({
                       <p className="text-[11px] text-gray-400">SEBI Regulatory Verification Status</p>
                     </div>
                   </div>
-                  <span className="px-2.5 py-1 bg-emerald-50 text-emerald-700 text-[10px] font-bold uppercase rounded-full">
+                  <span className={`px-2.5 py-1 text-[10px] font-bold uppercase rounded-full ${
+                    investor?.pan_number ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'
+                  }`}>
                     {investor?.pan_number ? 'PAN Documented' : 'Pending PAN'}
                   </span>
                 </div>
@@ -572,10 +582,16 @@ export default function InvestorFacebookProfilePage({
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
                   <div className="p-4 bg-gray-50 border border-gray-100 rounded-2xl">
                     <span className="text-gray-400 text-[10px] uppercase font-bold tracking-wider block">PAN Card Number</span>
-                    <span className="text-base font-mono font-extrabold text-gray-900 mt-1 block">
-                      {investor?.pan_number || 'NOT PROVIDED'}
-                    </span>
-                    <span className="text-[10px] text-emerald-600 font-semibold mt-1 inline-block">
+                    {investor?.pan_number ? (
+                      <span className="text-base font-mono font-extrabold text-gray-900 mt-1 block">
+                        {investor.pan_number}
+                      </span>
+                    ) : (
+                      <span className="text-sm font-sans font-bold text-amber-800 mt-1 block">
+                        NOT PROVIDED
+                      </span>
+                    )}
+                    <span className={`text-[10px] font-semibold mt-1 inline-block ${investor?.pan_number ? 'text-emerald-600' : 'text-amber-600'}`}>
                       {investor?.pan_number ? '✓ 10-Digit Alphanumeric Verified' : 'Action: Request PAN card from client'}
                     </span>
                   </div>
@@ -713,7 +729,7 @@ export default function InvestorFacebookProfilePage({
                     <button
                       onClick={() => handleToggleSubscription('reports')}
                       disabled={togglingSub}
-                      className={`px-4 py-2 rounded-full text-xs font-bold transition-all ${
+                      className={`px-4 py-2 rounded-full text-xs font-bold transition-all cursor-pointer ${
                         subReports
                           ? 'bg-purple-600 hover:bg-purple-700 text-white shadow-xs'
                           : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
@@ -740,7 +756,7 @@ export default function InvestorFacebookProfilePage({
                     <button
                       onClick={() => handleToggleSubscription('portfolio')}
                       disabled={togglingSub}
-                      className={`px-4 py-2 rounded-full text-xs font-bold transition-all ${
+                      className={`px-4 py-2 rounded-full text-xs font-bold transition-all cursor-pointer ${
                         subPortfolio
                           ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs'
                           : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
@@ -770,7 +786,7 @@ export default function InvestorFacebookProfilePage({
                   </div>
                   <button
                     onClick={onResetPassword}
-                    className="px-4 py-2 bg-gray-900 hover:bg-black text-white rounded-xl text-xs font-bold transition-all"
+                    className="px-4 py-2 bg-gray-900 hover:bg-black text-white rounded-xl text-xs font-bold transition-all cursor-pointer"
                   >
                     Reset Password
                   </button>
@@ -785,7 +801,7 @@ export default function InvestorFacebookProfilePage({
                   </div>
                   <button
                     onClick={onToggleStatus}
-                    className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+                    className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                       isActive ? 'bg-red-50 text-red-700 border border-red-200' : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
                     }`}
                   >
