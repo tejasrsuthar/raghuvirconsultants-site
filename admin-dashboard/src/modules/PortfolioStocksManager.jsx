@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-hot-toast';
-import { Briefcase, Plus, Trash2, Edit3, CheckSquare, Square, ArrowUpDown, Search, RefreshCw, TrendingUp, DollarSign } from 'lucide-react';
+import { Briefcase, Plus, Trash2, Edit3, CheckSquare, Square, ArrowUpDown, Search, RefreshCw, DollarSign } from 'lucide-react';
 import StockEditorPage from './StockEditorPage';
 import NumberedPagination from '../components/NumberedPagination';
 import ConfirmModal from '../components/ConfirmModal';
+import RowActionMenu from '../components/RowActionMenu';
+import DateRangeFilter, { isDateWithinRange } from '../components/DateRangeFilter';
 import { API_BASE_URL } from '../config/apiConfig';
 
 export default function PortfolioStocksManager() {
@@ -11,6 +13,9 @@ export default function PortfolioStocksManager() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [typeFilter, setTypeFilter] = useState('');
+
+  // Date Range Filter State
+  const [dateFilter, setDateFilter] = useState({ range: 'all', customStart: '', customEnd: '' });
 
   // Pagination State
   const [currentPage, setCurrentPage] = useState(1);
@@ -22,8 +27,8 @@ export default function PortfolioStocksManager() {
   const [bulkActionLoading, setBulkActionLoading] = useState(false);
 
   // Sorting State
-  const [sortField, setSortField] = useState('ticker');
-  const [sortDirection, setSortDirection] = useState('asc');
+  const [sortField, setSortField] = useState('created_at');
+  const [sortDirection, setSortDirection] = useState('desc');
 
   // Full-page Editor state
   const [showEditor, setShowEditor] = useState(false);
@@ -57,6 +62,15 @@ export default function PortfolioStocksManager() {
       toast.error('Network error loading stocks');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSort = (field) => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortDirection('asc');
     }
   };
 
@@ -128,16 +142,6 @@ export default function PortfolioStocksManager() {
     }
   };
 
-  // Sorting Handler
-  const handleSort = (field) => {
-    if (sortField === field) {
-      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
-    } else {
-      setSortField(field);
-      setSortDirection('asc');
-    }
-  };
-
   // Filtered & Sorted Stocks
   const filteredStocks = stocks
     .filter(s => {
@@ -146,13 +150,19 @@ export default function PortfolioStocksManager() {
         (s.company_name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
         (s.sector || '').toLowerCase().includes(searchQuery.toLowerCase());
       const matchesType = typeFilter === '' || s.type === typeFilter;
-      return matchesSearch && matchesType;
+      const matchesDate = isDateWithinRange(s.created_at, dateFilter.range, dateFilter.customStart, dateFilter.customEnd);
+      return matchesSearch && matchesType && matchesDate;
     })
     .sort((a, b) => {
       let valA = a[sortField] || '';
       let valB = b[sortField] || '';
-      if (typeof valA === 'string') valA = valA.toLowerCase();
-      if (typeof valB === 'string') valB = valB.toLowerCase();
+      if (sortField === 'allocation_percentage' || sortField === 'buy_price' || sortField === 'target_price') {
+        valA = Number(a[sortField] || 0);
+        valB = Number(b[sortField] || 0);
+      } else {
+        if (typeof valA === 'string') valA = valA.toLowerCase();
+        if (typeof valB === 'string') valB = valB.toLowerCase();
+      }
       if (valA < valB) return sortDirection === 'asc' ? -1 : 1;
       if (valA > valB) return sortDirection === 'asc' ? 1 : -1;
       return 0;
@@ -212,9 +222,9 @@ export default function PortfolioStocksManager() {
         </div>
       </div>
 
-      {/* Filter & Table Box */}
+      {/* Filter & Table Container */}
       <div className="bg-white border border-gray-200 rounded-3xl p-6 shadow-2xs space-y-4">
-        <div className="flex flex-col sm:flex-row justify-between gap-4">
+        <div className="flex flex-col xl:flex-row justify-between gap-4">
           <div className="flex flex-wrap items-center gap-3 flex-1">
             <div className="relative flex-1 min-w-[220px]">
               <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -226,6 +236,13 @@ export default function PortfolioStocksManager() {
                 className="w-full pl-9 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-full text-xs text-gray-800 focus:outline-none focus:border-emerald-500"
               />
             </div>
+
+            <DateRangeFilter
+              selectedRange={dateFilter.range}
+              customStart={dateFilter.customStart}
+              customEnd={dateFilter.customEnd}
+              onRangeChange={setDateFilter}
+            />
 
             <select
               value={typeFilter}
@@ -254,7 +271,7 @@ export default function PortfolioStocksManager() {
           )}
         </div>
 
-        {/* Stock Table */}
+        {/* Directory Table */}
         {loading ? (
           <div className="text-center py-12 text-xs text-gray-500 flex flex-col items-center gap-2">
             <RefreshCw className="w-5 h-5 animate-spin text-emerald-600" />
@@ -262,7 +279,7 @@ export default function PortfolioStocksManager() {
           </div>
         ) : filteredStocks.length === 0 ? (
           <div className="text-center py-12 text-xs text-gray-500">
-            No stock holdings found.
+            No stock holdings found matching the criteria.
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -283,16 +300,50 @@ export default function PortfolioStocksManager() {
                       Ticker / Company <ArrowUpDown className="w-3.5 h-3.5" />
                     </div>
                   </th>
-                  <th className="py-3.5 px-3">Sector</th>
-                  <th className="py-3.5 px-3">Allocation</th>
-                  <th className="py-3.5 px-3">Entry Price</th>
-                  <th className="py-3.5 px-3">Target Price</th>
+                  <th className="py-3.5 px-3 cursor-pointer select-none" onClick={() => handleSort('sector')}>
+                    <div className="flex items-center gap-1.5">
+                      Sector <ArrowUpDown className="w-3.5 h-3.5" />
+                    </div>
+                  </th>
+                  <th className="py-3.5 px-3 cursor-pointer select-none" onClick={() => handleSort('allocation_percentage')}>
+                    <div className="flex items-center gap-1.5">
+                      Allocation <ArrowUpDown className="w-3.5 h-3.5" />
+                    </div>
+                  </th>
+                  <th className="py-3.5 px-3 cursor-pointer select-none" onClick={() => handleSort('buy_price')}>
+                    <div className="flex items-center gap-1.5">
+                      Entry Price <ArrowUpDown className="w-3.5 h-3.5" />
+                    </div>
+                  </th>
+                  <th className="py-3.5 px-3 cursor-pointer select-none" onClick={() => handleSort('target_price')}>
+                    <div className="flex items-center gap-1.5">
+                      Target Price <ArrowUpDown className="w-3.5 h-3.5" />
+                    </div>
+                  </th>
                   <th className="py-3.5 px-3 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {filteredStocks.map((item) => {
                   const isSelected = selectedIds.includes(item.id);
+                  const rowActions = [
+                    {
+                      label: 'Edit Stock Position',
+                      icon: Edit3,
+                      onClick: () => {
+                        setEditingItem(item);
+                        setShowEditor(true);
+                      }
+                    },
+                    { divider: true },
+                    {
+                      label: 'Delete Position',
+                      icon: Trash2,
+                      isDestructive: true,
+                      onClick: () => setDeleteConfirmItem(item)
+                    }
+                  ];
+
                   return (
                     <tr key={item.id} className={`hover:bg-gray-50/60 transition-colors ${isSelected ? 'bg-emerald-50/30' : ''}`}>
                       <td className="py-3.5 px-3">
@@ -327,25 +378,7 @@ export default function PortfolioStocksManager() {
                         ₹{Number(item.target_price || 0).toLocaleString()}
                       </td>
                       <td className="py-3.5 px-3 text-right">
-                        <div className="flex items-center justify-end gap-1.5">
-                          <button
-                            onClick={() => {
-                              setEditingItem(item);
-                              setShowEditor(true);
-                            }}
-                            className="p-2 hover:bg-gray-100 rounded-xl text-gray-600 transition-colors"
-                            title="Edit Stock"
-                          >
-                            <Edit3 className="w-4 h-4" />
-                          </button>
-                          <button
-                            onClick={() => setDeleteConfirmItem(item)}
-                            className="p-2 hover:bg-red-50 rounded-xl text-red-600 transition-colors"
-                            title="Delete Stock"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </div>
+                        <RowActionMenu items={rowActions} />
                       </td>
                     </tr>
                   );

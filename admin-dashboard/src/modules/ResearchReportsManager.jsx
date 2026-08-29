@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-hot-toast';
-import { FileText, Plus, Trash2, Edit3, ExternalLink, CheckSquare, Square, ArrowUpDown, Search, RefreshCw, FileCode, CheckCircle2 } from 'lucide-react';
+import { FileText, Plus, Trash2, Edit3, CheckSquare, Square, Search, RefreshCw, ArrowUpDown, ExternalLink, Copy, Check } from 'lucide-react';
 import ReportEditorPage from './ReportEditorPage';
 import NumberedPagination from '../components/NumberedPagination';
 import ConfirmModal from '../components/ConfirmModal';
+import RowActionMenu from '../components/RowActionMenu';
+import DateRangeFilter, { isDateWithinRange } from '../components/DateRangeFilter';
 import { API_BASE_URL } from '../config/apiConfig';
 
 export default function ResearchReportsManager() {
@@ -11,6 +13,13 @@ export default function ResearchReportsManager() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
+
+  // Date Range Filter State
+  const [dateFilter, setDateFilter] = useState({ range: 'all', customStart: '', customEnd: '' });
+
+  // Sorting State
+  const [sortField, setSortField] = useState('created_at');
+  const [sortDirection, setSortDirection] = useState('desc');
 
   // Pagination State
   const [currentPage, setCurrentPage] = useState(1);
@@ -20,10 +29,6 @@ export default function ResearchReportsManager() {
   // Multi-Selection State
   const [selectedIds, setSelectedIds] = useState([]);
   const [bulkActionLoading, setBulkActionLoading] = useState(false);
-
-  // Sorting State
-  const [sortField, setSortField] = useState('published_at');
-  const [sortDirection, setSortDirection] = useState('desc');
 
   // Full-page Editor state
   const [showEditor, setShowEditor] = useState(false);
@@ -60,28 +65,19 @@ export default function ResearchReportsManager() {
     }
   };
 
-  const handleSingleStatusUpdate = async (id, newStatus) => {
-    const report = reports.find(r => r.id === id);
-    if (!report) return;
-    const toastId = toast.loading(`Updating report status...`);
-    try {
-      const res = await fetch(`${API_BASE_URL}/api/reports/${id}/status`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ status: newStatus })
-      });
-      if (res.ok) {
-        setReports(reports.map(r => r.id === id ? { ...r, status: newStatus } : r));
-        toast.success(`Report status updated to ${newStatus.toUpperCase()}`, { id: toastId });
-      } else {
-        toast.error('Failed to update report status', { id: toastId });
-      }
-    } catch (e) {
-      toast.error('Network error updating status', { id: toastId });
+  const handleSort = (field) => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortDirection('asc');
     }
+  };
+
+  const handleCopyLink = (url) => {
+    if (!url) return;
+    navigator.clipboard.writeText(url);
+    toast.success('Document URL copied to clipboard');
   };
 
   const executeDelete = async () => {
@@ -126,7 +122,7 @@ export default function ResearchReportsManager() {
         setSelectedIds([]);
         fetchReports(currentPage);
       } else {
-        toast.error('Failed to execute bulk delete', { id: toastId });
+        toast.error('Failed to delete reports', { id: toastId });
       }
     } catch (e) {
       toast.error('Network error executing bulk delete', { id: toastId });
@@ -152,51 +148,15 @@ export default function ResearchReportsManager() {
     }
   };
 
-  // Bulk Operations
-  const handleBulkStatusChange = async (newStatus) => {
-    if (selectedIds.length === 0) return;
-    setBulkActionLoading(true);
-    const toastId = toast.loading(`Updating ${selectedIds.length} reports to ${newStatus}...`);
-    try {
-      const res = await fetch(`${API_BASE_URL}/api/reports/bulk-status`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ ids: selectedIds, status: newStatus })
-      });
-      if (res.ok) {
-        toast.success(`Updated status for ${selectedIds.length} reports to ${newStatus.toUpperCase()}`, { id: toastId });
-        fetchReports(currentPage);
-      } else {
-        toast.error('Failed to execute bulk status update', { id: toastId });
-      }
-    } catch (e) {
-      toast.error('Network error during bulk update', { id: toastId });
-    } finally {
-      setBulkActionLoading(false);
-    }
-  };
-
-  // Sorting Handler
-  const handleSort = (field) => {
-    if (sortField === field) {
-      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
-    } else {
-      setSortField(field);
-      setSortDirection('asc');
-    }
-  };
-
-  // Filtered & Sorted Reports
   const filteredReports = reports
     .filter(r => {
       const matchesSearch = searchQuery === '' || 
-        r.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-        (r.content || '').toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesStatus = statusFilter === '' || r.status === statusFilter;
-      return matchesSearch && matchesStatus;
+        (r.title || '').toLowerCase().includes(searchQuery.toLowerCase()) || 
+        (r.ticker || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (r.summary || '').toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesStatus = statusFilter === '' || (r.status || 'published') === statusFilter;
+      const matchesDate = isDateWithinRange(r.created_at, dateFilter.range, dateFilter.customStart, dateFilter.customEnd);
+      return matchesSearch && matchesStatus && matchesDate;
     })
     .sort((a, b) => {
       let valA = a[sortField] || '';
@@ -236,8 +196,8 @@ export default function ResearchReportsManager() {
               <FileText className="w-6 h-6" />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-gray-900">Research & Advisory Reports</h2>
-              <p className="text-xs text-gray-500 mt-0.5">Manage published institutional research, sector reports, and Google Doc links</p>
+              <h2 className="text-xl font-bold text-gray-900">Institutional Research Reports</h2>
+              <p className="text-xs text-gray-500 mt-0.5">Publish in-depth company valuations, target models, and Google Docs research</p>
             </div>
           </div>
 
@@ -249,7 +209,7 @@ export default function ResearchReportsManager() {
               }}
               className="bg-gray-900 hover:bg-black text-white px-5 py-2.5 rounded-full font-bold text-xs flex items-center gap-2 shadow-md transition-all"
             >
-              <Plus className="w-4 h-4" /> New Report
+              <Plus className="w-4 h-4" /> Publish Report
             </button>
             <button
               onClick={() => fetchReports(currentPage)}
@@ -262,20 +222,27 @@ export default function ResearchReportsManager() {
         </div>
       </div>
 
-      {/* Filter & Bulk Bar */}
+      {/* Filter & Table Container */}
       <div className="bg-white border border-gray-200 rounded-3xl p-6 shadow-2xs space-y-4">
-        <div className="flex flex-col sm:flex-row justify-between gap-4">
+        <div className="flex flex-col xl:flex-row justify-between gap-4">
           <div className="flex flex-wrap items-center gap-3 flex-1">
             <div className="relative flex-1 min-w-[220px]">
               <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
-                placeholder="Search reports by title or content..."
+                placeholder="Search reports by ticker, title, or summary..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-9 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-full text-xs text-gray-800 focus:outline-none focus:border-blue-500"
               />
             </div>
+
+            <DateRangeFilter
+              selectedRange={dateFilter.range}
+              customStart={dateFilter.customStart}
+              customEnd={dateFilter.customEnd}
+              onRangeChange={setDateFilter}
+            />
 
             <select
               value={statusFilter}
@@ -285,7 +252,6 @@ export default function ResearchReportsManager() {
               <option value="">All Statuses</option>
               <option value="published">Published</option>
               <option value="draft">Draft</option>
-              <option value="archived">Archived</option>
             </select>
           </div>
 
@@ -294,31 +260,17 @@ export default function ResearchReportsManager() {
             <div className="flex items-center gap-2 bg-blue-50/70 border border-blue-200 p-1.5 px-3 rounded-full text-xs animate-in fade-in">
               <span className="font-bold text-blue-900 mr-2">{selectedIds.length} Selected</span>
               <button
-                onClick={() => handleBulkStatusChange('published')}
-                disabled={bulkActionLoading}
-                className="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full font-bold text-[11px] transition-colors"
-              >
-                Publish
-              </button>
-              <button
-                onClick={() => handleBulkStatusChange('draft')}
-                disabled={bulkActionLoading}
-                className="px-3 py-1 bg-amber-600 hover:bg-amber-700 text-white rounded-full font-bold text-[11px] transition-colors"
-              >
-                Draft
-              </button>
-              <button
                 onClick={() => setBulkDeleteConfirm(true)}
                 disabled={bulkActionLoading}
                 className="px-3 py-1 bg-red-600 hover:bg-red-700 text-white rounded-full font-bold text-[11px] flex items-center gap-1 transition-colors"
               >
-                <Trash2 className="w-3 h-3" /> Delete
+                <Trash2 className="w-3 h-3" /> Delete Selected
               </button>
             </div>
           )}
         </div>
 
-        {/* Reports Table */}
+        {/* Directory Table */}
         {loading ? (
           <div className="text-center py-12 text-xs text-gray-500 flex flex-col items-center gap-2">
             <RefreshCw className="w-5 h-5 animate-spin text-blue-600" />
@@ -326,7 +278,7 @@ export default function ResearchReportsManager() {
           </div>
         ) : filteredReports.length === 0 ? (
           <div className="text-center py-12 text-xs text-gray-500">
-            No research reports found.
+            No research reports found matching the criteria.
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -344,7 +296,7 @@ export default function ResearchReportsManager() {
                   </th>
                   <th className="py-3.5 px-3 cursor-pointer select-none" onClick={() => handleSort('title')}>
                     <div className="flex items-center gap-1.5">
-                      Report Title <ArrowUpDown className="w-3.5 h-3.5" />
+                      Report Title & Ticker <ArrowUpDown className="w-3.5 h-3.5" />
                     </div>
                   </th>
                   <th className="py-3.5 px-3">Google Doc Source</th>
@@ -353,9 +305,9 @@ export default function ResearchReportsManager() {
                       Status <ArrowUpDown className="w-3.5 h-3.5" />
                     </div>
                   </th>
-                  <th className="py-3.5 px-3 cursor-pointer select-none" onClick={() => handleSort('published_at')}>
+                  <th className="py-3.5 px-3 cursor-pointer select-none" onClick={() => handleSort('created_at')}>
                     <div className="flex items-center gap-1.5">
-                      Date <ArrowUpDown className="w-3.5 h-3.5" />
+                      Published <ArrowUpDown className="w-3.5 h-3.5" />
                     </div>
                   </th>
                   <th className="py-3.5 px-3 text-right">Actions</th>
@@ -364,6 +316,36 @@ export default function ResearchReportsManager() {
               <tbody className="divide-y divide-gray-100">
                 {filteredReports.map((item) => {
                   const isSelected = selectedIds.includes(item.id);
+                  const rowActions = [
+                    {
+                      label: 'Edit Report',
+                      icon: Edit3,
+                      onClick: () => {
+                        setEditingItem(item);
+                        setShowEditor(true);
+                      }
+                    },
+                    ...(item.google_doc_url ? [
+                      {
+                        label: 'Open Google Doc',
+                        icon: ExternalLink,
+                        onClick: () => window.open(item.google_doc_url, '_blank')
+                      },
+                      {
+                        label: 'Copy Doc Link',
+                        icon: Copy,
+                        onClick: () => handleCopyLink(item.google_doc_url)
+                      }
+                    ] : []),
+                    { divider: true },
+                    {
+                      label: 'Delete Report',
+                      icon: Trash2,
+                      isDestructive: true,
+                      onClick: () => setDeleteConfirmItem(item)
+                    }
+                  ];
+
                   return (
                     <tr key={item.id} className={`hover:bg-gray-50/60 transition-colors ${isSelected ? 'bg-blue-50/30' : ''}`}>
                       <td className="py-3.5 px-3">
@@ -376,60 +358,46 @@ export default function ResearchReportsManager() {
                         </button>
                       </td>
                       <td className="py-3.5 px-3">
-                        <div className="font-bold text-gray-900 leading-snug">{item.title}</div>
-                        <div className="text-[11px] text-gray-400 line-clamp-1">{item.content}</div>
+                        <div className="flex items-center gap-3">
+                          {item.ticker && (
+                            <span className="px-2.5 py-1 bg-gray-900 text-white font-mono font-bold rounded-lg text-xs shrink-0">
+                              {item.ticker}
+                            </span>
+                          )}
+                          <div>
+                            <span className="font-bold text-gray-900 block max-w-sm truncate">{item.title}</span>
+                            <span className="text-[11px] text-gray-500 block max-w-sm truncate">{item.summary || 'Institutional research note'}</span>
+                          </div>
+                        </div>
                       </td>
                       <td className="py-3.5 px-3">
-                        {item.doc_link ? (
+                        {item.google_doc_url ? (
                           <a
-                            href={item.doc_link}
+                            href={item.google_doc_url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold rounded-lg text-[10px] transition-colors"
+                            className="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-50 text-blue-700 hover:bg-blue-100 rounded-full font-bold text-[11px] transition-colors"
                           >
-                            <ExternalLink className="w-3 h-3" /> Open Doc
+                            <ExternalLink className="w-3 h-3" /> View Document
                           </a>
                         ) : (
-                          <span className="text-gray-400 font-mono text-[10px]">—</span>
+                          <span className="text-gray-400 text-[11px]">—</span>
                         )}
                       </td>
                       <td className="py-3.5 px-3">
-                        <select
-                          value={item.status}
-                          onChange={(e) => handleSingleStatusUpdate(item.id, e.target.value)}
-                          className={`px-2.5 py-1 rounded-xl text-[10px] font-bold uppercase border focus:outline-none transition-all cursor-pointer ${
-                            item.status === 'published' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
-                            item.status === 'draft' ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-gray-100 text-gray-600 border-gray-200'
-                          }`}
-                        >
-                          <option value="draft">DRAFT</option>
-                          <option value="published">PUBLISHED</option>
-                          <option value="archived">ARCHIVED</option>
-                        </select>
+                        <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                          (item.status || 'published') === 'published'
+                            ? 'bg-emerald-50 text-emerald-700 border border-emerald-200/60'
+                            : 'bg-amber-50 text-amber-700 border border-amber-200/60'
+                        }`}>
+                          {item.status || 'PUBLISHED'}
+                        </span>
                       </td>
                       <td className="py-3.5 px-3 text-gray-400 font-medium">
-                        {new Date(item.published_at).toLocaleDateString()}
+                        {new Date(item.created_at || Date.now()).toLocaleDateString()}
                       </td>
                       <td className="py-3.5 px-3 text-right">
-                        <div className="flex items-center justify-end gap-1.5">
-                          <button
-                            onClick={() => {
-                              setEditingItem(item);
-                              setShowEditor(true);
-                            }}
-                            className="p-2 hover:bg-gray-100 rounded-xl text-gray-600 transition-colors"
-                            title="Edit Report"
-                          >
-                            <Edit3 className="w-4 h-4" />
-                          </button>
-                          <button
-                            onClick={() => setDeleteConfirmItem(item)}
-                            className="p-2 hover:bg-red-50 rounded-xl text-red-600 transition-colors"
-                            title="Delete Report"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </div>
+                        <RowActionMenu items={rowActions} />
                       </td>
                     </tr>
                   );
@@ -455,8 +423,8 @@ export default function ResearchReportsManager() {
       {/* Delete Single Report Confirm */}
       <ConfirmModal
         isOpen={!!deleteConfirmItem}
-        title={`Delete Research Report?`}
-        message={`Are you sure you want to permanently delete report "${deleteConfirmItem?.title}"? Investors will lose access immediately.`}
+        title={`Delete Research Report: ${deleteConfirmItem?.title}?`}
+        message={`Are you sure you want to delete this report? Investors will lose instant access to its content.`}
         confirmText="Delete Report"
         isDestructive={true}
         loading={actionLoading}
@@ -467,9 +435,9 @@ export default function ResearchReportsManager() {
       {/* Bulk Delete Confirm */}
       <ConfirmModal
         isOpen={bulkDeleteConfirm}
-        title={`Bulk Delete ${selectedIds.length} Reports?`}
-        message={`Are you sure you want to permanently delete all ${selectedIds.length} selected research reports? This action cannot be reversed.`}
-        confirmText="Delete All Selected"
+        title={`Delete ${selectedIds.length} Research Reports?`}
+        message={`Are you sure you want to delete ${selectedIds.length} research reports? This action cannot be reversed.`}
+        confirmText="Delete Selected"
         isDestructive={true}
         loading={actionLoading}
         onConfirm={executeBulkDelete}
