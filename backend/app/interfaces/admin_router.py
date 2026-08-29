@@ -1,11 +1,13 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
 from app.interfaces.schemas import (
     UserStatusUpdateRequest, UserRoleUpdateRequest, InvestorListItem, PaginatedResponse, 
-    AdminInvestorProfileUpdate, AdminInvestorSubscriptionUpdate
+    AdminInvestorProfileUpdate, AdminInvestorSubscriptionUpdate,
+    AdminPasswordResetRequest, AdminUsernameUpdateRequest
 )
 from app.interfaces.dependencies import require_admin
 from app.infrastructure.repositories import UserRepository, SubscriptionRepository
 from app.domain.entities import User, UserStatus, ServiceType, Subscription, SubscriptionStatus
+from app.core.security import get_password_hash
 from datetime import datetime, timedelta
 import math
 
@@ -14,13 +16,14 @@ user_repo = UserRepository()
 sub_repo = SubscriptionRepository()
 
 @router.get("/investors", response_model=PaginatedResponse)
+@router.get("/users", response_model=PaginatedResponse)
 def list_investors(
     page: int = Query(1, ge=1),
     limit: int = Query(10, ge=1, le=1000),
     admin: User = Depends(require_admin)
 ):
     users, total = user_repo.get_all_paginated(page, limit)
-    pages = math.ceil(total / limit)
+    pages = math.ceil(total / limit) if limit > 0 else 1
     
     items = []
     for user in users:
@@ -48,6 +51,7 @@ def list_investors(
     )
 
 @router.put("/investors/{investor_id}/status")
+@router.put("/users/{investor_id}/status")
 def update_investor_status(
     investor_id: str,
     req: UserStatusUpdateRequest,
@@ -57,7 +61,7 @@ def update_investor_status(
     if not user:
         raise HTTPException(status_code=404, detail="Investor not found")
         
-    if user.role == "admin":
+    if user.role == "admin" and req.status != UserStatus.ACTIVE:
         raise HTTPException(status_code=400, detail="Cannot alter status of an administrator")
         
     success = user_repo.update_status(investor_id, req.status)
@@ -67,6 +71,7 @@ def update_investor_status(
     return {"message": f"Investor status successfully updated to {req.status.value}"}
 
 @router.put("/investors/{investor_id}/role")
+@router.put("/users/{investor_id}/role")
 def update_investor_role(
     investor_id: str,
     req: UserRoleUpdateRequest,
@@ -82,7 +87,74 @@ def update_investor_role(
          
     return {"message": f"User role successfully updated to {req.role.value}"}
 
+@router.put("/investors/{investor_id}/password")
+@router.put("/users/{investor_id}/password")
+def reset_investor_password(
+    investor_id: str,
+    req: AdminPasswordResetRequest,
+    admin: User = Depends(require_admin)
+):
+    user = user_repo.get_by_id(investor_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="Investor not found")
+        
+    if len(req.password) < 7:
+        raise HTTPException(status_code=400, detail="Password must be at least 7 characters long")
+        
+    hashed = get_password_hash(req.password)
+    success = user_repo.update_password(investor_id, hashed)
+    if not success:
+        raise HTTPException(status_code=400, detail="Failed to update password")
+        
+    return {"message": f"Password successfully reset for {user.username}"}
+
+@router.put("/investors/{investor_id}/username")
+@router.put("/users/{investor_id}/username")
+def update_investor_username(
+    investor_id: str,
+    req: AdminUsernameUpdateRequest,
+    admin: User = Depends(require_admin)
+):
+    user = user_repo.get_by_id(investor_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="Investor not found")
+        
+    clean_username = req.username.strip().replace(" ", "")
+    if not clean_username:
+        raise HTTPException(status_code=400, detail="Username cannot be empty")
+        
+    if clean_username != user.username:
+        existing = user_repo.get_by_username(clean_username)
+        if existing:
+            raise HTTPException(status_code=400, detail="Username already taken")
+            
+    success = user_repo.update_profile(investor_id, username=clean_username)
+    if not success:
+        raise HTTPException(status_code=400, detail="Failed to update username")
+        
+    return {"message": "Username successfully updated"}
+
+@router.delete("/investors/{investor_id}")
+@router.delete("/users/{investor_id}")
+def delete_investor(
+    investor_id: str,
+    admin: User = Depends(require_admin)
+):
+    user = user_repo.get_by_id(investor_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="Investor not found")
+        
+    if user.role == "admin":
+        raise HTTPException(status_code=400, detail="Cannot delete an administrator account")
+        
+    success = user_repo.delete(investor_id)
+    if not success:
+        raise HTTPException(status_code=400, detail="Failed to delete investor account")
+        
+    return {"message": "Investor account successfully deleted"}
+
 @router.get("/investors/{investor_id}", response_model=InvestorListItem)
+@router.get("/users/{investor_id}", response_model=InvestorListItem)
 def get_investor_detail(
     investor_id: str,
     admin: User = Depends(require_admin)
@@ -106,6 +178,7 @@ def get_investor_detail(
     )
 
 @router.get("/investors/{investor_id}/activities")
+@router.get("/users/{investor_id}/activities")
 def get_investor_activities(
     investor_id: str,
     admin: User = Depends(require_admin)
@@ -115,6 +188,7 @@ def get_investor_activities(
     return activity_repo.get_by_user_id(investor_id)
 
 @router.put("/investors/{investor_id}/profile")
+@router.put("/users/{investor_id}/profile")
 def update_investor_profile_by_admin(
     investor_id: str,
     req: AdminInvestorProfileUpdate,
@@ -142,6 +216,7 @@ def update_investor_profile_by_admin(
     return {"message": "Investor profile updated successfully"}
 
 @router.put("/investors/{investor_id}/subscriptions")
+@router.put("/users/{investor_id}/subscriptions")
 def update_investor_subscription_by_admin(
     investor_id: str,
     req: AdminInvestorSubscriptionUpdate,

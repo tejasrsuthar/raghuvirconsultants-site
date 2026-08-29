@@ -127,6 +127,12 @@ class AdminInvestorProfileUpdate(BaseModel):
     phone: Optional[str] = None
     address: Optional[str] = None
 
+class AdminPasswordResetRequest(BaseModel):
+    password: str
+
+class AdminUsernameUpdateRequest(BaseModel):
+    username: str
+
 class AdminInvestorSubscriptionUpdate(BaseModel):
     service_type: ServiceType
     active: bool
