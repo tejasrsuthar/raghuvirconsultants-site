@@ -9,13 +9,11 @@ from app.domain.entities import User, UserRole, UserStatus
 from app.core.security import get_password_hash
 import os
 
-# ── Allowed origins (tightened from "*" for production) ───────────────────────
 # ── Allowed origins & CORS configuration ──────────────────────────────────────
 DEFAULT_ORIGINS = [
     "https://www.raghuvirconsultants.in",
     "https://raghuvirconsultants.in",
     "https://app.raghuvirconsultants.in",
-    "https://api.raghuvirconsultants.in",
     "http://raghuvircons.local",
     "http://app.raghuvircons.local",
     "http://localhost",
@@ -51,7 +49,7 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
 app = FastAPI(
     title="Raghuvir Consultants API",
     description="Enterprise Advisory System Backend",
-    version="2.10.0"
+    version="2.10.1"
 )
 
 # ── Middleware stack (order matters — outermost first) ─────────────────────────
@@ -63,7 +61,6 @@ app.add_middleware(
         "www.raghuvirconsultants.in",
         "raghuvirconsultants.in",
         "app.raghuvirconsultants.in",
-        "api.raghuvirconsultants.in",
         "raghuvircons.local",
         "app.raghuvircons.local",
         "localhost",
@@ -129,11 +126,11 @@ def seed_admin():
 
 @app.get("/")
 def read_root():
-    return {"message": "Raghuvir Consultants API is running", "version": "2.10.0"}
+    return {"message": "Raghuvir Consultants API is running", "version": "2.10.1"}
 
 @app.get("/health")
 @app.get("/api/health")
 @app.get("/api/system/health")
 def health_check():
-    return {"status": "ok", "version": "2.10.0"}
+    return {"status": "ok", "version": "2.10.1"}
 
