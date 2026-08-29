@@ -1,13 +1,13 @@
-# Raghuvir Consultants Admin Console User Guide (v2.1.0)
+# Raghuvir Consultants Admin Console User Guide (v2.12.24)
 
-Complete operational manual for managing the Raghuvir Consultants advisory platform via `http://app.raghuvircons.local/` (or `/adminDashboard`).
+Complete operational manual for managing the Raghuvir Consultants advisory platform via `https://admin.raghuvirconsultants.in` (or `/adminDashboard`).
 
 ---
 
 ## 1. Authentication & Access
-- **URL**: `http://app.raghuvircons.local/login`
-- **Default Admin Email**: `admin@raghuvir.com`
-- **Default Admin Password**: `admin12345`
+- **URL**: `https://admin.raghuvirconsultants.in/login`
+- **Default Admin Username / Email**: `admin` / `admin@raghuvir.com`
+- **Default Admin Password**: `Raghuvir#Admin2026!`
 
 ```mermaid
 graph LR
@@ -28,11 +28,12 @@ graph LR
 The left sidebar is organized into 5 distinct operational categories under **Raghuvir Consultants Admin**:
 
 ### Category 1: Dashboard
-- **Home Overview**: View real-time database health, active investor metrics, research publications count, model portfolio stock count, and blog post stats.
+- **Home Overview**: View active investor metrics, research publications count, model portfolio stock count, and blog post stats.
 
 ### Category 2: Investors
-- **Investor Users Manager**:
-  - View registered investors.
+- **Investor Directory**:
+  - Full Indian KYC Compliance fields (PAN number, Gender, Date of Birth, Full Address, Referral Source).
+  - Dedicated Sub-Page Editor (`/investors/new` & `/investors/edit/:id`) with interactive breadcrumbs.
   - Account status options: **Activate**, **Disable**, or **Blacklist**.
 
 ### Category 3: Site Static Content
@@ -56,4 +57,4 @@ The left sidebar is organized into 5 distinct operational categories under **Rag
 - **Alerts**:
   - Quick inline status dropdown selector (`Published`, `Draft`, `Archived`) on each row.
   - Multi-selection checkboxes + Mass Bulk Action Bar.
-- **System Telemetry Status**: View real-time API version, MongoDB ping speed in `ms`, and CPU/Memory gauges.
+- **System Status**: View real-time API version, MongoDB ping speed in `ms`, and CPU/Memory gauges.

@@ -35,7 +35,7 @@ export default function AdminAppLayout() {
       case 'portfolio': return 'Model Portfolio';
       case 'news': return 'News & Announcements';
       case 'notifications': return 'Alerts & Broadcasts';
-      case 'system-status': return 'System Status Telemetry';
+      case 'system-status': return 'System Status';
       case 'admin-profile': return 'Admin Profile Settings';
       case 'settings': return 'Platform Settings';
       default: return tab;
@@ -285,7 +285,7 @@ export default function AdminAppLayout() {
                     activeTab === 'system-status' ? 'bg-white text-gray-900 font-bold shadow-xs' : 'text-[#4A4A4A] hover:text-gray-900 font-medium'
                   }`}
                 >
-                  <Activity className="w-3.5 h-3.5 text-emerald-600" /> System Telemetry Status
+                  <Activity className="w-3.5 h-3.5 text-emerald-600" /> System Status
                 </button>
               </div>
             </div>
@@ -404,7 +404,7 @@ export default function AdminAppLayout() {
           {activeTab === 'portfolio' && <PortfolioStocksManager />}
           {activeTab === 'news' && <NewsManager />}
           {activeTab === 'notifications' && <NotificationsManager />}
-          {activeTab === 'system-status' && <SystemStatusPage />}
+          {activeTab === 'system-status' && <SystemStatusPage onBack={() => setActiveTab('home')} />}
           {activeTab === 'admin-profile' && <AdminProfilePage onBack={() => setActiveTab('home')} />}
           {activeTab === 'settings' && <PlatformSettingsManager />}
         </div>

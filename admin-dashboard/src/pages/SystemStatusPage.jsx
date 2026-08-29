@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Server, Database, Cpu, HardDrive, RefreshCw, CheckCircle2, AlertCircle, Clock, ShieldCheck, Activity } from 'lucide-react';
+import AdminBreadcrumb from '../components/AdminBreadcrumb';
 import { API_BASE_URL } from '../config/apiConfig';
 
-export default function SystemStatusPage() {
+export default function SystemStatusPage({ onBack }) {
   const [statusData, setStatusData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [lastRefreshed, setLastRefreshed] = useState(null);
@@ -48,8 +49,18 @@ export default function SystemStatusPage() {
       {/* Page Title & Auto-refresh Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-gray-200/80 pb-6">
         <div>
+          {onBack && (
+            <div className="mb-3">
+              <AdminBreadcrumb
+                onNavigateHome={onBack}
+                items={[
+                  { label: 'System Status' }
+                ]}
+              />
+            </div>
+          )}
           <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-emerald-700 mb-1">
-            <Activity className="w-4 h-4 text-emerald-600 animate-pulse" /> Live Telemetry System
+            <Activity className="w-4 h-4 text-emerald-600 animate-pulse" /> Live System Status
           </div>
           <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">System Status & Infrastructure</h1>
           <p className="text-xs text-gray-500 mt-1">Real-time health, version telemetry, database ping speed, and hardware telemetry</p>
@@ -126,18 +137,18 @@ export default function SystemStatusPage() {
 
           <div>
             <span className="text-xs font-bold uppercase tracking-wider text-gray-400">Frontend Client Application</span>
-            <h3 className="text-2xl font-extrabold text-gray-900 mt-1">v1.7.0</h3>
-            <p className="text-xs text-gray-500 mt-0.5">React + Vite Web App</p>
+            <h3 className="text-2xl font-extrabold text-gray-900 mt-1">v{statusData?.api_version || '2.12.24'}</h3>
+            <p className="text-xs text-gray-500 mt-0.5">React + Vite Admin Console</p>
           </div>
 
           <div className="pt-3 border-t border-gray-100 space-y-2 text-xs">
             <div className="flex justify-between text-gray-600">
               <span>Host Domain:</span>
-              <span className="font-mono font-semibold text-gray-900">raghuvircons.local</span>
+              <span className="font-mono font-semibold text-gray-900">https://admin.raghuvirconsultants.in</span>
             </div>
             <div className="flex justify-between text-gray-600">
               <span>Port:</span>
-              <span className="font-mono font-bold text-gray-900">80 (HTTP Default)</span>
+              <span className="font-mono font-bold text-gray-900">443 (HTTPS / SSL)</span>
             </div>
           </div>
         </div>
