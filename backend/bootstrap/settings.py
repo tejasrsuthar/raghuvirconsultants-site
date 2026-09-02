@@ -19,6 +19,13 @@ class Settings(BaseSettings):
     RAZORPAY_KEY_SECRET: str = "placeholder_secret"
     RAZORPAY_WEBHOOK_SECRET: str = "webhook_secret_placeholder"
     
+    # MinIO Configuration
+    MINIO_ENDPOINT: str = "localhost:9000"
+    MINIO_ACCESS_KEY: str = "minioadmin"
+    MINIO_SECRET_KEY: str = "minioadmin"
+    MINIO_SECURE: bool = False
+    MINIO_BUCKET_NAME: str = "raghuvir-reports"
+    
     # OAuth
     GOOGLE_CLIENT_ID: Optional[str] = None
     
