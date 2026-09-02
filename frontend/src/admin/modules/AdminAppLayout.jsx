@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Toaster, toast } from 'react-hot-toast';
 import { 
   Home, Users, Briefcase, FileText, Settings, Bell, BookOpen, 
-  Layers, Search, ChevronRight, ChevronDown, CheckCircle2, Shield, Plus, Sparkles, LogOut, Newspaper, Activity, User, ShieldCheck, CreditCard
+  Layers, Search, ChevronRight, ChevronDown, CheckCircle2, Shield, Plus, Sparkles, LogOut, Newspaper, Activity, User, ShieldCheck, CreditCard, MessageSquare
 } from 'lucide-react';
 import SmallCasesManager from './SmallCasesManager';
 import ServicesManager from './ServicesManager';
@@ -12,6 +12,7 @@ import ResearchReportsManager from './ResearchReportsManager';
 import InvestorUsersManager from './InvestorUsersManager';
 import BillingDashboard from './BillingDashboard';
 import NotificationsManager from './NotificationsManager';
+import SupportInboxManager from './SupportInboxManager';
 import BlogPostManager from './BlogPostManager';
 import PlatformSettingsManager from './PlatformSettingsManager';
 import NewsManager from './NewsManager';
@@ -40,6 +41,7 @@ export default function AdminAppLayout() {
       case 'system-status': return 'System Status';
       case 'admin-profile': return 'Admin Profile Settings';
       case 'settings': return 'Platform Settings';
+      case 'support': return 'Support Inbox';
       default: return tab;
     }
   };
@@ -249,7 +251,24 @@ export default function AdminAppLayout() {
               </div>
             </div>
 
-            {/* 5. Misc Group */}
+            {/* 5. Client Support */}
+            <div>
+              <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400 px-3 pb-1 border-b border-[#EBEBEB]">
+                Client Support
+              </div>
+              <div className="border-l border-gray-200/80 ml-4 pl-3.5 space-y-1 my-1.5">
+                <button
+                  onClick={() => setActiveTab('support')}
+                  className={`w-full flex items-center gap-2 px-3 py-2 rounded-full text-xs transition-all ${
+                    activeTab === 'support' ? 'bg-white text-gray-900 font-bold shadow-xs' : 'text-[#4A4A4A] hover:text-gray-900 font-medium'
+                  }`}
+                >
+                  <MessageSquare className="w-3.5 h-3.5 text-gray-600" /> Support Inbox
+                </button>
+              </div>
+            </div>
+
+            {/* 6. Misc Group */}
             <div>
               <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400 px-3 pb-1 border-b border-[#EBEBEB]">
                 Misc
@@ -398,6 +417,7 @@ export default function AdminAppLayout() {
           {activeTab === 'smallcases' && <SmallCasesManager />}
           {activeTab === 'reports' && <ResearchReportsManager />}
           {activeTab === 'portfolio' && <PortfolioStocksManager />}
+          {activeTab === 'support' && <SupportInboxManager />}
           {activeTab === 'news' && <NewsManager />}
           {activeTab === 'notifications' && <NotificationsManager />}
           {activeTab === 'system-status' && <SystemStatusPage onBack={() => setActiveTab('home')} />}

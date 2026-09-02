@@ -29,6 +29,7 @@ import InvestorSettings from './investor/InvestorSettings';
 import SubscriptionPage from './investor/SubscriptionPage';
 import InvestorResearchReports from './pages/InvestorResearchReports';
 import InvestorModelPortfolio from './pages/InvestorModelPortfolio';
+import InvestorSupport from './pages/InvestorSupport';
 
 // Admin portal (Lazy loaded)
 const AdminApp = React.lazy(() => import('./admin/AdminApp'));
@@ -82,6 +83,7 @@ export default function App() {
             <Route path="/investor/reports" element={<ProtectedRoute><InvestorResearchReports /></ProtectedRoute>} />
             <Route path="/investor/portfolio" element={<ProtectedRoute><InvestorModelPortfolio /></ProtectedRoute>} />
             <Route path="/investor/billing" element={<ProtectedRoute><SubscriptionPage /></ProtectedRoute>} />
+            <Route path="/investor/support" element={<ProtectedRoute><InvestorSupport /></ProtectedRoute>} />
             <Route path="/investor/settings" element={<ProtectedRoute><InvestorSettings /></ProtectedRoute>} />
 
             {/* Admin Portal */}
