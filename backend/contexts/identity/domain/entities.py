@@ -24,6 +24,8 @@ class Investor(BaseModel):
     hashed_password: Optional[str] = None
     role: Role
     status: UserStatus = UserStatus.ACTIVE
+    is_kyc_verified: bool = False
+    consent_version: Optional[str] = "v1.0"
     two_factor_enabled: bool = False
     two_factor_secret: Optional[str] = None
     created_at: datetime = Field(default_factory=datetime.utcnow)

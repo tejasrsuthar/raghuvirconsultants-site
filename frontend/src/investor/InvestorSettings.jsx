@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Settings, Sliders, Shield, ArrowLeft } from 'lucide-react';
+import { Settings, Sliders, Shield, ArrowLeft, Database, Trash2, Download } from 'lucide-react';
 import { z } from 'zod';
 import Breadcrumb from '../components/Breadcrumb';
 import { API_BASE_URL } from '../config/apiConfig';
@@ -128,6 +128,15 @@ export default function InvestorSettings() {
           >
             <Sliders className="w-4 h-4" /> Preferences
           </button>
+          
+          <button
+            onClick={() => { setActiveTab('privacy'); setError(''); }}
+            className={`flex items-center gap-2.5 px-4 py-3 rounded-2xl text-xs font-bold transition-all text-left ${
+              activeTab === 'privacy' ? 'bg-forest text-white shadow-sm' : 'text-textmuted hover:bg-sand/65 hover:text-forest'
+            }`}
+          >
+            <Database className="w-4 h-4" /> Privacy & Data
+          </button>
         </div>
 
         {/* Tab contents */}
@@ -241,6 +250,78 @@ export default function InvestorSettings() {
                     }}
                     className="w-4 h-4 accent-forest cursor-pointer"
                   />
+                </div>
+              </div>
+            </div>
+          {activeTab === 'privacy' && (
+            <div className="max-w-lg">
+              <h2 className="text-xl font-bold text-forest mb-1">Privacy & Data Control</h2>
+              <p className="text-xs text-textmuted mb-6">Manage your GDPR data rights and platform consent</p>
+
+              <div className="space-y-6">
+                <div className="flex items-center justify-between p-4 bg-sand border border-bordercolor/60 rounded-2xl">
+                  <div>
+                    <h4 className="text-xs font-bold text-forest uppercase tracking-wider mb-0.5">Export My Data</h4>
+                    <p className="text-[10px] text-textmuted font-medium">Download a complete JSON archive of your profile, billing, and support history.</p>
+                  </div>
+                  <button
+                    onClick={async () => {
+                      const toastId = toast.loading("Preparing data export...");
+                      try {
+                        const res = await fetch(`${API_BASE_URL}/api/v1/users/export-data`, {
+                          headers: { 'Authorization': `Bearer ${token}` }
+                        });
+                        const data = await res.json();
+                        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                        const url = window.URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `raghuvir_data_export_${new Date().getTime()}.json`;
+                        a.click();
+                        toast.success("Data export ready", { id: toastId });
+                      } catch (e) {
+                        toast.error("Failed to export data", { id: toastId });
+                      }
+                    }}
+                    className="flex items-center justify-center gap-2 bg-white border border-bordercolor text-forest px-4 py-2 rounded-xl text-xs font-bold hover:bg-gray-50 transition-colors shadow-sm whitespace-nowrap ml-4"
+                  >
+                    <Download className="w-4 h-4" /> Export JSON
+                  </button>
+                </div>
+
+                <div className="p-4 bg-red-50 border border-red-100 rounded-2xl">
+                  <div className="flex items-start gap-4">
+                    <Trash2 className="w-5 h-5 text-red-500 mt-1" />
+                    <div>
+                      <h4 className="text-xs font-bold text-red-600 uppercase tracking-wider mb-1">Delete Account</h4>
+                      <p className="text-[10px] text-red-500/80 font-medium leading-relaxed mb-4">
+                        Permanently delete your account. This action cannot be undone. All active subscriptions will be cancelled immediately, and your personal data will be anonymized.
+                      </p>
+                      <button
+                        onClick={async () => {
+                          if (window.confirm("WARNING: Are you absolutely sure you want to delete your account? This action is irreversible.")) {
+                            try {
+                              const res = await fetch(`${API_BASE_URL}/api/v1/users/delete-account`, {
+                                method: 'DELETE',
+                                headers: { 'Authorization': `Bearer ${token}` }
+                              });
+                              if (res.ok) {
+                                localStorage.clear();
+                                window.location.href = '/';
+                              } else {
+                                toast.error("Failed to delete account");
+                              }
+                            } catch (e) {
+                              toast.error("Network error");
+                            }
+                          }
+                        }}
+                        className="bg-red-600 hover:bg-red-700 text-white px-5 py-2.5 rounded-xl text-xs font-bold shadow-sm transition-colors uppercase tracking-widest"
+                      >
+                        Delete My Account
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
