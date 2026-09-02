@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware
-from app.interfaces import admin_router, portfolio_router, payments_router, crud_routers, system_router
+from app.interfaces import admin_router, payments_router, crud_routers, system_router
 from contexts.identity.interfaces import auth_router as identity_auth_router
 from contexts.identity.interfaces import users_router, audit_router
 from contexts.billing.interfaces import billing_router, webhooks_router as billing_webhooks_router
