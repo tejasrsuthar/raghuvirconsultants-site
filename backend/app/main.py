@@ -8,6 +8,7 @@ from contexts.identity.interfaces import auth_router as identity_auth_router
 from contexts.identity.interfaces import users_router, audit_router
 from contexts.billing.interfaces import billing_router, webhooks_router as billing_webhooks_router
 from contexts.research_publishing.interfaces import reports_router as new_reports_router
+from contexts.model_portfolio.interfaces import portfolio_router as new_portfolio_router
 from app.infrastructure.repositories import UserRepository
 from app.domain.entities import User, UserRole, UserStatus
 from app.core.security import get_password_hash
@@ -152,7 +153,7 @@ app.include_router(billing_webhooks_router.router, prefix="/api/v1")
 app.include_router(billing_router.router, prefix="/api/v1")
 app.include_router(admin_router.router, prefix="/api/v1")
 app.include_router(new_reports_router.router, prefix="/api/v1")
-app.include_router(portfolio_router.router, prefix="/api/v1")
+app.include_router(new_portfolio_router.router, prefix="/api/v1")
 app.include_router(payments_router.router, prefix="/api/v1")
 app.include_router(crud_routers.router, prefix="/api/v1")
 app.include_router(system_router.router, prefix="/api/v1")
