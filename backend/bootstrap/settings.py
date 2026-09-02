@@ -12,7 +12,12 @@ class Settings(BaseSettings):
     DB_NAME: str = "raghuvir_consultants"
     
     # Security
-    JWT_SECRET_KEY: str = "supersecretenterprisekeyforraghuvir"
+    JWT_SECRET_KEY: str = "supersecretkey" # Override in production
+    
+    # External Services
+    RAZORPAY_KEY_ID: str = "rzp_test_placeholder"
+    RAZORPAY_KEY_SECRET: str = "placeholder_secret"
+    RAZORPAY_WEBHOOK_SECRET: str = "webhook_secret_placeholder"
     
     # OAuth
     GOOGLE_CLIENT_ID: Optional[str] = None

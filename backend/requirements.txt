@@ -17,3 +17,4 @@ sentry-sdk[fastapi]==1.40.6
 prometheus-fastapi-instrumentator==7.0.0
 ruff==0.3.2
 mypy==1.9.0
+razorpay==1.4.1

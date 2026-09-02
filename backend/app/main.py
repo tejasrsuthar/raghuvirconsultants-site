@@ -145,6 +145,7 @@ app.add_middleware(
 app.include_router(identity_auth_router.router, prefix="/api/v1")
 app.include_router(users_router.router, prefix="/api/v1")
 app.include_router(audit_router.router, prefix="/api/v1")
+app.include_router(billing_webhooks_router.router, prefix="/api/v1")
 app.include_router(admin_router.router, prefix="/api/v1")
 app.include_router(reports_router.router, prefix="/api/v1")
 app.include_router(portfolio_router.router, prefix="/api/v1")
