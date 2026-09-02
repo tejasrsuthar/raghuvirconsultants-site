@@ -3,8 +3,8 @@ from typing import List, Optional
 
 class Settings(BaseSettings):
     # App
-    PROJECT_NAME: str = "Raghuvir Consultants API"
-    VERSION: str = "2.12.29"
+    PROJECT_NAME: str = "Raghuvir Consultants Backend"
+    VERSION: str = "3.0.0"
     ALLOWED_ORIGINS: str = ""
     
     # Database
