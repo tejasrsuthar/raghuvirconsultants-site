@@ -1,59 +1,83 @@
-# Architecture & System Design
+# System Architecture & API Specifications
 
-## Bounded Contexts
-The backend follows Domain-Driven Design principles with clean architecture.
+## System Overview
+Raghuvir Consultants uses a modular monolith architectural style with Domain-Driven Design (DDD) bounded contexts. The system consists of a FastAPI backend connecting to MongoDB and MinIO, and a React frontend serving two distinct experiences (Marketing Site and Investor/Admin Portal).
 
+## High-Level Architecture Diagram
 ```mermaid
 graph TD
-    classDef frontend fill:#FFDAC1,stroke:#E2F0CB,stroke-width:2px;
-    classDef context fill:#B5EAD7,stroke:#C7CEEA,stroke-width:2px;
-    classDef infra fill:#E2F0CB,stroke:#FFB7B2,stroke-width:2px;
-    classDef core fill:#C7CEEA,stroke:#B5EAD7,stroke-width:2px;
+    classDef frontend fill:#E2F0CB,stroke:#333,stroke-width:2px;
+    classDef backend fill:#C7CEEA,stroke:#333,stroke-width:2px;
+    classDef db fill:#FFDAC1,stroke:#333,stroke-width:2px;
+    classDef storage fill:#FFB7B2,stroke:#333,stroke-width:2px;
+    classDef external fill:#B5EAD7,stroke:#333,stroke-width:2px;
 
-    Client[Frontend UI]:::frontend
-    Admin[Admin UI]:::frontend
+    Client[Client Browser]:::frontend
+    Traefik[Reverse Proxy / Traefik]:::backend
     
-    Identity[Identity & Access]:::context
-    Compliance[Compliance & Audit]:::context
-    Reports[Research Reports]:::context
-    Portfolio[Model Portfolio]:::context
-    Payments[Billing & Payments]:::context
+    Client -->|HTTPS| Traefik
+    Traefik -->|/api/*| FastAPI[FastAPI Gateway Router]:::backend
+    Traefik -->|/*| ReactSPA[React SPA]:::frontend
 
-    Mongo[(MongoDB)]:::infra
-    Sentry[Sentry]:::infra
-    Prometheus[Prometheus Metrics]:::infra
-    
-    Client --> Identity
-    Admin --> Identity
-    
-    Identity --> Mongo
-    Compliance --> Mongo
-    Reports --> Mongo
-    Portfolio --> Mongo
-    Payments --> Mongo
-    
-    Identity --> Sentry
-    Compliance --> Sentry
-    Reports --> Sentry
-    
-    Identity --> Prometheus
+    FastAPI --> IdentityContext[Identity Context]:::backend
+    FastAPI --> BillingContext[Billing Context]:::backend
+    FastAPI --> PublishingContext[Research Publishing]:::backend
+    FastAPI --> PortfolioContext[Model Portfolio]:::backend
+    FastAPI --> SupportContext[Client Support]:::backend
+
+    IdentityContext --> MongoDB[(MongoDB)]:::db
+    BillingContext --> MongoDB
+    PublishingContext --> MongoDB
+    PortfolioContext --> MongoDB
+    SupportContext --> MongoDB
+
+    PublishingContext --> MinIO[(MinIO Object Storage)]:::storage
+    BillingContext --> Razorpay[Razorpay Webhooks]:::external
 ```
 
-## Security & Identity
-We use JWT for authorization and TOTP for multi-factor authentication.
+## Bounded Context Boundaries
+Each context is entirely self-contained.
 
 ```mermaid
-sequenceDiagram
-    participant User
-    participant AuthRouter as Identity Router
-    participant Usecase as Identity Use Cases
-    participant DB as MongoDB
+graph LR
+    classDef context fill:#C7CEEA,stroke:#333,stroke-width:1px;
+    classDef port fill:#B5EAD7,stroke:#333,stroke-width:1px;
+    classDef adapter fill:#FFDAC1,stroke:#333,stroke-width:1px;
 
-    User->>AuthRouter: POST /api/v1/auth/login
-    AuthRouter->>Usecase: authenticate(email, password, totp)
-    Usecase->>DB: get_by_email()
-    DB-->>Usecase: Investor Entity
-    Usecase->>Usecase: verify_password() & verify_2fa()
-    Usecase-->>AuthRouter: Success
-    AuthRouter-->>User: JWT Token
+    subgraph "Domain Context (e.g., Client Support)"
+        Entities[Domain Entities]:::context
+        UseCases[Application Use Cases]:::context
+        Port[Repository Port]:::port
+        
+        UseCases --> Entities
+        UseCases --> Port
+    end
+
+    Adapter[Mongo Adapter]:::adapter
+    Adapter -.->|Implements| Port
 ```
+
+## Admin Console: Operational Guide
+
+### 1. Research Publishing
+- **Goal:** Publish secure, watermarked PDFs to institutional investors.
+- **Workflow:** Go to `Research Reports` -> Click `Publish Report`. Upload the PDF file and set the abstract.
+- **Behind the scenes:** The PDF is uploaded to MinIO WORM storage. It cannot be deleted or modified. When an investor downloads it, the `PDFWatermarker` stamps their ID on every page.
+
+### 2. Model Portfolios
+- **Goal:** Distribute real-time asset allocation data.
+- **Workflow:** Go to `Model Portfolios`. You can create smallcases or generic portfolios. Add assets (tickers, allocation percentages, entry prices). 
+- **Behind the scenes:** Real-time updates trigger webhooks or notifications to active subscribers.
+
+### 3. Client Support
+- **Goal:** Answer investor inquiries.
+- **Workflow:** Go to `Support Inbox`. Select an open ticket. You will see a chat interface. Type your reply and click send. Close the ticket when resolved.
+- **Behind the scenes:** Ticket messages are stored in MongoDB as an array on the Ticket document.
+
+### 4. Billing & Subscriptions
+- **Goal:** Track active subscriptions.
+- **Workflow:** Go to `Billing Dashboard` to see Razorpay webhook events and subscription statuses.
+- **Behind the scenes:** The system listens for Razorpay webhook events to activate or expire subscriptions automatically. No manual intervention is needed.
+
+## API Specifications
+The application mounts individual context routers onto the main Gateway router (`main.py`). The full Swagger API documentation is automatically generated by FastAPI and is available at `/docs` when running the backend.
