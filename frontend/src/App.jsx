@@ -26,6 +26,7 @@ import NotFound from './pages/NotFound';
 // Investor portal
 import InvestorDashboard from './investor/InvestorDashboard';
 import InvestorSettings from './investor/InvestorSettings';
+import SubscriptionPage from './investor/SubscriptionPage';
 import InvestorResearchReports from './pages/InvestorResearchReports';
 import InvestorModelPortfolio from './pages/InvestorModelPortfolio';
 
@@ -80,6 +81,7 @@ export default function App() {
             <Route path="/investor/services/portfolio" element={<ProtectedRoute><InvestorModelPortfolio /></ProtectedRoute>} />
             <Route path="/investor/reports" element={<ProtectedRoute><InvestorResearchReports /></ProtectedRoute>} />
             <Route path="/investor/portfolio" element={<ProtectedRoute><InvestorModelPortfolio /></ProtectedRoute>} />
+            <Route path="/investor/billing" element={<ProtectedRoute><SubscriptionPage /></ProtectedRoute>} />
             <Route path="/investor/settings" element={<ProtectedRoute><InvestorSettings /></ProtectedRoute>} />
 
             {/* Admin Portal */}
