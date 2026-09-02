@@ -58,14 +58,16 @@ export default function InvestorUsersManager() {
   const fetchUsers = async (page = 1) => {
     setLoading(true);
     try {
-      const res = await fetch(`${API_BASE_URL}/api/admin/investors?page=${page}&limit=10`, {
+      const skip = (page - 1) * 10;
+      const res = await fetch(`${API_BASE_URL}/api/v1/users?skip=${skip}&limit=10`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (res.ok) {
         const data = await res.json();
-        setUsers(data.items || []);
-        setTotalPages(data.pages || 1);
-        setTotalItems(data.total || 0);
+        setUsers(data || []);
+        // The new API doesn't return total pages yet, just doing a simple list
+        setTotalPages(1);
+        setTotalItems(data.length || 0);
       } else {
         toast.error('Failed to load investor accounts');
       }
@@ -89,7 +91,7 @@ export default function InvestorUsersManager() {
     const nextStatus = user.status === 'active' ? 'suspended' : 'active';
     const toastId = toast.loading(`Updating ${user.username}'s status...`);
     try {
-      const res = await fetch(`${API_BASE_URL}/api/admin/investors/${user.id}/status`, {
+      const res = await fetch(`${API_BASE_URL}/api/v1/admin/investors/${user.id}/status`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -105,6 +107,28 @@ export default function InvestorUsersManager() {
       }
     } catch (e) {
       toast.error('Network error updating status', { id: toastId });
+    }
+  };
+
+  const handleRoleChange = async (user, newRole) => {
+    const toastId = toast.loading(`Updating ${user.username}'s role...`);
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/v1/users/${user.id}/role`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ role_name: newRole })
+      });
+      if (res.ok) {
+        toast.success(`Role updated successfully`, { id: toastId });
+        fetchUsers(currentPage);
+      } else {
+        toast.error('Failed to update role', { id: toastId });
+      }
+    } catch (e) {
+      toast.error('Network error updating role', { id: toastId });
     }
   };
 
@@ -393,6 +417,11 @@ export default function InvestorUsersManager() {
                         setEditingInvestor(user);
                         setShowEditor(true);
                       }
+                    },
+                    {
+                      label: user.role === 'ADMIN' ? 'Demote to INVESTOR' : 'Promote to ADMIN',
+                      icon: Shield,
+                      onClick: () => handleRoleChange(user, user.role === 'ADMIN' ? 'INVESTOR' : 'ADMIN')
                     },
                     {
                       label: 'Reset Password',
