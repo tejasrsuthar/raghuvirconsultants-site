@@ -6,10 +6,10 @@ from app.infrastructure.repositories import SubscriptionRepository
 from pydantic import BaseModel
 from datetime import datetime, timedelta
 import stripe
-import os
+from bootstrap.settings import settings
 
-stripe.api_key = os.getenv("STRIPE_API_KEY", "sk_test_mockkey")
-STRIPE_WEBHOOK_SECRET = os.getenv("STRIPE_WEBHOOK_SECRET", "whsec_mock")
+stripe.api_key = settings.STRIPE_API_KEY
+STRIPE_WEBHOOK_SECRET = settings.STRIPE_WEBHOOK_SECRET
 
 router = APIRouter(prefix="/payments", tags=["Payments"])
 sub_repo = SubscriptionRepository()

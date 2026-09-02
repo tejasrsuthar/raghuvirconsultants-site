@@ -3,31 +3,40 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware
-from app.interfaces import auth_router, admin_router, reports_router, portfolio_router, payments_router, crud_routers, system_router
+from app.interfaces import admin_router, reports_router, portfolio_router, payments_router, crud_routers, system_router
+from contexts.identity.interfaces import auth_router as identity_auth_router
 from app.infrastructure.repositories import UserRepository
 from app.domain.entities import User, UserRole, UserStatus
 from app.core.security import get_password_hash
-import os
+import structlog
+import uuid
+import sentry_sdk
+from prometheus_fastapi_instrumentator import Instrumentator
+from bootstrap.settings import settings
+
+# ── Observability Configuration ────────────────────────────────────────────────
+if settings.SENTRY_DSN:
+    sentry_sdk.init(
+        dsn=settings.SENTRY_DSN,
+        traces_sample_rate=1.0,
+        profiles_sample_rate=1.0,
+    )
+
+structlog.configure(
+    processors=[
+        structlog.contextvars.merge_contextvars,
+        structlog.processors.add_log_level,
+        structlog.processors.TimeStamper(fmt="iso"),
+        structlog.dev.ConsoleRenderer() # Use JSONRenderer for prod later
+    ],
+    wrapper_class=structlog.make_filtering_bound_logger(20),
+    context_class=dict,
+    logger_factory=structlog.PrintLoggerFactory(),
+)
+logger = structlog.get_logger()
 
 # ── Allowed origins & CORS configuration ──────────────────────────────────────
-DEFAULT_ORIGINS = [
-    "https://www.raghuvirconsultants.in",
-    "https://raghuvirconsultants.in",
-    "https://admin.raghuvirconsultants.in",
-    "http://raghuvircons.local",
-    "http://app.raghuvircons.local",
-    "http://localhost",
-    "http://localhost:5173",
-    "http://localhost:5174",
-    "http://localhost:3000",
-    "http://127.0.0.1",
-    "http://127.0.0.1:5173",
-    "http://127.0.0.1:5174",
-]
-
-env_origins = os.getenv("ALLOWED_ORIGINS", "")
-custom_origins = [o.strip() for o in env_origins.split(",") if o.strip()]
-ALLOWED_ORIGINS = list(dict.fromkeys(DEFAULT_ORIGINS + custom_origins))
+ALLOWED_ORIGINS = settings.cors_origins
 
 # ── Security headers middleware ────────────────────────────────────────────────
 class SecurityHeadersMiddleware(BaseHTTPMiddleware):
@@ -47,10 +56,54 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         return response
 
 app = FastAPI(
-    title="Raghuvir Consultants API",
+    title=settings.PROJECT_NAME,
     description="Enterprise Advisory System Backend",
-    version="2.12.29"
+    version=settings.VERSION
 )
+
+# Prometheus setup
+Instrumentator().instrument(app).expose(app)
+
+# ── Audit Middleware ──────────────────────────────────────────────────────────
+from contexts.compliance.domain.entities import AuditLog
+from contexts.compliance.infrastructure.repositories import AuditLogRepository
+
+audit_repo = AuditLogRepository()
+
+@app.middleware("http")
+async def audit_middleware(request: Request, call_next):
+    response = await call_next(request)
+    
+    if request.method in ["POST", "PUT", "DELETE", "PATCH"]:
+        # Extract basic info; in a real app, user ID comes from request.state.user if authenticated
+        ip_address = request.client.host if request.client else None
+        user_agent = request.headers.get("user-agent")
+        
+        log = AuditLog(
+            action=request.method,
+            resource=request.url.path,
+            ip_address=ip_address,
+            user_agent=user_agent,
+            metadata={"status_code": response.status_code}
+        )
+        # Fire and forget / background save would be better here, but synchronous for now
+        try:
+            audit_repo.save(log)
+        except Exception as e:
+            logger.error("audit_log_failed", error=str(e))
+            
+    return response
+
+# ── Correlation ID Middleware ────────────────────────────────────────────────
+@app.middleware("http")
+async def structlog_middleware(request: Request, call_next):
+    correlation_id = request.headers.get("X-Correlation-ID", uuid.uuid4().hex)
+    structlog.contextvars.clear_contextvars()
+    structlog.contextvars.bind_contextvars(correlation_id=correlation_id, path=request.url.path, method=request.method)
+    
+    response = await call_next(request)
+    response.headers["X-Correlation-ID"] = correlation_id
+    return response
 
 # ── Middleware stack (order matters — outermost first) ─────────────────────────
 
@@ -89,13 +142,14 @@ app.add_middleware(
 )
 
 # Register Routers
-app.include_router(auth_router.router, prefix="/api")
-app.include_router(admin_router.router, prefix="/api")
-app.include_router(reports_router.router, prefix="/api")
-app.include_router(portfolio_router.router, prefix="/api")
-app.include_router(payments_router.router, prefix="/api")
-app.include_router(crud_routers.router, prefix="/api")
-app.include_router(system_router.router, prefix="/api")
+app.include_router(identity_auth_router.router, prefix="/api/v1")
+app.include_router(audit_router.router, prefix="/api/v1")
+app.include_router(admin_router.router, prefix="/api/v1")
+app.include_router(reports_router.router, prefix="/api/v1")
+app.include_router(portfolio_router.router, prefix="/api/v1")
+app.include_router(payments_router.router, prefix="/api/v1")
+app.include_router(crud_routers.router, prefix="/api/v1")
+app.include_router(system_router.router, prefix="/api/v1")
 
 @app.on_event("startup")
 def seed_admin():
@@ -134,11 +188,23 @@ def seed_admin():
 
 @app.get("/")
 def read_root():
-    return {"message": "Raghuvir Consultants API is running", "version": "2.12.27"}
+    return {"message": f"{settings.PROJECT_NAME} is running", "version": settings.VERSION}
 
+@app.get("/healthz")
 @app.get("/health")
 @app.get("/api/health")
 @app.get("/api/system/health")
-def health_check():
-    return {"status": "ok", "version": "2.12.27"}
+def healthz_check():
+    return {"status": "ok", "version": settings.VERSION}
+
+@app.get("/readyz")
+def readyz_check():
+    try:
+        from app.infrastructure.db import client
+        client.admin.command('ping')
+        return {"status": "ready", "db": "connected"}
+    except Exception as e:
+        logger.error("mongodb_health_check_failed", error=str(e))
+        from fastapi import HTTPException
+        raise HTTPException(status_code=503, detail="Database unavailable")
 

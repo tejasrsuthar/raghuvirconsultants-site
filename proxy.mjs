@@ -14,14 +14,14 @@ import net from 'net';
 
 const ROUTES = {
   'raghuvircons.local':      { target: '127.0.0.1', port: 5173 },
-  'app.raghuvircons.local':  { target: '127.0.0.1', port: 5174 },
 };
 
 const PROXY_PORT = 80;
 
 function getRoute(req) {
-  const host = (req.headers.host || '').split(':')[0];
-  return ROUTES[host] || null;
+  // If it's an API request, we could route to backend, but usually Vite proxies that.
+  // We'll just route all subdomains to 5173 for local dev since frontend is unified.
+  return { target: '127.0.0.1', port: 5173 };
 }
 
 // HTTP proxy (including Vite HMR upgrade)
