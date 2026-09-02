@@ -3,13 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import { Toaster, toast } from 'react-hot-toast';
 import { 
   Home, Users, Briefcase, FileText, Settings, Bell, BookOpen, 
-  Layers, Search, ChevronRight, ChevronDown, CheckCircle2, Shield, Plus, Sparkles, LogOut, Newspaper, Activity, User, ShieldCheck
+  Layers, Search, ChevronRight, ChevronDown, CheckCircle2, Shield, Plus, Sparkles, LogOut, Newspaper, Activity, User, ShieldCheck, CreditCard
 } from 'lucide-react';
 import SmallCasesManager from './SmallCasesManager';
 import ServicesManager from './ServicesManager';
 import PortfolioStocksManager from './PortfolioStocksManager';
 import ResearchReportsManager from './ResearchReportsManager';
 import InvestorUsersManager from './InvestorUsersManager';
+import BillingDashboard from './BillingDashboard';
 import NotificationsManager from './NotificationsManager';
 import BlogPostManager from './BlogPostManager';
 import PlatformSettingsManager from './PlatformSettingsManager';
@@ -28,6 +29,7 @@ export default function AdminAppLayout() {
     switch (tab) {
       case 'home': return 'Dashboard Overview';
       case 'investors': return 'Investor Directory';
+      case 'billing': return 'Billing Dashboard';
       case 'blogs': return 'Blog Posts';
       case 'services': return 'Services Catalog';
       case 'smallcases': return 'Smallcases Manager';
@@ -161,6 +163,20 @@ export default function AdminAppLayout() {
                 <Users className="w-4 h-4 text-gray-700" /> Investors
               </div>
               <span className="text-xs font-medium text-gray-400">{stats.investors}</span>
+            </button>
+
+            {/* Billing */}
+            <button
+              onClick={() => setActiveTab('billing')}
+              className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-full text-xs transition-all ${
+                activeTab === 'billing' 
+                  ? 'bg-white text-gray-900 font-bold shadow-xs' 
+                  : 'text-[#4A4A4A] hover:text-gray-900 hover:bg-white/50 font-medium'
+              }`}
+            >
+              <div className="flex items-center gap-2.5">
+                <CreditCard className="w-4 h-4 text-gray-700" /> Subscriptions
+              </div>
             </button>
 
             {/* 3. Site Static Content Group */}
@@ -376,6 +392,7 @@ export default function AdminAppLayout() {
           )}
 
           {activeTab === 'investors' && <InvestorUsersManager />}
+          {activeTab === 'billing' && <BillingDashboard />}
           {activeTab === 'blogs' && <BlogPostManager />}
           {activeTab === 'services' && <ServicesManager />}
           {activeTab === 'smallcases' && <SmallCasesManager />}

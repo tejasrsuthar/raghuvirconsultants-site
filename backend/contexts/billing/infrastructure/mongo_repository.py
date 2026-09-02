@@ -37,3 +37,7 @@ class MongoSubscriptionRepository(SubscriptionRepository):
             "status": SubscriptionStatus.ACTIVE.value
         })
         return [Subscription(**data) for data in cursor]
+
+    def find_all(self, skip: int = 0, limit: int = 100) -> List[Subscription]:
+        cursor = self.collection.find().skip(skip).limit(limit)
+        return [Subscription(**data) for data in cursor]

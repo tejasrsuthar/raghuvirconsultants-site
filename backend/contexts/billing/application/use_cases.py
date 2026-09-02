@@ -16,6 +16,9 @@ class BillingUseCases:
 
     def get_investor_subscriptions(self, investor_id: str) -> List[Subscription]:
         return self.subscription_repo.get_active_for_investor(investor_id)
+        
+    def get_all_subscriptions(self, skip: int = 0, limit: int = 100) -> List[Subscription]:
+        return self.subscription_repo.find_all(skip=skip, limit=limit)
 
     def subscribe_to_plan(self, investor_id: str, plan_id: str) -> Dict[str, Any]:
         investor = self.investor_repo.get_by_id(investor_id)

@@ -39,3 +39,7 @@ class SubscriptionRepository(ABC):
     @abstractmethod
     def get_active_for_investor(self, investor_id: str) -> list[Subscription]:
         pass
+
+    @abstractmethod
+    def find_all(self, skip: int = 0, limit: int = 100) -> list[Subscription]:
+        pass
