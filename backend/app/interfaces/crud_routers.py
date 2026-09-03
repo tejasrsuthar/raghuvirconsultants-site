@@ -10,12 +10,13 @@ from app.interfaces.schemas import (
     NewsItemCreate, NewsItemResponse,
     PaginatedResponse, BulkStatusRequest, BulkDeleteRequest
 )
-from app.interfaces.dependencies import require_admin, get_current_user
+from contexts.identity.interfaces.dependencies import require_permission
 from app.infrastructure.repositories import (
     SmallcaseRepository, ServiceOfferingRepository, NotificationRepository,
     BlogPostRepository, PlatformSettingsRepository, NewsRepository
 )
-from app.domain.entities import SmallcaseItem, ServiceOffering, Notification, BlogPost, PlatformSettings, NewsItem, User
+from app.domain.entities import SmallcaseItem, ServiceOffering, Notification, BlogPost, PlatformSettings, NewsItem
+from contexts.identity.domain.entities import Investor
 
 router = APIRouter(tags=["Enterprise CRUD Modules"])
 
@@ -37,20 +38,20 @@ def get_smallcases(page: int = Query(1, ge=1), limit: int = Query(10, ge=1)):
     )
 
 @router.post("/smallcases", response_model=SmallcaseResponse)
-def create_smallcase(req: SmallcaseCreate, admin: User = Depends(require_admin)):
+def create_smallcase(req: SmallcaseCreate, admin: Investor = Depends(require_permission("reports:write"))):
     item = SmallcaseItem(name=req.name, cagr=req.cagr, min_investment=req.min_investment, description=req.description)
     created = smallcase_repo.create(item)
     return SmallcaseResponse.model_validate(created)
 
 @router.put("/smallcases/{item_id}", response_model=SmallcaseResponse)
-def update_smallcase(item_id: str, req: SmallcaseCreate, admin: User = Depends(require_admin)):
+def update_smallcase(item_id: str, req: SmallcaseCreate, admin: Investor = Depends(require_permission("reports:write"))):
     updated = smallcase_repo.update(item_id, SmallcaseItem(**req.model_dump()))
     if not updated:
         raise HTTPException(status_code=404, detail="Smallcase item not found")
     return SmallcaseResponse.model_validate(updated)
 
 @router.delete("/smallcases/{item_id}")
-def delete_smallcase(item_id: str, admin: User = Depends(require_admin)):
+def delete_smallcase(item_id: str, admin: Investor = Depends(require_permission("reports:write"))):
     if not smallcase_repo.delete(item_id):
         raise HTTPException(status_code=404, detail="Smallcase item not found")
     return {"message": "Smallcase deleted successfully"}
@@ -67,20 +68,20 @@ def get_services(page: int = Query(1, ge=1), limit: int = Query(10, ge=1)):
     )
 
 @router.post("/services", response_model=ServiceOfferingResponse)
-def create_service(req: ServiceOfferingCreate, admin: User = Depends(require_admin)):
+def create_service(req: ServiceOfferingCreate, admin: Investor = Depends(require_permission("reports:write"))):
     item = ServiceOffering(**req.model_dump())
     created = service_repo.create(item)
     return ServiceOfferingResponse.model_validate(created)
 
 @router.put("/services/{item_id}", response_model=ServiceOfferingResponse)
-def update_service(item_id: str, req: ServiceOfferingCreate, admin: User = Depends(require_admin)):
+def update_service(item_id: str, req: ServiceOfferingCreate, admin: Investor = Depends(require_permission("reports:write"))):
     updated = service_repo.update(item_id, ServiceOffering(**req.model_dump()))
     if not updated:
         raise HTTPException(status_code=404, detail="Service offering not found")
     return ServiceOfferingResponse.model_validate(updated)
 
 @router.delete("/services/{item_id}")
-def delete_service(item_id: str, admin: User = Depends(require_admin)):
+def delete_service(item_id: str, admin: Investor = Depends(require_permission("reports:write"))):
     if not service_repo.delete(item_id):
         raise HTTPException(status_code=404, detail="Service offering not found")
     return {"message": "Service offering deleted successfully"}
@@ -101,32 +102,32 @@ def get_notifications(
     )
 
 @router.post("/notifications", response_model=NotificationResponse)
-def create_notification(req: NotificationCreate, admin: User = Depends(require_admin)):
+def create_notification(req: NotificationCreate, admin: Investor = Depends(require_permission("reports:write"))):
     item = Notification(title=req.title, message=req.message, status=req.status, created_by=admin.username)
     created = notification_repo.create(item)
     return NotificationResponse.model_validate(created)
 
 @router.put("/notifications/{item_id}", response_model=NotificationResponse)
-def update_notification(item_id: str, req: NotificationCreate, admin: User = Depends(require_admin)):
+def update_notification(item_id: str, req: NotificationCreate, admin: Investor = Depends(require_permission("reports:write"))):
     updated = notification_repo.update(item_id, Notification(title=req.title, message=req.message, status=req.status, created_by=admin.username))
     if not updated:
         raise HTTPException(status_code=404, detail="Notification not found")
     return NotificationResponse.model_validate(updated)
 
 @router.delete("/notifications/{item_id}")
-def delete_notification(item_id: str, admin: User = Depends(require_admin)):
+def delete_notification(item_id: str, admin: Investor = Depends(require_permission("reports:write"))):
     if not notification_repo.delete(item_id):
         raise HTTPException(status_code=404, detail="Notification not found")
     return {"message": "Notification deleted successfully"}
 
 @router.post("/notifications/bulk-status")
-def bulk_status_notifications(req: BulkStatusRequest, admin: User = Depends(require_admin)):
+def bulk_status_notifications(req: BulkStatusRequest, admin: Investor = Depends(require_permission("reports:write"))):
     for item_id in req.ids:
         notification_repo.update_status(item_id, req.status)
     return {"message": f"Updated status for {len(req.ids)} notifications"}
 
 @router.post("/notifications/bulk-delete")
-def bulk_delete_notifications(req: BulkDeleteRequest, admin: User = Depends(require_admin)):
+def bulk_delete_notifications(req: BulkDeleteRequest, admin: Investor = Depends(require_permission("reports:write"))):
     deleted_count = 0
     for item_id in req.ids:
         if notification_repo.delete(item_id):
@@ -156,20 +157,20 @@ def get_blog_by_id(item_id: str):
     return BlogPostResponse.model_validate(item)
 
 @router.post("/blogs", response_model=BlogPostResponse)
-def create_blog(req: BlogPostCreate, admin: User = Depends(require_admin)):
+def create_blog(req: BlogPostCreate, admin: Investor = Depends(require_permission("reports:write"))):
     item = BlogPost(**req.model_dump(), author=admin.username or "Admin")
     created = blog_repo.create(item)
     return BlogPostResponse.model_validate(created)
 
 @router.put("/blogs/{item_id}", response_model=BlogPostResponse)
-def update_blog(item_id: str, req: BlogPostCreate, admin: User = Depends(require_admin)):
+def update_blog(item_id: str, req: BlogPostCreate, admin: Investor = Depends(require_permission("reports:write"))):
     updated = blog_repo.update(item_id, BlogPost(**req.model_dump(), author=admin.username or "Admin"))
     if not updated:
         raise HTTPException(status_code=404, detail="Blog post not found")
     return BlogPostResponse.model_validate(updated)
 
 @router.delete("/blogs/{item_id}")
-def delete_blog(item_id: str, admin: User = Depends(require_admin)):
+def delete_blog(item_id: str, admin: Investor = Depends(require_permission("reports:write"))):
     if not blog_repo.delete(item_id):
         raise HTTPException(status_code=404, detail="Blog post not found")
     return {"message": "Blog post deleted successfully"}
@@ -182,7 +183,7 @@ def get_settings():
     return PlatformSettingsResponse.model_validate(settings)
 
 @router.put("/settings", response_model=PlatformSettingsResponse)
-def update_settings(req: PlatformSettingsUpdate, admin: User = Depends(require_admin)):
+def update_settings(req: PlatformSettingsUpdate, admin: Investor = Depends(require_permission("settings:write"))):
     settings = PlatformSettings(default_page_size=req.default_page_size, min_password_length=req.min_password_length)
     updated = settings_repo.update(settings)
     return PlatformSettingsResponse.model_validate(updated)
@@ -199,13 +200,13 @@ def get_news(page: int = Query(1, ge=1), limit: int = Query(10, ge=1)):
     )
 
 @router.post("/news", response_model=NewsItemResponse)
-def create_news(req: NewsItemCreate, admin: User = Depends(require_admin)):
+def create_news(req: NewsItemCreate, admin: Investor = Depends(require_permission("reports:write"))):
     item = NewsItem(**req.model_dump())
     created = news_repo.create(item)
     return NewsItemResponse.model_validate(created)
 
 @router.delete("/news/{item_id}")
-def delete_news(item_id: str, admin: User = Depends(require_admin)):
+def delete_news(item_id: str, admin: Investor = Depends(require_permission("reports:write"))):
     if not news_repo.delete(item_id):
         raise HTTPException(status_code=404, detail="News item not found")
     return {"message": "News item deleted successfully"}

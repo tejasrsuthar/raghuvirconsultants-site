@@ -174,7 +174,7 @@ export default function Signup() {
         referral_source: referralSource || undefined,
       };
 
-      const res = await fetch(`${API_BASE_URL}/api/auth/register`, {
+      const res = await fetch(`${API_BASE_URL}/api/v1/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -194,7 +194,7 @@ export default function Signup() {
       localStorage.setItem('username', data.username);
       localStorage.setItem('email', data.email);
 
-      navigate('/investor');
+      navigate('/portal');
     } catch (err) {
       setError(err.message);
     } finally {
@@ -205,7 +205,7 @@ export default function Signup() {
   const handleGoogleSuccess = async (credential) => {
     setError('');
     try {
-      const res = await fetch(`${API_BASE_URL}/api/auth/google`, {
+      const res = await fetch(`${API_BASE_URL}/api/v1/auth/google`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token: credential }),
@@ -222,7 +222,7 @@ export default function Signup() {
       localStorage.setItem('username', data.username);
       localStorage.setItem('email', data.email);
 
-      navigate('/investor');
+      navigate('/portal');
     } catch (err) {
       setError(err.message);
     }
@@ -534,7 +534,7 @@ export default function Signup() {
         </div>
 
         <p className="text-xs text-textmuted text-center mt-6">
-          Already registered? <Link to="/login" className="text-forest font-bold underline">Log In</Link>
+          Already registered? <Link to="/portal/login" className="text-forest font-bold underline">Log In</Link>
         </p>
       </div>
     </div>

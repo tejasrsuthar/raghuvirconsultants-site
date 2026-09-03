@@ -16,7 +16,7 @@ export default function ForgotPassword() {
     setLoading(true);
 
     try {
-      const res = await fetch(`${API_BASE_URL}/api/auth/forgot-password`, {
+      const res = await fetch(`${API_BASE_URL}/api/v1/auth/forgot-password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),
@@ -98,7 +98,7 @@ export default function ForgotPassword() {
         )}
 
         <p className="text-xs text-textmuted text-center mt-8">
-          Back to <Link to="/login" className="text-forest font-bold underline">Login</Link>
+          Back to <Link to="/portal/login" className="text-forest font-bold underline">Login</Link>
         </p>
       </div>
     </div>

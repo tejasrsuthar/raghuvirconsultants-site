@@ -1,181 +1,156 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { FileText, RefreshCw, Calendar, Download, Search } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Download, Lock, FileText, ChevronRight } from 'lucide-react';
 import Breadcrumb from '../components/Breadcrumb';
 import { API_BASE_URL } from '../config/apiConfig';
+import toast from 'react-hot-toast';
 
 export default function InvestorResearchReports() {
   const navigate = useNavigate();
   const token = localStorage.getItem('token');
-
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [subscribed, setSubscribed] = useState(true);
-  const [page, setPage] = useState(1);
-  const [pages, setPages] = useState(1);
-  const [search, setSearch] = useState('');
-  const [selectedReport, setSelectedReport] = useState(null);
+
+  // Mock tier logic. In full implementation, decode JWT to check tier.
+  // We'll assume the user has "reports_yearly" but not "portfolio_yearly" for demonstration,
+  // or we can allow anything if they are an admin. We'll default to 'reports_yearly'.
+  const userTier = "reports_yearly"; 
 
   useEffect(() => {
     if (!token) {
-      navigate('/login');
+      navigate('/portal/login');
       return;
     }
     fetchReports();
-  }, [token, page]);
+  }, [token]);
 
   const fetchReports = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${API_BASE_URL}/api/reports?page=${page}&limit=10`, {
+      // Investor route: /api/v1/reports/
+      const res = await fetch(`${API_BASE_URL}/api/v1/reports/`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (res.ok) {
         const data = await res.json();
-        setReports(data.items || []);
-        setPages(data.pages || 1);
-        setSubscribed(true);
-      } else {
-        setSubscribed(false);
+        setReports(data || []);
       }
     } catch (e) {
-      setSubscribed(false);
+      toast.error("Failed to load reports.");
     } finally {
       setLoading(false);
     }
   };
 
-  const filteredReports = reports.filter(r => 
-    r.title.toLowerCase().includes(search.toLowerCase()) || 
-    r.content.toLowerCase().includes(search.toLowerCase())
-  );
+  const handleDownload = async (reportId, title) => {
+    const toastId = toast.loading("Preparing secure download...");
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/v1/reports/${reportId}/download`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      
+      if (!res.ok) {
+        throw new Error("Download failed. Check subscription tier.");
+      }
+      
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      toast.success("Download started", { id: toastId });
+    } catch (e) {
+      toast.error(e.message, { id: toastId });
+    }
+  };
+
+  const isLocked = (requiredTier) => {
+    if (requiredTier === 'portfolio_yearly' && userTier !== 'portfolio_yearly') return true;
+    return false;
+  };
 
   return (
-    <div className="pt-32 pb-24 px-6 max-w-6xl mx-auto min-h-[90vh]">
-      {/* Breadcrumb Navigation */}
-      <Breadcrumb
-        items={[
-          { label: 'Investor Dashboard', to: '/investor' },
-          { label: 'Research Reports Service' }
-        ]}
-      />
-
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-bordercolor pb-6 mb-8 gap-4">
-        <div>
-          <h1 className="text-3xl font-extrabold text-forest flex items-center gap-3">
-            <FileText className="w-8 h-8 text-lime" /> Equity & Sector Research Reports
-          </h1>
-          <p className="text-sm text-textmuted mt-1">Exclusive SEBI-registered advisory research publications and insights</p>
-        </div>
-        <span className="px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider bg-lime text-forest shadow-xs">
-          Active Subscription
-        </span>
+    <div className="pt-32 pb-32 px-6 max-w-7xl mx-auto min-h-screen relative overflow-hidden bg-[#F3F0EE]">
+      {/* Ghost Watermark */}
+      <div className="absolute top-40 left-1/2 -translate-x-1/2 text-[15rem] font-black text-gray-200/50 select-none pointer-events-none whitespace-nowrap z-0">
+        RESEARCH
       </div>
 
-      {!subscribed ? (
-        <div className="bg-white border border-bordercolor p-12 rounded-3xl text-center shadow-sm">
-          <FileText className="w-12 h-12 text-textmuted mx-auto mb-4" />
-          <h3 className="text-xl font-bold text-forest mb-2">Subscription Required</h3>
-          <p className="text-sm text-textmuted max-w-md mx-auto mb-6">
-            You do not currently have an active subscription to Research Reports.
-          </p>
-          <Link to="/services" className="btn-forest text-white px-6 py-3 rounded-full text-xs font-bold uppercase">
-            Subscribe Now
-          </Link>
+      <div className="relative z-10">
+        <Breadcrumb items={[{ label: 'Investor Dashboard', to: '/investor' }, { label: 'Research Reports' }]} />
+
+        <div className="text-center mt-12 mb-20 max-w-2xl mx-auto">
+          <h1 className="text-5xl font-extrabold text-gray-900 tracking-tight">Investment Research</h1>
+          <p className="mt-4 text-gray-600 font-medium">In-depth sector analysis and company valuations, published exclusively for our advisory clients.</p>
         </div>
-      ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Reports List */}
-          <div className="lg:col-span-1 space-y-4">
-            <div className="relative mb-4">
-              <Search className="w-4 h-4 text-textmuted absolute left-3 top-1/2 -translate-y-1/2" />
-              <input
-                type="text"
-                placeholder="Search reports..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-9 pr-4 py-2.5 bg-sand border border-bordercolor rounded-2xl text-xs font-semibold focus:outline-none focus:border-forest"
-              />
-            </div>
 
-            {loading ? (
-              <div className="text-center py-8 text-xs text-textmuted">Loading reports...</div>
-            ) : filteredReports.length === 0 ? (
-              <div className="p-6 bg-white border border-bordercolor rounded-2xl text-center text-xs text-textmuted">
-                No reports found matching your search.
-              </div>
-            ) : (
-              filteredReports.map((report) => (
-                <div
-                  key={report.id}
-                  onClick={() => setSelectedReport(report)}
-                  className={`p-5 rounded-2xl border cursor-pointer transition-all ${
-                    selectedReport?.id === report.id
-                      ? 'bg-forest text-white border-forest shadow-md'
-                      : 'bg-white border-bordercolor hover:border-forest/50 text-forest'
-                  }`}
-                >
-                  <div className="flex items-center justify-between text-[10px] opacity-75 mb-2 font-mono">
-                    <span className="flex items-center gap-1">
-                      <Calendar className="w-3 h-3" />
-                      {new Date(report.published_at).toLocaleDateString()}
-                    </span>
-                    <span className="font-bold uppercase tracking-wider">PDF Available</span>
-                  </div>
-                  <h3 className="font-bold text-sm leading-snug mb-2">{report.title}</h3>
-                  <p className={`text-xs line-clamp-2 ${selectedReport?.id === report.id ? 'text-white/80' : 'text-textmuted'}`}>
-                    {report.content}
-                  </p>
-                </div>
-              ))
-            )}
+        {loading ? (
+          <div className="text-center py-20 animate-pulse text-gray-500 font-bold uppercase tracking-widest text-sm">
+            Loading Reports...
           </div>
+        ) : reports.length === 0 ? (
+          <div className="text-center py-20 bg-white/50 backdrop-blur-md rounded-[40px] border border-gray-200 text-gray-500 font-medium shadow-sm max-w-3xl mx-auto">
+            No published reports available yet.
+          </div>
+        ) : (
+          <div className="relative">
+            {/* Orbital Arc SVG Background (Decorative) */}
+            <svg className="absolute top-1/2 left-0 w-full h-full -translate-y-1/2 -z-10 text-gray-300 pointer-events-none" viewBox="0 0 1000 200" preserveAspectRatio="none">
+              <path d="M0,100 Q500,200 1000,100" fill="none" stroke="currentColor" strokeWidth="1" strokeDasharray="4 4" />
+            </svg>
 
-          {/* Report Reader Content */}
-          <div className="lg:col-span-2 bg-white border border-bordercolor p-8 rounded-3xl shadow-sm min-h-[500px]">
-            {selectedReport ? (
-              <div>
-                <div className="flex justify-between items-start mb-6 border-b border-bordercolor pb-6">
-                  <div>
-                    <span className="text-xs font-bold text-textmuted uppercase tracking-widest block mb-1">
-                      Published: {new Date(selectedReport.published_at).toLocaleDateString()}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-16 justify-items-center">
+              {reports.map((report) => {
+                const locked = isLocked(report.plan_tier_required);
+
+                return (
+                  <div key={report.id} className="relative group flex flex-col items-center max-w-xs text-center">
+                    {/* Eyebrow Label */}
+                    <span className="mb-4 text-[10px] font-bold uppercase tracking-widest text-gray-500 bg-white px-3 py-1 rounded-full shadow-sm">
+                      {new Date(report.published_at || report.created_at).toLocaleDateString(undefined, { month: 'short', year: 'numeric' })}
                     </span>
-                    <h2 className="text-2xl font-extrabold text-forest">{selectedReport.title}</h2>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    {selectedReport.doc_link && (
-                      <a 
-                        href={selectedReport.doc_link}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="bg-blue-50 border border-blue-200 hover:bg-blue-100 px-3 py-2 rounded-full text-blue-700 text-xs font-bold flex items-center gap-1.5 transition-colors"
+
+                    {/* Circular Portrait Card */}
+                    <div className="relative w-56 h-56 rounded-full bg-white shadow-xl border-4 border-[#F3F0EE] group-hover:border-blue-100 transition-colors flex items-center justify-center mb-6">
+                      <FileText className={`w-16 h-16 ${locked ? 'text-gray-300' : 'text-blue-900'}`} />
+                      
+                      {/* Satellite CTA Button */}
+                      <button 
+                        onClick={() => !locked && handleDownload(report.id, report.title)}
+                        disabled={locked}
+                        className={`absolute bottom-0 right-4 translate-x-1/4 translate-y-1/4 w-14 h-14 rounded-full flex items-center justify-center shadow-lg transition-transform ${
+                          locked 
+                            ? 'bg-[#A39E99] text-white cursor-not-allowed' 
+                            : 'bg-gray-900 hover:bg-black text-white hover:scale-110 active:scale-95'
+                        }`}
                       >
-                        <FileText className="w-4 h-4 text-blue-600" /> Open Google Doc
-                      </a>
+                        {locked ? <Lock className="w-5 h-5" /> : <Download className="w-5 h-5" />}
+                      </button>
+                    </div>
+
+                    {/* Title & Metadata */}
+                    <h3 className="text-xl font-extrabold text-gray-900 leading-tight mb-2">
+                      {report.title}
+                    </h3>
+                    <p className="text-sm text-gray-600 line-clamp-3">
+                      {report.summary || 'In-depth analysis report.'}
+                    </p>
+                    
+                    {locked && (
+                      <div className="mt-4 flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-amber-600 bg-amber-50 px-3 py-1 rounded-full border border-amber-200">
+                        <Lock className="w-3 h-3" /> Upgrade to {report.plan_tier_required.split('_')[0]} Tier
+                      </div>
                     )}
-                    <button 
-                      onClick={() => alert("Downloading full PDF report...")}
-                      className="bg-sand border border-bordercolor hover:border-forest p-2.5 rounded-full text-forest text-xs font-bold flex items-center gap-2"
-                    >
-                      <Download className="w-4 h-4" /> Download PDF
-                    </button>
                   </div>
-                </div>
-                <div className="prose max-w-none text-sm text-forest/90 leading-relaxed whitespace-pre-wrap">
-                  {selectedReport.content}
-                </div>
-              </div>
-            ) : (
-              <div className="h-full flex flex-col items-center justify-center text-center py-20 text-textmuted">
-                <FileText className="w-12 h-12 mb-3 text-textmuted/40" />
-                <h4 className="font-bold text-forest text-base mb-1">Select a Research Report</h4>
-                <p className="text-xs max-w-xs">Click on any report on the left panel to read the full research publication.</p>
-              </div>
-            )}
+                );
+              })}
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }

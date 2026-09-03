@@ -19,7 +19,7 @@ export default function ResetPassword() {
     setLoading(true);
 
     try {
-      const res = await fetch(`${API_BASE_URL}/api/auth/reset-password`, {
+      const res = await fetch(`${API_BASE_URL}/api/v1/auth/reset-password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token, new_password: password }),
@@ -65,7 +65,7 @@ export default function ResetPassword() {
               <h4 className="font-bold mt-2 text-forest">Password Reset Successful</h4>
               <p className="text-sm text-textmuted mt-1">You can now sign in with your new password.</p>
             </div>
-            <Link to="/login" className="block w-full btn-forest text-white py-4 rounded-full text-xs font-bold uppercase tracking-widest text-center">
+            <Link to="/portal/login" className="block w-full btn-forest text-white py-4 rounded-full text-xs font-bold uppercase tracking-widest text-center">
               Go to Login
             </Link>
           </div>

@@ -43,18 +43,11 @@ cd "$WORKSPACE/frontend"
 npm run dev &
 FRONTEND_PID=$!
 
-# ── Start admin-dashboard ─────────────────────────────────────────────────────
-echo "🔐 Starting admin-dashboard on port 5174..."
-cd "$WORKSPACE/admin-dashboard"
-npm run dev &
-ADMIN_PID=$!
-
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "  Main Site:  http://raghuvircons.local"
-echo "  Investor:   http://raghuvircons.local/investor"
-echo "  Admin:      http://app.raghuvircons.local"
-echo "  API:        http://localhost:8000"
+echo "  Main Site & Admin:  http://raghuvircons.local"
+echo "  Admin Login Path:   http://raghuvircons.local/login"
+echo "  API:                http://localhost:8000"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "  Press Ctrl+C to stop all services"
 echo ""
@@ -63,7 +56,7 @@ echo ""
 cleanup() {
   echo "🛑 Stopping all services..."
   sudo kill $PROXY_PID 2>/dev/null
-  kill $BACKEND_PID $FRONTEND_PID $ADMIN_PID 2>/dev/null
+  kill $BACKEND_PID $FRONTEND_PID 2>/dev/null
   echo "Done."
 }
 trap cleanup EXIT INT TERM

@@ -8,9 +8,9 @@ export default function Services() {
   const handleSubscribe = (serviceType) => {
     const token = localStorage.getItem('token');
     if (!token) {
-      navigate('/login?redirect=checkout&service=' + serviceType);
+      navigate('/portal/login?redirect=checkout&service=' + serviceType);
     } else {
-      navigate('/investor');
+      navigate('/portal');
     }
   };
 

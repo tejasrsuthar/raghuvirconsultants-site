@@ -4,6 +4,7 @@ import { Toaster } from 'react-hot-toast';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import ScrollToTop from './components/ScrollToTop';
+import ProtectedRoute from './components/ProtectedRoute';
 
 // Public pages
 import Home from './pages/Home';
@@ -25,8 +26,13 @@ import NotFound from './pages/NotFound';
 // Investor portal
 import InvestorDashboard from './investor/InvestorDashboard';
 import InvestorSettings from './investor/InvestorSettings';
+import SubscriptionPage from './investor/SubscriptionPage';
 import InvestorResearchReports from './pages/InvestorResearchReports';
 import InvestorModelPortfolio from './pages/InvestorModelPortfolio';
+import InvestorSupport from './pages/InvestorSupport';
+
+// Admin portal (Lazy loaded)
+const AdminApp = React.lazy(() => import('./admin/AdminApp'));
 
 export default function App() {
   return (
@@ -48,7 +54,10 @@ export default function App() {
         }}
       />
       <div className="flex flex-col min-h-screen">
-        <Header />
+        <Routes>
+          <Route path="/portal/admin/*" element={null} />
+          <Route path="*" element={<Header />} />
+        </Routes>
         <main className="flex-grow">
           <Routes>
             {/* Public */}
@@ -62,24 +71,41 @@ export default function App() {
             <Route path="/news" element={<NewsAnnouncements />} />
 
             {/* Auth */}
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/portal/login" element={<Login />} />
+            <Route path="/portal/signup" element={<Signup />} />
+            <Route path="/portal/forgot-password" element={<ForgotPassword />} />
+            <Route path="/portal/reset-password" element={<ResetPassword />} />
 
             {/* Investor Portal */}
-            <Route path="/investor" element={<InvestorDashboard />} />
-            <Route path="/investor/services/reports" element={<InvestorResearchReports />} />
-            <Route path="/investor/services/portfolio" element={<InvestorModelPortfolio />} />
-            <Route path="/investor/reports" element={<InvestorResearchReports />} />
-            <Route path="/investor/portfolio" element={<InvestorModelPortfolio />} />
-            <Route path="/investor/settings" element={<InvestorSettings />} />
+            <Route path="/portal" element={<ProtectedRoute><InvestorDashboard /></ProtectedRoute>} />
+            <Route path="/portal/services/reports" element={<ProtectedRoute><InvestorResearchReports /></ProtectedRoute>} />
+            <Route path="/portal/services/portfolio" element={<ProtectedRoute><InvestorModelPortfolio /></ProtectedRoute>} />
+            <Route path="/portal/reports" element={<ProtectedRoute><InvestorResearchReports /></ProtectedRoute>} />
+            <Route path="/portal/portfolio" element={<ProtectedRoute><InvestorModelPortfolio /></ProtectedRoute>} />
+            <Route path="/portal/billing" element={<ProtectedRoute><SubscriptionPage /></ProtectedRoute>} />
+            <Route path="/portal/support" element={<ProtectedRoute><InvestorSupport /></ProtectedRoute>} />
+            <Route path="/portal/settings" element={<ProtectedRoute><InvestorSettings /></ProtectedRoute>} />
+
+            {/* Admin Portal */}
+            <Route 
+              path="/portal/admin/*" 
+              element={
+                <ProtectedRoute allowedRoles={['super_admin', 'admin']}>
+                  <React.Suspense fallback={<div className="flex justify-center items-center h-screen">Loading Admin...</div>}>
+                    <AdminApp />
+                  </React.Suspense>
+                </ProtectedRoute>
+              } 
+            />
 
             {/* 404 Fallback */}
             <Route path="*" element={<NotFound />} />
           </Routes>
         </main>
-        <Footer />
+        <Routes>
+          <Route path="/portal/admin/*" element={null} />
+          <Route path="*" element={<Footer />} />
+        </Routes>
       </div>
     </Router>
   );

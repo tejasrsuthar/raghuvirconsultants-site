@@ -1,96 +1,96 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-
-:root {
-    --forest-green: #0F2522;
-    --forest-green-hover: #0a1917;
-    --forest-green-dark: #07100F;
-    --lime-green: #CBE743;
-    --lime-green-hover: #b9d435;
-    --soft-sage: #EDEEE9;
-    --soft-sage-hover: #E3E5DC;
-    --bg-light: #FAF9F6;
-    --border-color: #E2E4DC;
-    --text-muted: #5E6967;
-}
-
 @layer base {
   html, body, button, input, select, textarea {
-    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+    font-family: 'Sofia Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply tracking-tightest;
   }
 }
 
 .font-sans {
-  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+  font-family: 'Sofia Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
 }
 
 body { 
-    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important; 
-    background-color: var(--bg-light); 
-    color: var(--forest-green); 
+    font-family: 'Sofia Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important; 
+    background-color: theme('colors.canvas'); 
+    color: theme('colors.ink'); 
     scroll-behavior: smooth; 
-}
-
-/* Custom Grid Pattern overlay */
-.grid-overlay {
-    background-image: 
-        linear-gradient(to right, rgba(15, 37, 34, 0.04) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(15, 37, 34, 0.04) 1px, transparent 1px);
-    background-size: 60px 60px;
-}
-
-/* Card Styling - match reference cards */
-.custom-card {
-    border: 1px solid var(--border-color);
-    border-radius: 1.5rem; /* 24px */
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.custom-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 12px 30px -10px rgba(15, 37, 34, 0.08);
-}
-
-/* Text highlighted like the reference image */
-.text-underline-highlight {
-    position: relative;
-    z-index: 1;
-    display: inline-block;
-}
-
-.text-underline-highlight::after {
-    content: '';
-    position: absolute;
-    left: 0;
-    bottom: 0.1em;
-    width: 100%;
-    height: 0.15em;
-    background-color: var(--lime-green);
-    z-index: -1;
+    font-weight: 450;
 }
 
 /* Button Classes */
-.btn-forest {
-    @apply bg-forest text-white transition-all duration-200;
+.btn-primary {
+    @apply bg-ink text-canvas rounded-button px-6 py-1.5 transition-all duration-200 border-[1.5px] border-ink;
+    font-weight: 500;
+    letter-spacing: -0.02em;
 }
-.btn-forest:hover {
-    @apply bg-forest-hover -translate-y-0.5;
-}
-
-.btn-lime {
-    @apply bg-lime text-forest transition-all duration-200;
-}
-.btn-lime:hover {
-    @apply bg-lime-hover -translate-y-0.5;
+.btn-primary:active {
+    @apply scale-95;
 }
 
-.btn-white {
-    @apply bg-white text-forest border border-bordercolor transition-all duration-200;
+.btn-secondary {
+    @apply bg-white text-ink rounded-button px-6 py-1.5 transition-all duration-200 border-[1.5px] border-ink;
+    font-weight: 450;
+    line-height: 20.8px;
 }
-.btn-white:hover {
-    @apply bg-sand border-textmuted -translate-y-0.5;
+.btn-secondary:active {
+    @apply scale-95;
+}
+
+.btn-consent {
+    @apply bg-signal text-white rounded-consent px-[30px] py-[1px] transition-all duration-200 border-0;
+    font-weight: 400;
+    letter-spacing: 0.13px;
+    font-size: 13px;
+}
+
+.satellite-cta {
+    @apply bg-white text-ink rounded-full flex items-center justify-center transition-all duration-200 shadow-float;
+    width: 56px;
+    height: 56px;
+    font-size: 20px;
+}
+
+/* Card Styling */
+.media-stadium {
+    @apply rounded-stadium overflow-hidden;
+}
+
+.portrait-circle {
+    @apply rounded-full overflow-hidden object-cover;
+}
+
+.pill-card {
+    @apply rounded-pill overflow-hidden;
+}
+
+/* Floating Nav */
+.floating-nav {
+    @apply bg-white/95 backdrop-blur-md rounded-pill shadow-lift px-10 py-4 mx-auto mt-6 z-50 sticky top-6 border border-white/20;
+    width: max-content;
+    max-width: calc(100% - 48px);
+}
+
+/* Typography elements */
+.eyebrow {
+    @apply text-[14px] font-bold tracking-eyebrow uppercase flex items-center gap-2;
+}
+
+.eyebrow::before {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    background-color: theme('colors.arc');
+    border-radius: 50%;
+}
+
+.ghost-watermark {
+    @apply text-taupe/30 font-medium tracking-tightest leading-none select-none -z-10 absolute;
 }

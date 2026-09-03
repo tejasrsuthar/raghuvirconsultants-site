@@ -1,12 +1,11 @@
 import os
 from pymongo import MongoClient
-from dotenv import load_dotenv
 import certifi
 
-load_dotenv()
+from bootstrap.settings import settings
 
-MONGO_URI = os.getenv("MONGODB_URI") or os.getenv("MONGO_URI") or os.getenv("MONGO_URL") or "mongodb://localhost:27017"
-DB_NAME = os.getenv("DB_NAME", "raghuvir_consultants")
+MONGO_URI = settings.MONGODB_URI
+DB_NAME = settings.DB_NAME
 
 # Use certifi's root certificate bundle for mongodb+srv / tls connections
 mongo_kwargs = {}
