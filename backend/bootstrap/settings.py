@@ -4,7 +4,7 @@ from typing import List, Optional
 class Settings(BaseSettings):
     # App
     PROJECT_NAME: str = "Raghuvir Consultants Backend"
-    VERSION: str = "3.0.0"
+    VERSION: str = "3.0.1"
     ALLOWED_ORIGINS: str = ""
     
     # Database
@@ -36,7 +36,7 @@ class Settings(BaseSettings):
     # Observability
     SENTRY_DSN: Optional[str] = None
 
-    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
+    model_config = SettingsConfigDict(env_file=("../.env", ".env"), env_file_encoding="utf-8", extra="ignore")
 
     @property
     def cors_origins(self) -> List[str]:

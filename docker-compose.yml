@@ -6,8 +6,8 @@ services:
     container_name: raghuvir-backend
     restart: unless-stopped
     environment:
-      - MONGO_URI=${MONGO_URI}
-      - SECRET_KEY=${SECRET_KEY}
+      - MONGODB_URI=${MONGODB_URI}
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
       - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-https://www.raghuvirconsultants.in,https://raghuvirconsultants.in,https://admin.raghuvirconsultants.in,http://localhost:5173,http://localhost:5174,http://raghuvircons.local,http://app.raghuvircons.local}
       - ENVIRONMENT=production
     expose:
@@ -40,26 +40,7 @@ services:
       retries: 3
       start_period: 10s
 
-  admin-dashboard:
-    build:
-      context: ./admin-dashboard
-      dockerfile: Dockerfile
-      args:
-        - VITE_GOOGLE_CLIENT_ID=${VITE_GOOGLE_CLIENT_ID:-}
-        - VITE_API_BASE_URL=https://www.raghuvirconsultants.in
-    container_name: raghuvir-admin
-    restart: unless-stopped
-    expose:
-      - "80"
-    depends_on:
-      backend:
-        condition: service_healthy
-    healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1/health || exit 1"]
-      interval: 30s
-      timeout: 5s
-      retries: 3
-      start_period: 10s
+
 
 networks:
   default:

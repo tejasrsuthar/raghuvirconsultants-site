@@ -1,9 +1,7 @@
 import os
 from pymongo import MongoClient
-from dotenv import load_dotenv
 import certifi
 
-load_dotenv()
 from bootstrap.settings import settings
 
 MONGO_URI = settings.MONGODB_URI

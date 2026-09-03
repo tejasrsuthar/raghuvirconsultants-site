@@ -16,8 +16,8 @@ export default function NewsAnnouncements() {
     setLoading(true);
     try {
       const [newsRes, notifRes] = await Promise.all([
-        fetch(`${API_BASE_URL}/api/news?page=1&limit=10`),
-        fetch(`${API_BASE_URL}/api/notifications?page=1&limit=10&status=published`)
+        fetch(`${API_BASE_URL}/api/v1/news?page=1&limit=10`),
+        fetch(`${API_BASE_URL}/api/v1/notifications?page=1&limit=10&status=published`)
       ]);
 
       if (newsRes.ok) {

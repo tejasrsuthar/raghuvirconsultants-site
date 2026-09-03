@@ -43,7 +43,7 @@ export default function SmallCasesManager() {
   const fetchItems = async (page = 1) => {
     setLoading(true);
     try {
-      const res = await fetch(`${API_BASE_URL}/api/smallcases?page=${page}&limit=10`, {
+      const res = await fetch(`${API_BASE_URL}/api/v1/smallcases?page=${page}&limit=10`, {
         headers: token ? { 'Authorization': `Bearer ${token}` } : {}
       });
       if (res.ok) {
@@ -75,7 +75,7 @@ export default function SmallCasesManager() {
     setActionLoading(true);
     const toastId = toast.loading(`Deleting strategy "${deleteConfirmItem.name}"...`);
     try {
-      const res = await fetch(`${API_BASE_URL}/api/smallcases/${deleteConfirmItem.id}`, {
+      const res = await fetch(`${API_BASE_URL}/api/v1/smallcases/${deleteConfirmItem.id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });

@@ -51,8 +51,8 @@ export default function NotificationsManager() {
     setSelectedIds([]);
     try {
       const url = statusFilter 
-        ? `${API_BASE_URL}/api/notifications?page=${page}&limit=10&status=${statusFilter}`
-        : `${API_BASE_URL}/api/notifications?page=${page}&limit=10`;
+        ? `${API_BASE_URL}/api/v1/notifications?page=${page}&limit=10&status=${statusFilter}`
+        : `${API_BASE_URL}/api/v1/notifications?page=${page}&limit=10`;
       const res = await fetch(url, {
         headers: token ? { 'Authorization': `Bearer ${token}` } : {}
       });
@@ -83,7 +83,7 @@ export default function NotificationsManager() {
   const handleSingleStatusUpdate = async (item, newStatus) => {
     const toastId = toast.loading(`Updating alert status to ${newStatus.toUpperCase()}...`);
     try {
-      const res = await fetch(`${API_BASE_URL}/api/notifications/${item.id}`, {
+      const res = await fetch(`${API_BASE_URL}/api/v1/notifications/${item.id}`, {
         method: 'PUT',
         headers: { 
           'Content-Type': 'application/json',
@@ -111,7 +111,7 @@ export default function NotificationsManager() {
     setActionLoading(true);
     const toastId = toast.loading(`Deleting alert "${deleteConfirmItem.title}"...`);
     try {
-      const res = await fetch(`${API_BASE_URL}/api/notifications/${deleteConfirmItem.id}`, {
+      const res = await fetch(`${API_BASE_URL}/api/v1/notifications/${deleteConfirmItem.id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -134,7 +134,7 @@ export default function NotificationsManager() {
     setActionLoading(true);
     const toastId = toast.loading(`Deleting ${selectedIds.length} notifications...`);
     try {
-      const res = await fetch(`${API_BASE_URL}/api/notifications/bulk-delete`, {
+      const res = await fetch(`${API_BASE_URL}/api/v1/notifications/bulk-delete`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -180,7 +180,7 @@ export default function NotificationsManager() {
     setBulkActionLoading(true);
     const toastId = toast.loading(`Updating ${selectedIds.length} alerts to ${newStatus}...`);
     try {
-      const res = await fetch(`${API_BASE_URL}/api/notifications/bulk-status`, {
+      const res = await fetch(`${API_BASE_URL}/api/v1/notifications/bulk-status`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -44,7 +44,7 @@ export default function Login() {
     setLoading(true);
 
     try {
-      const res = await fetch(`${API_BASE_URL}/api/auth/login`, {
+      const res = await fetch(`${API_BASE_URL}/api/v1/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
@@ -65,9 +65,10 @@ export default function Login() {
       localStorage.setItem('email', data.email);
 
       if (redirectUrl === 'checkout') {
-        navigate('/investor');
+        navigate('/portal');
       } else {
-        navigate(data.role === 'admin' ? '/admin' : '/investor');
+        const userRole = (data.role || '').toLowerCase();
+        navigate(userRole === 'admin' || userRole === 'super_admin' ? '/portal/admin' : '/portal');
       }
     } catch (err) {
       setError(err.message);
@@ -79,7 +80,7 @@ export default function Login() {
   const handleGoogleSuccess = async (credential) => {
     setError('');
     try {
-      const res = await fetch(`${API_BASE_URL}/api/auth/google`, {
+      const res = await fetch(`${API_BASE_URL}/api/v1/auth/google`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token: credential }),
@@ -96,7 +97,8 @@ export default function Login() {
       localStorage.setItem('username', data.username);
       localStorage.setItem('email', data.email);
 
-      navigate('/investor');
+      const userRole = (data.role || '').toLowerCase();
+      navigate(userRole === 'admin' || userRole === 'super_admin' ? '/portal/admin' : '/portal');
     } catch (err) {
       setError(err.message);
     }
@@ -139,7 +141,7 @@ export default function Login() {
           <div>
             <div className="flex justify-between items-center mb-1">
               <label className="block text-xs font-bold uppercase tracking-widest text-textmuted">Password</label>
-              <Link to="/forgot-password" className="text-xs text-textmuted hover:text-forest underline">Forgot password?</Link>
+              <Link to="/portal/forgot-password" className="text-xs text-textmuted hover:text-forest underline">Forgot password?</Link>
             </div>
             <div className="relative">
               <input
@@ -203,7 +205,7 @@ export default function Login() {
         </div>
 
         <p className="text-xs text-textmuted text-center mt-8">
-          Don't have an account? <Link to="/signup" className="text-forest font-bold underline">Create one</Link>
+          Don't have an account? <Link to="/portal/signup" className="text-forest font-bold underline">Create one</Link>
         </p>
       </div>
     </div>

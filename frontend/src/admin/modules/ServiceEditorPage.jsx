@@ -20,7 +20,7 @@ export default function ServiceEditorPage({ initialData, onBack, onSaveSuccess }
     setError('');
     setSuccess(false);
 
-    const url = editingId ? `${API_BASE_URL}/api/services/${editingId}` : `${API_BASE_URL}/api/services`;
+    const url = editingId ? `${API_BASE_URL}/api/v1/services/${editingId}` : `${API_BASE_URL}/api/v1/services`;
     const method = editingId ? 'PUT' : 'POST';
 
     setLoading(true);

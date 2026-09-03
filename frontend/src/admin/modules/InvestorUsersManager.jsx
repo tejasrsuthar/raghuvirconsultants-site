@@ -142,7 +142,7 @@ export default function InvestorUsersManager() {
     setPasswordLoading(true);
     const toastId = toast.loading(`Resetting password for ${passwordModalUser.username}...`);
     try {
-      const res = await fetch(`${API_BASE_URL}/api/admin/investors/${passwordModalUser.id}/password`, {
+      const res = await fetch(`${API_BASE_URL}/api/v1/admin/investors/${passwordModalUser.id}/password`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -169,7 +169,7 @@ export default function InvestorUsersManager() {
     setDeleteLoading(true);
     const toastId = toast.loading(`Deleting account ${deleteConfirmUser.username}...`);
     try {
-      const res = await fetch(`${API_BASE_URL}/api/admin/investors/${deleteConfirmUser.id}`, {
+      const res = await fetch(`${API_BASE_URL}/api/v1/admin/investors/${deleteConfirmUser.id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });

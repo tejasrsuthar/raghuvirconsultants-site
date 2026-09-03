@@ -18,7 +18,6 @@ class MinIOStorage(ReportStorage):
             secure=secure
         )
         self.bucket_name = bucket_name
-        self._ensure_bucket_exists()
 
     def _ensure_bucket_exists(self):
         try:
@@ -32,6 +31,8 @@ class MinIOStorage(ReportStorage):
         file_obj.seek(0, 2)
         size = file_obj.tell()
         file_obj.seek(0)
+        
+        self._ensure_bucket_exists()
         
         try:
             self.client.put_object(

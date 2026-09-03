@@ -4,7 +4,7 @@ from pydantic import BaseModel
 from contexts.billing.application.use_cases import BillingUseCases
 from contexts.billing.interfaces.dependencies import get_billing_use_cases
 from contexts.identity.domain.entities import Investor
-from contexts.identity.interfaces.dependencies import get_current_investor, require_permission
+from contexts.identity.interfaces.dependencies import get_current_user, require_permission
 
 router = APIRouter(prefix="/billing", tags=["Billing & Subscriptions"])
 
@@ -44,7 +44,7 @@ def get_all_subscriptions(
 
 @router.get("/subscriptions", response_model=List[SubscriptionResponse])
 def get_my_subscriptions(
-    investor: Investor = Depends(get_current_investor),
+    investor: Investor = Depends(get_current_user),
     use_cases: BillingUseCases = Depends(get_billing_use_cases)
 ):
     subs = use_cases.get_investor_subscriptions(investor.id.value)
@@ -64,7 +64,7 @@ def get_my_subscriptions(
 @router.post("/subscribe")
 def subscribe(
     req: SubscribeRequest,
-    investor: Investor = Depends(get_current_investor),
+    investor: Investor = Depends(get_current_user),
     use_cases: BillingUseCases = Depends(get_billing_use_cases)
 ):
     try:
@@ -76,7 +76,7 @@ def subscribe(
 @router.post("/subscriptions/{subscription_id}/cancel")
 def cancel_subscription(
     subscription_id: str,
-    investor: Investor = Depends(get_current_investor),
+    investor: Investor = Depends(get_current_user),
     use_cases: BillingUseCases = Depends(get_billing_use_cases)
 ):
     try:

@@ -22,7 +22,7 @@ export default function InvestorDashboard() {
 
   useEffect(() => {
     if (!token) {
-      navigate('/login');
+      navigate('/portal/login');
       return;
     }
     fetchDashboardData();
@@ -32,10 +32,10 @@ export default function InvestorDashboard() {
     setLoading(true);
     try {
       const [repRes, portRes, notifRes, newsRes] = await Promise.all([
-        fetch(`${API_BASE_URL}/api/reports?page=1&limit=1`, { headers: { 'Authorization': `Bearer ${token}` } }),
-        fetch(`${API_BASE_URL}/api/portfolio?page=1&limit=1`, { headers: { 'Authorization': `Bearer ${token}` } }),
-        fetch(`${API_BASE_URL}/api/notifications?page=1&limit=5&status=published`),
-        fetch(`${API_BASE_URL}/api/news?page=1&limit=4`),
+        fetch(`${API_BASE_URL}/api/v1/reports?page=1&limit=1`, { headers: { 'Authorization': `Bearer ${token}` } }),
+        fetch(`${API_BASE_URL}/api/v1/portfolio?page=1&limit=1`, { headers: { 'Authorization': `Bearer ${token}` } }),
+        fetch(`${API_BASE_URL}/api/v1/notifications?page=1&limit=5&status=published`),
+        fetch(`${API_BASE_URL}/api/v1/news?page=1&limit=4`),
       ]);
 
       if (repRes.ok) {
@@ -65,7 +65,7 @@ export default function InvestorDashboard() {
 
   const handleStripeCheckout = async (serviceType) => {
     try {
-      const res = await fetch(`${API_BASE_URL}/api/payments/checkout`, {
+      const res = await fetch(`${API_BASE_URL}/api/v1/payments/checkout`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -75,7 +75,7 @@ export default function InvestorDashboard() {
       });
       const data = await res.json();
       if (data.checkout_url) {
-        const mockWebhookRes = await fetch(`${API_BASE_URL}/api/payments/stripe-webhook`, {
+        const mockWebhookRes = await fetch(`${API_BASE_URL}/api/v1/payments/stripe-webhook`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -102,7 +102,7 @@ export default function InvestorDashboard() {
     e.preventDefault();
     setUpiLoading(true);
     try {
-      const res = await fetch(`${API_BASE_URL}/api/payments/upi-confirm`, {
+      const res = await fetch(`${API_BASE_URL}/api/v1/payments/upi-confirm`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -137,7 +137,7 @@ export default function InvestorDashboard() {
           <p className="text-sm text-textmuted">Welcome back, <strong>{localStorage.getItem('username') || 'Investor'}</strong></p>
         </div>
         <div className="flex gap-3 flex-wrap">
-          <Link to="/investor/settings" className="btn-forest text-[#FAF9F6] text-xs font-bold uppercase tracking-widest px-6 py-3.5 rounded-full shadow-md flex items-center gap-1 hover:bg-forest-hover transition-all">
+          <Link to="/portal/settings" className="btn-forest text-[#FAF9F6] text-xs font-bold uppercase tracking-widest px-6 py-3.5 rounded-full shadow-md flex items-center gap-1 hover:bg-forest-hover transition-all">
             Account Settings
           </Link>
         </div>
@@ -232,7 +232,7 @@ export default function InvestorDashboard() {
 
             {reportsSubscribed ? (
               <Link
-                to="/investor/services/reports"
+                to="/portal/services/reports"
                 className="w-full btn-forest text-white py-3.5 rounded-full text-xs font-bold uppercase tracking-widest text-center flex items-center justify-center gap-2 shadow-sm"
               >
                 Access Research Reports Page <ArrowRight className="w-4 h-4" />
@@ -295,7 +295,7 @@ export default function InvestorDashboard() {
 
             {portfolioSubscribed ? (
               <Link
-                to="/investor/services/portfolio"
+                to="/portal/services/portfolio"
                 className="w-full btn-forest text-white py-3.5 rounded-full text-xs font-bold uppercase tracking-widest text-center flex items-center justify-center gap-2 shadow-sm"
               >
                 Access Model Portfolio Page <ArrowRight className="w-4 h-4" />

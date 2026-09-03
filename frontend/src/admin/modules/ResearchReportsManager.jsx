@@ -19,7 +19,7 @@ export default function ResearchReportsManager() {
   const fetchReports = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${API_BASE_URL}/api/reports/admin`, {
+      const res = await fetch(`${API_BASE_URL}/api/v1/reports/admin`, {
         headers: token ? { 'Authorization': `Bearer ${token}` } : {}
       });
       if (res.ok) {

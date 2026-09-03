@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { API_BASE_URL } from '../config/apiConfig';
 import AdminBreadcrumb from '../components/AdminBreadcrumb';
+import { Layers, Save, CheckCircle2 } from 'lucide-react';
 
 export default function SmallCaseEditorPage({ initialData, onBack, onSaveSuccess }) {
   const [editingId] = useState(initialData?.id || null);
@@ -21,7 +22,7 @@ export default function SmallCaseEditorPage({ initialData, onBack, onSaveSuccess
     setError('');
     setSuccess(false);
 
-    const url = editingId ? `${API_BASE_URL}/api/smallcases/${editingId}` : `${API_BASE_URL}/api/smallcases`;
+    const url = editingId ? `${API_BASE_URL}/api/v1/smallcases/${editingId}` : `${API_BASE_URL}/api/v1/smallcases`;
     const method = editingId ? 'PUT' : 'POST';
 
     setLoading(true);

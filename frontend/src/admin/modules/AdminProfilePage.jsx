@@ -39,7 +39,7 @@ export default function AdminProfilePage({ onBack }) {
       };
       if (formData.password) payload.password = formData.password;
 
-      const res = await fetch(`${API_BASE_URL}/api/auth/profile`, {
+      const res = await fetch(`${API_BASE_URL}/api/v1/auth/profile`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

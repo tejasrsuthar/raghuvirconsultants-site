@@ -107,7 +107,7 @@ export default function BlogEditorPage({ initialData, onBack, onSaveSuccess }) {
       status
     };
 
-    const url = editingId ? `${API_BASE_URL}/api/blogs/${editingId}` : `${API_BASE_URL}/api/blogs`;
+    const url = editingId ? `${API_BASE_URL}/api/v1/blogs/${editingId}` : `${API_BASE_URL}/api/v1/blogs`;
     const method = editingId ? 'PUT' : 'POST';
 
     setLoading(true);

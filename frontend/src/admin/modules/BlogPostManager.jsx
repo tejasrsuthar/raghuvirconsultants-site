@@ -43,8 +43,8 @@ export default function BlogPostManager() {
     setLoading(true);
     try {
       const url = selectedTag 
-        ? `${API_BASE_URL}/api/blogs?page=${currentPage}&limit=10&tag=${encodeURIComponent(selectedTag)}`
-        : `${API_BASE_URL}/api/blogs?page=${currentPage}&limit=10`;
+        ? `${API_BASE_URL}/api/v1/blogs?page=${currentPage}&limit=10&tag=${encodeURIComponent(selectedTag)}`
+        : `${API_BASE_URL}/api/v1/blogs?page=${currentPage}&limit=10`;
       const res = await fetch(url, {
         headers: token ? { 'Authorization': `Bearer ${token}` } : {}
       });
@@ -77,7 +77,7 @@ export default function BlogPostManager() {
     setActionLoading(true);
     const toastId = toast.loading(`Deleting blog post "${deleteConfirmPost.title}"...`);
     try {
-      const res = await fetch(`${API_BASE_URL}/api/blogs/${deleteConfirmPost.id}`, {
+      const res = await fetch(`${API_BASE_URL}/api/v1/blogs/${deleteConfirmPost.id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });

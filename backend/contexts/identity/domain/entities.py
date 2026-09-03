@@ -22,6 +22,21 @@ class Investor(BaseModel):
     full_name: str
     username: str
     hashed_password: Optional[str] = None
+    phone: Optional[str] = None
+    gender: Optional[str] = None
+    referral_source: Optional[str] = None
+    country: Optional[str] = "India"
+    state: Optional[str] = None
+    city: Optional[str] = None
+    address: Optional[str] = None
+    address_line1: Optional[str] = None
+    address_line2: Optional[str] = None
+    pincode: Optional[str] = None
+    pan_number: Optional[str] = None
+    date_of_birth: Optional[str] = None
+    kyc_status: Optional[str] = "verified"
+    risk_profile: Optional[str] = "Moderate"
+    admin_notes: Optional[str] = None
     role: Role
     status: UserStatus = UserStatus.ACTIVE
     is_kyc_verified: bool = False

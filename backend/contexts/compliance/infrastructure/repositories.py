@@ -6,7 +6,7 @@ from bootstrap.settings import settings
 class AuditLogRepository:
     def __init__(self):
         self.client = MongoClient(settings.MONGODB_URI)
-        self.db = self.client[settings.MONGODB_DB_NAME]
+        self.db = self.client[settings.DB_NAME]
         self.collection = self.db["audit_logs"]
 
     def save(self, log: AuditLog) -> None:

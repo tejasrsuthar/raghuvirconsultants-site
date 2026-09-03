@@ -1,206 +1,87 @@
+from typing import Optional, List, Tuple, TypeVar, Generic, Type, Any
 import uuid
 from datetime import datetime
-from typing import Optional, List, Tuple
+from pydantic import BaseModel
+from app.infrastructure.db import db
 from app.domain.entities import (
-    User, ResearchReport, Stock, Subscription, UserStatus, UserRole, ActivityLog,
+    ResearchReport, Stock, Subscription, ActivityLog,
     SmallcaseItem, ServiceOffering, Notification, BlogPost, PlatformSettings, NewsItem
 )
-from app.infrastructure.db import db
 
-class UserRepository:
-    def __init__(self):
-        self.collection = db["users"]
-        self.collection.create_index("email")
-        self.collection.create_index("username")
-        self.collection.create_index("created_at")
+T = TypeVar("T", bound=BaseModel)
 
-    def create(self, user: User) -> User:
-        user_dict = user.model_dump()
-        user_dict["id"] = str(uuid.uuid4())
-        user_dict["created_at"] = datetime.utcnow()
-        self.collection.insert_one(user_dict)
-        return User(**user_dict)
+class BaseMongoRepository(Generic[T]):
+    def __init__(self, collection_name: str, entity_class: Type[T], sort_field: str = "created_at"):
+        self.collection = db[collection_name]
+        self.entity_class = entity_class
+        self.sort_field = sort_field
 
-    def get_by_id(self, user_id: str) -> Optional[User]:
-        data = self.collection.find_one({"id": user_id})
-        return User(**data) if data else None
+    def _to_entity(self, data: Optional[dict]) -> Optional[T]:
+        return self.entity_class(**data) if data else None
 
-    def get_by_email(self, email: str) -> Optional[User]:
-        data = self.collection.find_one({"email": email})
-        if not data and email:
-            import re
-            data = self.collection.find_one({"email": {"$regex": f"^{re.escape(email)}$", "$options": "i"}})
-        return User(**data) if data else None
+    def create(self, item: T) -> T:
+        d = item.model_dump()
+        if not d.get("id"):
+            d["id"] = str(uuid.uuid4())
+        
+        # Inject standard timestamp if present in model
+        if hasattr(self.entity_class, "__fields__"):
+            fields = self.entity_class.__fields__
+        else:
+            fields = self.entity_class.model_fields # Pydantic v2
+            
+        if self.sort_field in fields and self.sort_field not in d:
+            d[self.sort_field] = datetime.utcnow()
+            
+        self.collection.insert_one(d)
+        return self._to_entity(d)
 
-    def get_by_username(self, username: str) -> Optional[User]:
-        data = self.collection.find_one({"username": username})
-        if not data and username:
-            import re
-            data = self.collection.find_one({"username": {"$regex": f"^{re.escape(username)}$", "$options": "i"}})
-        return User(**data) if data else None
+    def get_by_id(self, item_id: str) -> Optional[T]:
+        res = self.collection.find_one({"id": item_id})
+        return self._to_entity(res)
 
-    def get_by_google_id(self, google_id: str) -> Optional[User]:
-        data = self.collection.find_one({"google_id": google_id})
-        return User(**data) if data else None
-
-    def update_status(self, user_id: str, status: UserStatus) -> bool:
-        res = self.collection.update_one({"id": user_id}, {"$set": {"status": status.value if isinstance(status, UserStatus) else status}})
-        return res.modified_count > 0
-
-    def update_role(self, user_id: str, role: UserRole) -> bool:
-        res = self.collection.update_one({"id": user_id}, {"$set": {"role": role.value if isinstance(role, UserRole) else role}})
-        return res.modified_count > 0
-
-    def update_password(self, user_id: str, hashed_password: str) -> bool:
-        res = self.collection.update_one({"id": user_id}, {"$set": {"hashed_password": hashed_password}})
-        return res.modified_count > 0
-
-    def update_profile(
-        self, user_id: str, username: Optional[str] = None, email: Optional[str] = None, 
-        phone: Optional[str] = None, address: Optional[str] = None, hashed_password: Optional[str] = None,
-        full_name: Optional[str] = None, pan_number: Optional[str] = None,
-        address_line1: Optional[str] = None, address_line2: Optional[str] = None,
-        pincode: Optional[str] = None, date_of_birth: Optional[str] = None,
-        city: Optional[str] = None, state: Optional[str] = None, country: Optional[str] = None,
-        kyc_status: Optional[str] = None, risk_profile: Optional[str] = None,
-        admin_notes: Optional[str] = None, role: Optional[str] = None, status: Optional[str] = None,
-        **extra
-    ) -> bool:
-        update_fields = {}
-        if username is not None:
-            update_fields["username"] = username
-        if email is not None:
-            update_fields["email"] = email
-        if phone is not None:
-            update_fields["phone"] = phone
-        if address is not None:
-            update_fields["address"] = address
-        if hashed_password is not None:
-            update_fields["hashed_password"] = hashed_password
-        if full_name is not None:
-            update_fields["full_name"] = full_name
-        if pan_number is not None:
-            update_fields["pan_number"] = pan_number.upper().strip()
-        if address_line1 is not None:
-            update_fields["address_line1"] = address_line1
-        if address_line2 is not None:
-            update_fields["address_line2"] = address_line2
-        if pincode is not None:
-            update_fields["pincode"] = pincode
-        if date_of_birth is not None:
-            update_fields["date_of_birth"] = date_of_birth
-        if city is not None:
-            update_fields["city"] = city
-        if state is not None:
-            update_fields["state"] = state
-        if country is not None:
-            update_fields["country"] = country
-        if kyc_status is not None:
-            update_fields["kyc_status"] = kyc_status
-        if risk_profile is not None:
-            update_fields["risk_profile"] = risk_profile
-        if admin_notes is not None:
-            update_fields["admin_notes"] = admin_notes
-        if role is not None:
-            update_fields["role"] = role.value if hasattr(role, 'value') else role
-        if status is not None:
-            update_fields["status"] = status.value if hasattr(status, 'value') else status
-
-        if not update_fields:
-            return False
-        res = self.collection.update_one({"id": user_id}, {"$set": update_fields})
-        return res.modified_count > 0 or res.matched_count > 0
-
-    def get_all_paginated(self, page: int = 1, limit: int = 10) -> Tuple[List[User], int]:
-        total = self.collection.count_documents({})
+    def get_all_paginated(self, page: int = 1, limit: int = 10, query: dict = None) -> Tuple[List[T], int]:
+        if query is None:
+            query = {}
+        total = self.collection.count_documents(query)
         skip = (page - 1) * limit
-        cursor = self.collection.find().sort("created_at", -1).skip(skip).limit(limit)
-        return [User(**doc) for doc in cursor], total
+        cursor = self.collection.find(query).sort(self.sort_field, -1).skip(skip).limit(limit)
+        return [self._to_entity(doc) for doc in cursor], total
 
-    def delete(self, user_id: str) -> bool:
-        res = self.collection.delete_one({"id": user_id})
+    def update(self, item_id: str, item_data: Any) -> Optional[T]:
+        # Handle both Pydantic models and dicts
+        if isinstance(item_data, BaseModel):
+            d = item_data.model_dump(exclude_unset=True)
+        else:
+            d = dict(item_data)
+            
+        d.pop("id", None)
+        if not d:
+            return self.get_by_id(item_id)
+            
+        self.collection.update_one({"id": item_id}, {"$set": d})
+        return self.get_by_id(item_id)
+
+    def delete(self, item_id: str) -> bool:
+        res = self.collection.delete_one({"id": item_id})
         return res.deleted_count > 0
 
-
-class ResearchReportRepository:
+class ResearchReportRepository(BaseMongoRepository[ResearchReport]):
     def __init__(self):
-        self.collection = db["research_reports"]
-        self.collection.create_index("published_at")
-        self.collection.create_index("status")
-
-    def create(self, report: ResearchReport) -> ResearchReport:
-        dict_data = report.model_dump()
-        dict_data["id"] = str(uuid.uuid4())
-        dict_data["published_at"] = datetime.utcnow()
-        self.collection.insert_one(dict_data)
-        return ResearchReport(**dict_data)
-
-    def get_by_id(self, report_id: str) -> Optional[ResearchReport]:
-        data = self.collection.find_one({"id": report_id})
-        return ResearchReport(**data) if data else None
-
-    def get_all_paginated(self, page: int = 1, limit: int = 10) -> Tuple[List[ResearchReport], int]:
-        total = self.collection.count_documents({})
-        skip = (page - 1) * limit
-        cursor = self.collection.find().sort("published_at", -1).skip(skip).limit(limit)
-        return [ResearchReport(**doc) for doc in cursor], total
-
-    def update(self, report_id: str, title: str, content: str, doc_link: Optional[str] = None) -> Optional[ResearchReport]:
-        update_fields = {"title": title, "content": content}
-        if doc_link is not None:
-            update_fields["doc_link"] = doc_link
-        self.collection.update_one({"id": report_id}, {"$set": update_fields})
-        data = self.collection.find_one({"id": report_id})
-        return ResearchReport(**data) if data else None
-
+        super().__init__("research_reports", ResearchReport, "published_at")
+        
     def update_status(self, report_id: str, status: str) -> Optional[ResearchReport]:
-        self.collection.update_one({"id": report_id}, {"$set": {"status": status}})
-        data = self.collection.find_one({"id": report_id})
-        return ResearchReport(**data) if data else None
-
-    def delete(self, report_id: str) -> bool:
-        res = self.collection.delete_one({"id": report_id})
-        return res.deleted_count > 0
+        return self.update(report_id, {"status": status})
 
 
-class StockRepository:
+class StockRepository(BaseMongoRepository[Stock]):
     def __init__(self):
-        self.collection = db["stocks"]
-        self.collection.create_index("added_at")
-
-    def create(self, stock: Stock) -> Stock:
-        dict_data = stock.model_dump()
-        dict_data["id"] = str(uuid.uuid4())
-        dict_data["added_at"] = datetime.utcnow()
-        self.collection.insert_one(dict_data)
-        return Stock(**dict_data)
-
-    def get_by_id(self, stock_id: str) -> Optional[Stock]:
-        data = self.collection.find_one({"id": stock_id})
-        return Stock(**data) if data else None
-
-    def get_all_paginated(self, page: int = 1, limit: int = 10) -> Tuple[List[Stock], int]:
-        total = self.collection.count_documents({})
-        skip = (page - 1) * limit
-        cursor = self.collection.find().sort("added_at", -1).skip(skip).limit(limit)
-        return [Stock(**doc) for doc in cursor], total
-
-    def update(self, stock_id: str, stock_data: Stock) -> Optional[Stock]:
-        dict_data = stock_data.model_dump(exclude_unset=True)
-        dict_data.pop("id", None)
-        self.collection.update_one({"id": stock_id}, {"$set": dict_data})
-        data = self.collection.find_one({"id": stock_id})
-        return Stock(**data) if data else None
-
-    def delete(self, stock_id: str) -> bool:
-        res = self.collection.delete_one({"id": stock_id})
-        return res.deleted_count > 0
+        super().__init__("stocks", Stock, "added_at")
 
 
-class SubscriptionRepository:
+class SubscriptionRepository(BaseMongoRepository[Subscription]):
     def __init__(self):
-        self.collection = db["subscriptions"]
-        self.collection.create_index("user_id")
+        super().__init__("subscriptions", Subscription)
 
     def create_or_update(self, sub: Subscription) -> Subscription:
         sub_dict = sub.model_dump()
@@ -212,7 +93,7 @@ class SubscriptionRepository:
             upsert=True
         )
         data = self.collection.find_one({"user_id": sub.user_id, "service_type": sub.service_type})
-        return Subscription(**data) if data else None
+        return self._to_entity(data)
 
     def get_active_subscription(self, user_id: str, service_type: str) -> Optional[Subscription]:
         data = self.collection.find_one({
@@ -221,171 +102,52 @@ class SubscriptionRepository:
             "status": "active",
             "expires_at": {"$gt": datetime.utcnow()}
         })
-        return Subscription(**data) if data else None
+        return self._to_entity(data)
 
 
-class ActivityLogRepository:
+class ActivityLogRepository(BaseMongoRepository[ActivityLog]):
     def __init__(self):
-        self.collection = db["activity_logs"]
-        self.collection.create_index("user_id")
-        self.collection.create_index("timestamp")
-
-    def create(self, log: ActivityLog) -> ActivityLog:
-        log_dict = log.model_dump()
-        if not log_dict.get("id"):
-            log_dict["id"] = str(uuid.uuid4())
-        self.collection.insert_one(log_dict)
-        return ActivityLog(**log_dict)
+        super().__init__("activity_logs", ActivityLog, "timestamp")
 
     def get_by_user_id(self, user_id: str) -> List[ActivityLog]:
         cursor = self.collection.find({"user_id": user_id}).sort("timestamp", -1)
-        return [ActivityLog(**doc) for doc in cursor]
+        return [self._to_entity(doc) for doc in cursor]
 
 
-class SmallcaseRepository:
+class SmallcaseRepository(BaseMongoRepository[SmallcaseItem]):
     def __init__(self):
-        self.collection = db["smallcases"]
-        self.collection.create_index("created_at")
-
-    def create(self, item: SmallcaseItem) -> SmallcaseItem:
-        d = item.model_dump()
-        d["id"] = str(uuid.uuid4())
-        d["created_at"] = datetime.utcnow()
-        self.collection.insert_one(d)
-        return SmallcaseItem(**d)
-
-    def get_all_paginated(self, page: int = 1, limit: int = 10) -> Tuple[List[SmallcaseItem], int]:
-        total = self.collection.count_documents({})
-        skip = (page - 1) * limit
-        cursor = self.collection.find().sort("created_at", -1).skip(skip).limit(limit)
-        return [SmallcaseItem(**doc) for doc in cursor], total
-
-    def update(self, item_id: str, item_data: SmallcaseItem) -> Optional[SmallcaseItem]:
-        d = item_data.model_dump(exclude_unset=True)
-        d.pop("id", None)
-        self.collection.update_one({"id": item_id}, {"$set": d})
-        res = self.collection.find_one({"id": item_id})
-        return SmallcaseItem(**res) if res else None
-
-    def delete(self, item_id: str) -> bool:
-        res = self.collection.delete_one({"id": item_id})
-        return res.deleted_count > 0
+        super().__init__("smallcases", SmallcaseItem)
 
 
-class ServiceOfferingRepository:
+class ServiceOfferingRepository(BaseMongoRepository[ServiceOffering]):
     def __init__(self):
-        self.collection = db["service_offerings"]
-        self.collection.create_index("created_at")
-
-    def create(self, item: ServiceOffering) -> ServiceOffering:
-        d = item.model_dump()
-        d["id"] = str(uuid.uuid4())
-        d["created_at"] = datetime.utcnow()
-        self.collection.insert_one(d)
-        return ServiceOffering(**d)
-
-    def get_all_paginated(self, page: int = 1, limit: int = 10) -> Tuple[List[ServiceOffering], int]:
-        total = self.collection.count_documents({})
-        skip = (page - 1) * limit
-        cursor = self.collection.find().sort("created_at", -1).skip(skip).limit(limit)
-        return [ServiceOffering(**doc) for doc in cursor], total
-
-    def update(self, item_id: str, item_data: ServiceOffering) -> Optional[ServiceOffering]:
-        d = item_data.model_dump(exclude_unset=True)
-        d.pop("id", None)
-        self.collection.update_one({"id": item_id}, {"$set": d})
-        res = self.collection.find_one({"id": item_id})
-        return ServiceOffering(**res) if res else None
-
-    def delete(self, item_id: str) -> bool:
-        res = self.collection.delete_one({"id": item_id})
-        return res.deleted_count > 0
+        super().__init__("service_offerings", ServiceOffering)
 
 
-class NotificationRepository:
+class NotificationRepository(BaseMongoRepository[Notification]):
     def __init__(self):
-        self.collection = db["notifications"]
-        self.collection.create_index("created_at")
-        self.collection.create_index("status")
-
-    def create(self, item: Notification) -> Notification:
-        d = item.model_dump()
-        d["id"] = str(uuid.uuid4())
-        d["created_at"] = datetime.utcnow()
-        self.collection.insert_one(d)
-        return Notification(**d)
+        super().__init__("notifications", Notification)
 
     def get_all_paginated(self, page: int = 1, limit: int = 10, status: Optional[str] = None) -> Tuple[List[Notification], int]:
-        query = {}
-        if status:
-            query["status"] = status
-        total = self.collection.count_documents(query)
-        skip = (page - 1) * limit
-        cursor = self.collection.find(query).sort("created_at", -1).skip(skip).limit(limit)
-        return [Notification(**doc) for doc in cursor], total
-
-    def get_by_id(self, item_id: str) -> Optional[Notification]:
-        data = self.collection.find_one({"id": item_id})
-        return Notification(**data) if data else None
-
-    def update(self, item_id: str, item_data: Notification) -> Optional[Notification]:
-        d = item_data.model_dump(exclude_unset=True)
-        d.pop("id", None)
-        self.collection.update_one({"id": item_id}, {"$set": d})
-        res = self.collection.find_one({"id": item_id})
-        return Notification(**res) if res else None
+        query = {"status": status} if status else None
+        return super().get_all_paginated(page, limit, query)
 
     def update_status(self, item_id: str, status: str) -> Optional[Notification]:
-        self.collection.update_one({"id": item_id}, {"$set": {"status": status}})
-        res = self.collection.find_one({"id": item_id})
-        return Notification(**res) if res else None
-
-    def delete(self, item_id: str) -> bool:
-        res = self.collection.delete_one({"id": item_id})
-        return res.deleted_count > 0
+        return self.update(item_id, {"status": status})
 
 
-class BlogPostRepository:
+class BlogPostRepository(BaseMongoRepository[BlogPost]):
     def __init__(self):
-        self.collection = db["blog_posts"]
-        self.collection.create_index("created_at")
-        self.collection.create_index("tags")
-
-    def create(self, item: BlogPost) -> BlogPost:
-        d = item.model_dump()
-        d["id"] = str(uuid.uuid4())
-        d["created_at"] = datetime.utcnow()
-        self.collection.insert_one(d)
-        return BlogPost(**d)
+        super().__init__("blog_posts", BlogPost)
 
     def get_all_paginated(self, page: int = 1, limit: int = 10, tag: Optional[str] = None) -> Tuple[List[BlogPost], int]:
-        query = {}
-        if tag:
-            query["tags"] = tag
-        total = self.collection.count_documents(query)
-        skip = (page - 1) * limit
-        cursor = self.collection.find(query).sort("created_at", -1).skip(skip).limit(limit)
-        return [BlogPost(**doc) for doc in cursor], total
-
-    def get_by_id(self, item_id: str) -> Optional[BlogPost]:
-        res = self.collection.find_one({"id": item_id})
-        return BlogPost(**res) if res else None
-
-    def update(self, item_id: str, item_data: BlogPost) -> Optional[BlogPost]:
-        d = item_data.model_dump(exclude_unset=True)
-        d.pop("id", None)
-        self.collection.update_one({"id": item_id}, {"$set": d})
-        res = self.collection.find_one({"id": item_id})
-        return BlogPost(**res) if res else None
-
-    def delete(self, item_id: str) -> bool:
-        res = self.collection.delete_one({"id": item_id})
-        return res.deleted_count > 0
+        query = {"tags": tag} if tag else None
+        return super().get_all_paginated(page, limit, query)
 
 
-class PlatformSettingsRepository:
+class PlatformSettingsRepository(BaseMongoRepository[PlatformSettings]):
     def __init__(self):
-        self.collection = db["platform_settings"]
+        super().__init__("platform_settings", PlatformSettings, "updated_at")
 
     def get(self) -> PlatformSettings:
         res = self.collection.find_one({"id": "global_settings"})
@@ -393,33 +155,16 @@ class PlatformSettingsRepository:
             settings = PlatformSettings()
             self.collection.insert_one(settings.model_dump())
             return settings
-        return PlatformSettings(**res)
+        return self._to_entity(res)
 
     def update(self, settings: PlatformSettings) -> PlatformSettings:
         d = settings.model_dump()
         d["updated_at"] = datetime.utcnow()
         self.collection.update_one({"id": "global_settings"}, {"$set": d}, upsert=True)
-        return PlatformSettings(**d)
+        return self._to_entity(d)
 
 
-class NewsRepository:
+class NewsRepository(BaseMongoRepository[NewsItem]):
     def __init__(self):
-        self.collection = db["news_items"]
-        self.collection.create_index("created_at")
+        super().__init__("news_items", NewsItem)
 
-    def create(self, item: NewsItem) -> NewsItem:
-        d = item.model_dump()
-        d["id"] = str(uuid.uuid4())
-        d["created_at"] = datetime.utcnow()
-        self.collection.insert_one(d)
-        return NewsItem(**d)
-
-    def get_all_paginated(self, page: int = 1, limit: int = 10) -> Tuple[List[NewsItem], int]:
-        total = self.collection.count_documents({})
-        skip = (page - 1) * limit
-        cursor = self.collection.find().sort("created_at", -1).skip(skip).limit(limit)
-        return [NewsItem(**doc) for doc in cursor], total
-
-    def delete(self, item_id: str) -> bool:
-        res = self.collection.delete_one({"id": item_id})
-        return res.deleted_count > 0

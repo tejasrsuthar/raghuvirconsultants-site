@@ -43,7 +43,7 @@ export default function NewsManager() {
   const fetchItems = async (page = 1) => {
     setLoading(true);
     try {
-      const res = await fetch(`${API_BASE_URL}/api/news?page=${page}&limit=10`, {
+      const res = await fetch(`${API_BASE_URL}/api/v1/news?page=${page}&limit=10`, {
         headers: token ? { 'Authorization': `Bearer ${token}` } : {}
       });
       if (res.ok) {
@@ -75,7 +75,7 @@ export default function NewsManager() {
     setActionLoading(true);
     const toastId = toast.loading(`Deleting news item "${deleteConfirmItem.title}"...`);
     try {
-      const res = await fetch(`${API_BASE_URL}/api/news/${deleteConfirmItem.id}`, {
+      const res = await fetch(`${API_BASE_URL}/api/v1/news/${deleteConfirmItem.id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });

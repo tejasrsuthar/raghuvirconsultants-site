@@ -3,7 +3,7 @@ from typing import List, Optional
 from pydantic import BaseModel
 from contexts.client_support.application.use_cases import SupportUseCases
 from contexts.client_support.interfaces.dependencies import get_support_use_cases
-from contexts.identity.interfaces.dependencies import get_current_investor, require_permission
+from contexts.identity.interfaces.dependencies import get_current_user, require_permission
 from contexts.identity.domain.entities import Investor
 
 router = APIRouter(prefix="/support", tags=["Support"])
@@ -36,7 +36,7 @@ class TicketResponse(BaseModel):
 @router.post("/", response_model=TicketResponse)
 def create_ticket(
     request: CreateTicketRequest,
-    investor: Investor = Depends(get_current_investor),
+    investor: Investor = Depends(get_current_user),
     use_cases: SupportUseCases = Depends(get_support_use_cases)
 ):
     ticket = use_cases.create_ticket(
@@ -49,7 +49,7 @@ def create_ticket(
 
 @router.get("/", response_model=List[TicketResponse])
 def list_my_tickets(
-    investor: Investor = Depends(get_current_investor),
+    investor: Investor = Depends(get_current_user),
     use_cases: SupportUseCases = Depends(get_support_use_cases)
 ):
     tickets = use_cases.get_investor_tickets(investor_id=investor.id)
@@ -58,7 +58,7 @@ def list_my_tickets(
 @router.get("/{ticket_id}", response_model=TicketResponse)
 def get_ticket(
     ticket_id: str,
-    investor: Investor = Depends(get_current_investor),
+    investor: Investor = Depends(get_current_user),
     use_cases: SupportUseCases = Depends(get_support_use_cases)
 ):
     ticket = use_cases.get_ticket(ticket_id)
@@ -70,7 +70,7 @@ def get_ticket(
 def add_message(
     ticket_id: str,
     request: AddMessageRequest,
-    investor: Investor = Depends(get_current_investor),
+    investor: Investor = Depends(get_current_user),
     use_cases: SupportUseCases = Depends(get_support_use_cases)
 ):
     try:
@@ -88,7 +88,7 @@ def add_message(
 @router.get("/admin/all", response_model=List[TicketResponse])
 def list_all_tickets_admin(
     status: Optional[str] = None,
-    admin: Investor = Depends(require_permission("manage_support")),
+    admin: Investor = Depends(require_permission("users:read")),
     use_cases: SupportUseCases = Depends(get_support_use_cases)
 ):
     tickets = use_cases.get_all_tickets(status=status)
@@ -97,7 +97,7 @@ def list_all_tickets_admin(
 @router.post("/admin/{ticket_id}/close", response_model=TicketResponse)
 def close_ticket(
     ticket_id: str,
-    admin: Investor = Depends(require_permission("manage_support")),
+    admin: Investor = Depends(require_permission("users:write")),
     use_cases: SupportUseCases = Depends(get_support_use_cases)
 ):
     try:

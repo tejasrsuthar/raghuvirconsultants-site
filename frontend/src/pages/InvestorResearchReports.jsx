@@ -18,7 +18,7 @@ export default function InvestorResearchReports() {
 
   useEffect(() => {
     if (!token) {
-      navigate('/login');
+      navigate('/portal/login');
       return;
     }
     fetchReports();

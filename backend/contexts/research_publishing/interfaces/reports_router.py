@@ -4,7 +4,7 @@ from typing import List, Optional
 from pydantic import BaseModel
 from contexts.research_publishing.application.use_cases import ResearchPublishingUseCases
 from contexts.research_publishing.interfaces.dependencies import get_research_use_cases
-from contexts.identity.interfaces.dependencies import get_current_investor, require_permission
+from contexts.identity.interfaces.dependencies import get_current_user, require_permission
 from contexts.identity.domain.entities import Investor
 
 router = APIRouter(prefix="/reports", tags=["Research Publishing"])
@@ -26,7 +26,7 @@ async def upload_draft_report(
     plan_tier: str = Form("reports_yearly"),
     parent_report_id: str = Form(None),
     file: UploadFile = File(...),
-    admin: Investor = Depends(require_permission("publish_report")),
+    admin: Investor = Depends(require_permission("reports:write")),
     use_cases: ResearchPublishingUseCases = Depends(get_research_use_cases)
 ):
     try:
@@ -55,7 +55,7 @@ async def upload_draft_report(
 @router.post("/admin/{report_id}/publish", response_model=ReportResponse)
 def publish_report(
     report_id: str,
-    admin: Investor = Depends(require_permission("publish_report")),
+    admin: Investor = Depends(require_permission("reports:write")),
     use_cases: ResearchPublishingUseCases = Depends(get_research_use_cases)
 ):
     try:
@@ -77,7 +77,7 @@ def publish_report(
 def admin_list_reports(
     skip: int = 0,
     limit: int = 100,
-    admin: Investor = Depends(require_permission("publish_report")),
+    admin: Investor = Depends(require_permission("reports:read")),
     use_cases: ResearchPublishingUseCases = Depends(get_research_use_cases)
 ):
     reports = use_cases.get_all_reports(skip=skip, limit=limit)
@@ -98,7 +98,7 @@ def admin_list_reports(
 def list_published_reports(
     skip: int = 0,
     limit: int = 100,
-    investor: Investor = Depends(get_current_investor),
+    investor: Investor = Depends(get_current_user),
     use_cases: ResearchPublishingUseCases = Depends(get_research_use_cases)
 ):
     reports = use_cases.get_published_reports(skip=skip, limit=limit)
@@ -118,7 +118,7 @@ def list_published_reports(
 @router.get("/{report_id}/download")
 def download_report(
     report_id: str,
-    investor: Investor = Depends(get_current_investor),
+    investor: Investor = Depends(get_current_user),
     use_cases: ResearchPublishingUseCases = Depends(get_research_use_cases)
 ):
     try:

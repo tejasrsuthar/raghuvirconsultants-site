@@ -23,7 +23,7 @@ export default function FloatingNav() {
             <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
           </svg>
         </button>
-        <Link to="/login" className="btn-primary hidden md:inline-flex">
+        <Link to="/portal/login" className="btn-primary hidden md:inline-flex">
           Sign In
         </Link>
       </div>

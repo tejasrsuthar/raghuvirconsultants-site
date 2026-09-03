@@ -18,7 +18,7 @@ export default function InvestorModelPortfolio() {
 
   useEffect(() => {
     if (!token) {
-      navigate('/login');
+      navigate('/portal/login');
       return;
     }
     fetchPortfolio();
@@ -80,7 +80,7 @@ export default function InvestorModelPortfolio() {
               <p className="text-gray-400 font-medium max-w-md text-center mb-8">
                 You need the {portfolio.plan_tier_required.split('_')[0].toUpperCase()} plan to view live allocations, target prices, and rationale.
               </p>
-              <Link to="/investor/billing" className="bg-white hover:bg-gray-200 text-black px-8 py-4 rounded-full font-bold text-sm tracking-widest uppercase transition-colors">
+              <Link to="/portal/billing" className="bg-white hover:bg-gray-200 text-black px-8 py-4 rounded-full font-bold text-sm tracking-widest uppercase transition-colors">
                 Upgrade Subscription
               </Link>
             </div>

@@ -25,7 +25,7 @@ export default function InvestorSupport() {
 
   useEffect(() => {
     if (!token) {
-      navigate('/login');
+      navigate('/portal/login');
       return;
     }
     fetchTickets();

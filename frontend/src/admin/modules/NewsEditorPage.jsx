@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { API_BASE_URL } from '../config/apiConfig';
 import AdminBreadcrumb from '../components/AdminBreadcrumb';
+import { Newspaper, Save, CheckCircle2 } from 'lucide-react';
 
 export default function NewsEditorPage({ initialData, onBack, onSaveSuccess }) {
   const [editingId] = useState(initialData?.id || null);
@@ -20,7 +21,7 @@ export default function NewsEditorPage({ initialData, onBack, onSaveSuccess }) {
     setError('');
     setSuccess(false);
 
-    const url = editingId ? `${API_BASE_URL}/api/news/${editingId}` : `${API_BASE_URL}/api/news`;
+    const url = editingId ? `${API_BASE_URL}/api/v1/news/${editingId}` : `${API_BASE_URL}/api/v1/news`;
     const method = editingId ? 'PUT' : 'POST';
 
     setLoading(true);

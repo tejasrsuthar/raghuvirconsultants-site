@@ -26,7 +26,7 @@ def get_current_user(
     if email is None:
         raise credentials_exception
         
-    user = use_cases.repository.find_by_email(email)
+    user = use_cases.repository.get_by_email(email)
     if user is None:
         raise credentials_exception
         

@@ -4,6 +4,7 @@ import platform
 from datetime import datetime
 from fastapi import APIRouter
 from app.infrastructure.db import db
+from bootstrap.settings import settings
 
 router = APIRouter(prefix="/system", tags=["System Telemetry"])
 START_TIME = time.time()
@@ -50,7 +51,7 @@ def get_system_status():
 
     return {
         "api_status": "online",
-        "api_version": "2.12.29",
+        "api_version": settings.VERSION,
         "environment": "production",
         "uptime_seconds": uptime_seconds,
         "database": {

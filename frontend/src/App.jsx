@@ -55,7 +55,7 @@ export default function App() {
       />
       <div className="flex flex-col min-h-screen">
         <Routes>
-          <Route path="/admin/*" element={null} />
+          <Route path="/portal/admin/*" element={null} />
           <Route path="*" element={<Header />} />
         </Routes>
         <main className="flex-grow">
@@ -71,26 +71,26 @@ export default function App() {
             <Route path="/news" element={<NewsAnnouncements />} />
 
             {/* Auth */}
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/portal/login" element={<Login />} />
+            <Route path="/portal/signup" element={<Signup />} />
+            <Route path="/portal/forgot-password" element={<ForgotPassword />} />
+            <Route path="/portal/reset-password" element={<ResetPassword />} />
 
             {/* Investor Portal */}
-            <Route path="/investor" element={<ProtectedRoute><InvestorDashboard /></ProtectedRoute>} />
-            <Route path="/investor/services/reports" element={<ProtectedRoute><InvestorResearchReports /></ProtectedRoute>} />
-            <Route path="/investor/services/portfolio" element={<ProtectedRoute><InvestorModelPortfolio /></ProtectedRoute>} />
-            <Route path="/investor/reports" element={<ProtectedRoute><InvestorResearchReports /></ProtectedRoute>} />
-            <Route path="/investor/portfolio" element={<ProtectedRoute><InvestorModelPortfolio /></ProtectedRoute>} />
-            <Route path="/investor/billing" element={<ProtectedRoute><SubscriptionPage /></ProtectedRoute>} />
-            <Route path="/investor/support" element={<ProtectedRoute><InvestorSupport /></ProtectedRoute>} />
-            <Route path="/investor/settings" element={<ProtectedRoute><InvestorSettings /></ProtectedRoute>} />
+            <Route path="/portal" element={<ProtectedRoute><InvestorDashboard /></ProtectedRoute>} />
+            <Route path="/portal/services/reports" element={<ProtectedRoute><InvestorResearchReports /></ProtectedRoute>} />
+            <Route path="/portal/services/portfolio" element={<ProtectedRoute><InvestorModelPortfolio /></ProtectedRoute>} />
+            <Route path="/portal/reports" element={<ProtectedRoute><InvestorResearchReports /></ProtectedRoute>} />
+            <Route path="/portal/portfolio" element={<ProtectedRoute><InvestorModelPortfolio /></ProtectedRoute>} />
+            <Route path="/portal/billing" element={<ProtectedRoute><SubscriptionPage /></ProtectedRoute>} />
+            <Route path="/portal/support" element={<ProtectedRoute><InvestorSupport /></ProtectedRoute>} />
+            <Route path="/portal/settings" element={<ProtectedRoute><InvestorSettings /></ProtectedRoute>} />
 
             {/* Admin Portal */}
             <Route 
-              path="/admin/*" 
+              path="/portal/admin/*" 
               element={
-                <ProtectedRoute allowedRoles={['SUPER_ADMIN', 'ADMIN']}>
+                <ProtectedRoute allowedRoles={['super_admin', 'admin']}>
                   <React.Suspense fallback={<div className="flex justify-center items-center h-screen">Loading Admin...</div>}>
                     <AdminApp />
                   </React.Suspense>
@@ -103,7 +103,7 @@ export default function App() {
           </Routes>
         </main>
         <Routes>
-          <Route path="/admin/*" element={null} />
+          <Route path="/portal/admin/*" element={null} />
           <Route path="*" element={<Footer />} />
         </Routes>
       </div>

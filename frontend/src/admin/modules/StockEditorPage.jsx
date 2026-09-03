@@ -26,7 +26,7 @@ export default function StockEditorPage({ initialData, onBack, onSaveSuccess }) 
     setError('');
     setSuccess(false);
 
-    const url = editingId ? `${API_BASE_URL}/api/portfolio/${editingId}` : `${API_BASE_URL}/api/portfolio`;
+    const url = editingId ? `${API_BASE_URL}/api/v1/portfolio/${editingId}` : `${API_BASE_URL}/api/v1/portfolio`;
     const method = editingId ? 'PUT' : 'POST';
 
     setLoading(true);

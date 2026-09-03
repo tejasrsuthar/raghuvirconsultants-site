@@ -21,7 +21,7 @@ export default function NotificationEditorPage({ initialData, onBack, onSaveSucc
     setError('');
     setSuccess(false);
 
-    const url = editingId ? `${API_BASE_URL}/api/notifications/${editingId}` : `${API_BASE_URL}/api/notifications`;
+    const url = editingId ? `${API_BASE_URL}/api/v1/notifications/${editingId}` : `${API_BASE_URL}/api/v1/notifications`;
     const method = editingId ? 'PUT' : 'POST';
 
     setLoading(true);

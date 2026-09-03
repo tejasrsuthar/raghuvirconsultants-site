@@ -1,7 +1,6 @@
 from datetime import datetime, timedelta
 from typing import Optional
 from jose import jwt
-from passlib.context import CryptContext
 from bootstrap.settings import settings
 
 SECRET_KEY = settings.JWT_SECRET_KEY

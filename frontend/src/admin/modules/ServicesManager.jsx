@@ -43,7 +43,7 @@ export default function ServicesManager() {
   const fetchItems = async (page = 1) => {
     setLoading(true);
     try {
-      const res = await fetch(`${API_BASE_URL}/api/services?page=${page}&limit=10`, {
+      const res = await fetch(`${API_BASE_URL}/api/v1/services?page=${page}&limit=10`, {
         headers: token ? { 'Authorization': `Bearer ${token}` } : {}
       });
       if (res.ok) {
@@ -75,7 +75,7 @@ export default function ServicesManager() {
     setActionLoading(true);
     const toastId = toast.loading(`Deleting service "${deleteConfirmItem.title}"...`);
     try {
-      const res = await fetch(`${API_BASE_URL}/api/services/${deleteConfirmItem.id}`, {
+      const res = await fetch(`${API_BASE_URL}/api/v1/services/${deleteConfirmItem.id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });

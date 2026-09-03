@@ -53,7 +53,7 @@ export default function AdminAppLayout() {
 
   useEffect(() => {
     if (!token) {
-      navigate('/login');
+      navigate('/portal/login');
       return;
     }
     const user = localStorage.getItem('username');
@@ -75,10 +75,10 @@ export default function AdminAppLayout() {
     const headers = { 'Authorization': `Bearer ${token}` };
     try {
       const [invRes, repRes, stockRes, blogRes] = await Promise.all([
-        fetch(`${API_BASE_URL}/api/admin/investors?page=1&limit=1`, { headers }),
-        fetch(`${API_BASE_URL}/api/reports?page=1&limit=1`, { headers }),
-        fetch(`${API_BASE_URL}/api/portfolio?page=1&limit=1`, { headers }),
-        fetch(`${API_BASE_URL}/api/blogs?page=1&limit=1`),
+        fetch(`${API_BASE_URL}/api/v1/admin/investors?page=1&limit=1`, { headers }),
+        fetch(`${API_BASE_URL}/api/v1/reports?page=1&limit=1`, { headers }),
+        fetch(`${API_BASE_URL}/api/v1/portfolio?page=1&limit=1`, { headers }),
+        fetch(`${API_BASE_URL}/api/v1/blogs?page=1&limit=1`),
       ]);
       const invData = invRes.ok ? await invRes.json() : {};
       const repData = repRes.ok ? await repRes.json() : {};
@@ -98,7 +98,7 @@ export default function AdminAppLayout() {
   const handleLogout = () => {
     localStorage.clear();
     toast.success('Signed out of Admin Console');
-    navigate('/login');
+    navigate('/portal/login');
   };
 
   return (

@@ -12,7 +12,7 @@ export default function SystemStatusPage({ onBack }) {
   const fetchStatus = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${API_BASE_URL}/api/system/status`);
+      const res = await fetch(`${API_BASE_URL}/api/v1/system/status`);
       if (res.ok) {
         const data = await res.json();
         setStatusData(data);

@@ -3,7 +3,7 @@ from typing import List, Optional
 from pydantic import BaseModel
 from contexts.model_portfolio.application.use_cases import ModelPortfolioUseCases
 from contexts.model_portfolio.interfaces.dependencies import get_portfolio_use_cases
-from contexts.identity.interfaces.dependencies import get_current_investor, require_permission
+from contexts.identity.interfaces.dependencies import get_current_user, require_permission
 from contexts.identity.domain.entities import Investor
 
 router = APIRouter(prefix="/portfolio", tags=["Model Portfolio"])
@@ -30,7 +30,7 @@ class PortfolioResponse(BaseModel):
 
 @router.get("/", response_model=PortfolioResponse)
 def get_model_portfolio(
-    investor: Investor = Depends(get_current_investor),
+    investor: Investor = Depends(get_current_user),
     use_cases: ModelPortfolioUseCases = Depends(get_portfolio_use_cases)
 ):
     portfolio = use_cases.get_portfolio()
@@ -49,7 +49,7 @@ def get_model_portfolio(
 
 @router.get("/admin", response_model=PortfolioResponse)
 def get_admin_model_portfolio(
-    admin: Investor = Depends(require_permission("rebalance_portfolio")),
+    admin: Investor = Depends(require_permission("portfolio:write")),
     use_cases: ModelPortfolioUseCases = Depends(get_portfolio_use_cases)
 ):
     portfolio = use_cases.get_portfolio()
@@ -65,7 +65,7 @@ def get_admin_model_portfolio(
 @router.post("/admin/rebalance", response_model=PortfolioResponse)
 def rebalance_portfolio(
     request: RebalanceRequest,
-    admin: Investor = Depends(require_permission("rebalance_portfolio")),
+    admin: Investor = Depends(require_permission("portfolio:write")),
     use_cases: ModelPortfolioUseCases = Depends(get_portfolio_use_cases)
 ):
     try:

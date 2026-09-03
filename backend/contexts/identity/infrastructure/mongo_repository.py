@@ -45,7 +45,29 @@ class MongoInvestorRepository(InvestorRepository):
         cursor = self.collection.find().skip(skip).limit(limit)
         return [self._to_entity(data) for data in cursor]
 
+    def get_all_paginated(self, page: int = 1, limit: int = 10) -> tuple[List[Investor], int]:
+        total = self.collection.count_documents({})
+        skip = (page - 1) * limit
+        cursor = self.collection.find().sort("created_at", -1).skip(skip).limit(limit)
+        return [self._to_entity(doc) for doc in cursor], total
+
+    def delete(self, investor_id: str) -> bool:
+        res = self.collection.delete_one({"id": investor_id})
+        return res.deleted_count > 0
+
     def _to_entity(self, data: dict) -> Investor:
         # Convert string ID back to InvestorId
         data["id"] = InvestorId(value=data["id"])
+        
+        # Always inject the latest role permissions from code (roles.py) 
+        # instead of relying on the stale nested object stored in MongoDB
+        if "role" in data:
+            role_name = data["role"].get("name") if isinstance(data["role"], dict) else str(data["role"])
+            try:
+                from contexts.identity.domain.roles import get_role_by_name
+                latest_role = get_role_by_name(role_name)
+                data["role"] = latest_role.model_dump()
+            except Exception:
+                pass
+
         return Investor(**data)

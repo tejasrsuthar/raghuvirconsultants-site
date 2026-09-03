@@ -33,7 +33,7 @@ export default function InvestorSettings() {
 
   useEffect(() => {
     if (!token) {
-      navigate('/login');
+      navigate('/portal/login');
     }
   }, [token]);
 
@@ -61,7 +61,7 @@ export default function InvestorSettings() {
       const payload = { email, phone, address };
       if (password) payload.password = password;
 
-      const res = await fetch(`${API_BASE_URL}/api/auth/profile`, {
+      const res = await fetch(`${API_BASE_URL}/api/v1/auth/profile`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -253,6 +253,8 @@ export default function InvestorSettings() {
                 </div>
               </div>
             </div>
+          )}
+
           {activeTab === 'privacy' && (
             <div className="max-w-lg">
               <h2 className="text-xl font-bold text-forest mb-1">Privacy & Data Control</h2>

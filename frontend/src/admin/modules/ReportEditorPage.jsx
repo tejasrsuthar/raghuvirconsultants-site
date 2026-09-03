@@ -48,7 +48,7 @@ export default function ReportEditorPage({ initialData, onBack, onSaveSuccess })
       if (editingId) {
         // Just calling publish for now if editing. 
         // In full implementation, we might update metadata.
-        const res = await fetch(`${API_BASE_URL}/api/reports/admin/${editingId}/publish`, {
+        const res = await fetch(`${API_BASE_URL}/api/v1/reports/admin/${editingId}/publish`, {
           method: 'POST',
           headers: { 'Authorization': `Bearer ${token}` }
         });
@@ -63,7 +63,7 @@ export default function ReportEditorPage({ initialData, onBack, onSaveSuccess })
         if (formData.parent_report_id) data.append('parent_report_id', formData.parent_report_id);
         data.append('file', file);
 
-        const res = await fetch(`${API_BASE_URL}/api/reports/admin/upload`, {
+        const res = await fetch(`${API_BASE_URL}/api/v1/reports/admin/upload`, {
           method: 'POST',
           headers: { 'Authorization': `Bearer ${token}` },
           body: data
@@ -75,7 +75,7 @@ export default function ReportEditorPage({ initialData, onBack, onSaveSuccess })
         
         // Auto publish it
         const result = await res.json();
-        await fetch(`${API_BASE_URL}/api/reports/admin/${result.id}/publish`, {
+        await fetch(`${API_BASE_URL}/api/v1/reports/admin/${result.id}/publish`, {
           method: 'POST',
           headers: { 'Authorization': `Bearer ${token}` }
         });

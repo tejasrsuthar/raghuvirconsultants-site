@@ -4,7 +4,7 @@ from pydantic import BaseModel
 from contexts.identity.application.use_cases import IdentityUseCases
 from bootstrap.di import get_identity_use_cases
 from contexts.identity.domain.entities import Investor, UserStatus
-from contexts.identity.interfaces.dependencies import require_permission, get_current_investor
+from contexts.identity.interfaces.dependencies import require_permission, get_current_user
 from contexts.identity.domain.roles import get_role_by_name
 
 router = APIRouter(prefix="/users", tags=["Identity & Access (Admin)"])
@@ -42,13 +42,12 @@ def list_users(
     ]
 
 @router.get("/me")
-def get_me(investor: Investor = Depends(get_current_investor)):
+def get_me(investor: Investor = Depends(get_current_user)):
     return {
         "id": investor.id,
         "email": investor.email,
-        "first_name": investor.first_name,
-        "last_name": investor.last_name,
-        "role": investor.role.value,
+        "full_name": investor.full_name,
+        "role": investor.role.name,
         "is_kyc_verified": investor.is_kyc_verified,
         "consent_version": investor.consent_version,
         "two_factor_enabled": investor.two_factor_enabled
@@ -56,16 +55,15 @@ def get_me(investor: Investor = Depends(get_current_investor)):
 
 @router.get("/export-data")
 def export_investor_data(
-    investor: Investor = Depends(get_current_investor),
+    investor: Investor = Depends(get_current_user),
     use_cases: IdentityUseCases = Depends(get_identity_use_cases)
 ):
     # Dumps JSON data of user's profile
     return {
         "id": investor.id,
         "email": investor.email,
-        "first_name": investor.first_name,
-        "last_name": investor.last_name,
-        "role": investor.role.value,
+        "full_name": investor.full_name,
+        "role": investor.role.name,
         "status": investor.status.value,
         "is_kyc_verified": investor.is_kyc_verified,
         "consent_version": investor.consent_version,
@@ -75,14 +73,13 @@ def export_investor_data(
 
 @router.delete("/delete-account")
 def delete_investor_account(
-    investor: Investor = Depends(get_current_investor),
+    investor: Investor = Depends(get_current_user),
     use_cases: IdentityUseCases = Depends(get_identity_use_cases)
 ):
     # Anonymize user data
-    investor.first_name = "Deleted"
-    investor.last_name = "User"
-    investor.email = f"deleted_{investor.id}@example.com"
-    investor.status = UserStatus.DELETED
+    investor.full_name = "Deleted User"
+    investor.email = f"deleted_{investor.id.value}@example.com"
+    investor.status = UserStatus.INACTIVE
     use_cases.repository.save(investor)
     return {"message": "Account successfully anonymized and deleted"}
 

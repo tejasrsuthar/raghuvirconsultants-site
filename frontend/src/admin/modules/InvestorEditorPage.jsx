@@ -81,8 +81,8 @@ export default function InvestorEditorPage({ investor, onBack, onSaveSuccess, on
 
     try {
       const url = isNew 
-        ? `${API_BASE_URL}/api/admin/investors` 
-        : `${API_BASE_URL}/api/admin/investors/${formData.id}/profile`;
+        ? `${API_BASE_URL}/api/v1/admin/investors` 
+        : `${API_BASE_URL}/api/v1/admin/investors/${formData.id}/profile`;
 
       const method = isNew ? 'POST' : 'PUT';
 

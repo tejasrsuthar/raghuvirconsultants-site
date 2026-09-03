@@ -19,7 +19,7 @@ export default function PlatformSettingsManager() {
   const fetchSettings = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${API_BASE_URL}/api/settings`);
+      const res = await fetch(`${API_BASE_URL}/api/v1/settings`);
       if (res.ok) {
         const data = await res.json();
         setSettings({
@@ -40,7 +40,7 @@ export default function PlatformSettingsManager() {
     setSaved(false);
 
     try {
-      const res = await fetch(`${API_BASE_URL}/api/settings`, {
+      const res = await fetch(`${API_BASE_URL}/api/v1/settings`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

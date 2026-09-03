@@ -45,7 +45,7 @@ export default function InvestorFacebookProfilePage({
     setSavingNote(true);
     const toastId = toast.loading('Saving admin note...');
     try {
-      const res = await fetch(`${API_BASE_URL}/api/admin/investors/${investor.id}/profile`, {
+      const res = await fetch(`${API_BASE_URL}/api/v1/admin/investors/${investor.id}/profile`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -80,7 +80,7 @@ export default function InvestorFacebookProfilePage({
 
     const toastId = toast.loading(`Updating ${serviceType === 'reports' ? 'Research Reports' : 'Model Portfolio'} access...`);
     try {
-      const res = await fetch(`${API_BASE_URL}/api/admin/investors/${investor.id}/subscriptions`, {
+      const res = await fetch(`${API_BASE_URL}/api/v1/admin/investors/${investor.id}/subscriptions`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
